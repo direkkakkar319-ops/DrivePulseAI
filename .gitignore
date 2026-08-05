@@ -1,0 +1,46 @@
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python & Pycache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebook Runs & Checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# Data & Model Artifacts
+data/raw/*
+!data/raw/README.md
+ml/artifacts/*
+!ml/artifacts/.gitkeep
+mlruns/
+
+# Node & Frontend
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Environment & Config
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

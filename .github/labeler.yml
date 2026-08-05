@@ -1,0 +1,28 @@
+backend:
+  - changed-files:
+      - any-glob-to-any-file: 'backend/**/*'
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file: 'frontend/**/*'
+
+ml:
+  - changed-files:
+      - any-glob-to-any-file: 'ml/**/*'
+
+simulator:
+  - changed-files:
+      - any-glob-to-any-file: 'simulator/**/*'
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file: 'docs/**/*'
+      - any-glob-to-any-file: 'README.md'
+
+data:
+  - changed-files:
+      - any-glob-to-any-file: 'data/**/*'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**/*'
