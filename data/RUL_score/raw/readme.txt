@@ -7,7 +7,7 @@ Fault Modes: ONE (HPC Degradation)
 Data Set: FD002
 Train trjectories: 260
 Test trajectories: 259
-Conditions: SIX 
+Conditions: SIX
 Fault Modes: ONE (HPC Degradation)
 
 Data Set: FD003
@@ -19,7 +19,7 @@ Fault Modes: TWO (HPC Degradation, Fan Degradation)
 Data Set: FD004
 Train trjectories: 248
 Test trajectories: 249
-Conditions: SIX 
+Conditions: SIX
 Fault Modes: TWO (HPC Degradation, Fan Degradation)
 
 
