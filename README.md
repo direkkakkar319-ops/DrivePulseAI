@@ -166,7 +166,7 @@ The UI must describe model output as risk or inspection guidance, never as a cer
 - Optional OBD-II work requires a separate safety/privacy review and owner consent.
 - Model limitations, imbalance, dataset mismatch, and known failure modes must be documented openly.
 
-## Developer
+## Developers
 
 **Rudraksh Gupta**
 **Direk Kakkar** 
