@@ -35,30 +35,6 @@ The project is an engineering and machine-learning prototype—not a certified d
 | Alert workflow | New, acknowledged, resolved, and dismissed states with an audit trail |
 | User experience | Fleet overview, vehicle cockpit, alert details, technician report, model monitor, and scenario lab |
 
-## Architecture
-
-```mermaid
-flowchart LR
-    S[Telemetry simulator] -->|simulated events| A[FastAPI ingestion]
-    A --> V[Schema and quality validation]
-    V --> D[(PostgreSQL)]
-    V --> F[Feature service]
-    F --> R[Threshold rules]
-    F --> M[ML inference]
-    R --> L[Alert and health service]
-    M -->|score + evidence + version| L
-    L --> D
-    L --> W[REST and WebSocket APIs]
-    W --> U[Next.js dashboard]
-    T[Offline training pipeline] --> X[Versioned model artifacts]
-    X --> M
-    T --> E[MLflow experiments]
-```
-
-The online path is separated from offline model training so ingestion, feature generation, inference, alerting, and presentation can be tested independently. Backend services access deployed models only through `ml/src/inference/predictor.py`.
-
-See [docs/architecture.md](docs/architecture.md) for the evolving architecture documentation.
-
 ## Technology stack
 
 - **Backend:** Python, FastAPI, Pydantic, SQLAlchemy, Alembic, PostgreSQL, WebSockets
@@ -70,9 +46,9 @@ See [docs/architecture.md](docs/architecture.md) for the evolving architecture d
 
 Development combines public predictive-maintenance benchmarks with an automotive telemetry simulator:
 
-- **UCI AI4I 2020:** labelled predictive-maintenance experiments.
-- **NASA C-MAPSS:** optional degradation/RUL experiments.
-- **Synthetic automotive telemetry:** normal, degraded, and fault scenarios for anomaly evaluation and the live product demo.
+- **[UCI AI4I 2020](https://archive.ics.uci.edu/dataset/601/ai4i):** labelled predictive-maintenance experiments.
+- **[NASA C-MAPSS](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data):** optional degradation/RUL experiments.
+- **Synthetic automotive telemetry:** internally generated normal, degraded, and fault scenarios for anomaly evaluation and the live product demo.
 
 AI4I and C-MAPSS are engineering benchmarks, not real automotive diagnostic datasets. Results trained on them will be presented as demonstrations of the modelling pipeline rather than claims of real-world vehicle diagnostic accuracy. Every generated telemetry event must be marked with `"source": "simulated"`.
 
@@ -112,16 +88,14 @@ DrivePulseAI/
 └── .env.example             Environment-variable template (planned)
 ```
 
-## Getting started
-
-### Prerequisites
+## Prerequisites
 
 - Python 3.11 or newer (Python 3.12 is the target baseline)
 - Node.js 20 or newer
 - PostgreSQL 15 or newer
 - Docker and Docker Compose for the integrated stack
 
-### Current development setup
+## Current development setup
 
 The repository is not yet runnable end to end because the component configuration and entry points are still being implemented. For work on the existing scaffold, create isolated environments and install dependencies as follows:
 
@@ -183,17 +157,6 @@ The UI must describe model output as risk or inspection guidance, never as a cer
 - Rebuild features, train, and evaluate from a clean environment with one documented command.
 - Test validation, feature calculations, health scoring, alert behaviour, API/database integration, WebSockets, split integrity, schema parity, and critical frontend flows.
 
-## Roadmap
-
-| Phase | Weeks | Deliverable |
-| --- | ---: | --- |
-| Discovery and data | 1–3 | Approved scope, dataset decision, data dictionary, EDA, and quality rules |
-| Telemetry foundation | 4–6 | Reproducible simulator, validated ingestion, persistence, history, and WebSockets |
-| MVP | 7–8 | Fleet/cockpit dashboard, rule alerts, health score, and end-to-end demo |
-| Explainable ML | 9–11 | Baselines, model comparison, calibration, error analysis, explanations, and model card |
-| Product workflows | 12–13 | Alert lifecycle, technician/fleet views, reports, MLflow, and observability |
-| Release | 14–16 | Docker, CI, testing, accessibility, deployment, documentation, demo, and final presentation |
-
 ## Safety, privacy, and limitations
 
 - DrivePulse AI is decision-support software for education and demonstration.
@@ -203,14 +166,7 @@ The UI must describe model output as risk or inspection guidance, never as a cer
 - Optional OBD-II work requires a separate safety/privacy review and owner consent.
 - Model limitations, imbalance, dataset mismatch, and known failure modes must be documented openly.
 
-## Contributing
+## Developer
 
-This project is currently developed as an OJT portfolio project. Before contributing, open an issue describing the proposed change and preserve the fixed technology choices, evidence-first prediction contract, and simulated-data labelling rules. Python code should be type hinted and pass Ruff/Pytest; frontend changes should keep TypeScript contracts synchronized with backend Pydantic schemas.
-
-## Author
-
-**Rudraksh Gupta** — B.Tech, Artificial Intelligence and Machine Learning
-
-## Licence
-
-A licence has not yet been selected. Until a valid licence file is added, the repository should not be treated as granting permission to copy, modify, or redistribute the project.
+**Rudraksh Gupta**
+**Direk Kakkar** 
