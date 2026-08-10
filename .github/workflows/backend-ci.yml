@@ -1,4 +1,4 @@
-name: Backend CI
+name: backend
 
 on:
   push:
@@ -17,9 +17,9 @@ jobs:
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: 'backend/requirements.txt'
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: "backend/requirements.txt"
 
       - name: Install Dependencies
         run: |
