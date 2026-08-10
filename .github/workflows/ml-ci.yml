@@ -2,17 +2,9 @@ name: ML CI
 
 on:
   push:
-    paths:
-      - 'ml/**'
-      - '.github/workflows/ml-ci.yml'
+    branches: [main]
   pull_request:
-    paths:
-      - 'ml/**'
-      - '.github/workflows/ml-ci.yml'
   merge_group:
-    paths:
-      - 'ml/**'
-      - '.github/workflows/ml-ci.yml'
 
 jobs:
   test-and-lint:
