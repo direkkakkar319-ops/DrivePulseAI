@@ -1,1 +1,12 @@
-# Python dependencies for the ML package only (keeps it installable standalone)
+[project]
+name = "drivepulse-ml"
+version = "0.1.0"
+description = "ML training, inference, and explainability for DrivePulse AI"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88

@@ -169,4 +169,4 @@ The UI must describe model output as risk or inspection guidance, never as a cer
 ## Developers
 
 **Rudraksh Gupta**
-**Direk Kakkar** 
+**Direk Kakkar**
