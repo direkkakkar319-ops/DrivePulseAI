@@ -1,5 +1,3 @@
-# Automatically labels PRs based on modified files
-
 name: "Pull Request Labeler"
 on:
   pull_request:
