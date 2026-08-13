@@ -34,7 +34,7 @@ def load_ai4i(filepath: Union[str, Path]) -> pd.DataFrame:
     if "intake_air_temp_c" in df.columns:
         df["intake_air_temp_c"] = df["intake_air_temp_c"] - 273.15
 
-    # Scale engine_load_pct to 0-100 (assuming torque max is around 80 Nm in AI4I)
+    # Scale engine_load_pct to 0 to 100 (assuming torque max is around 80 Nm in AI4I)
     if "engine_load_pct" in df.columns:
         df["engine_load_pct"] = (
             df["engine_load_pct"] / df["engine_load_pct"].max()
