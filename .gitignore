@@ -46,4 +46,4 @@ frontend/build/
 Thumbs.db
 
 # Demo Documents
-documents/*
+demo-docs/*
