@@ -1,9 +1,9 @@
-import pandas as pd
 from pathlib import Path
-from typing import Union
+
+import pandas as pd
 
 
-def load_ai4i(filepath: Union[str, Path]) -> pd.DataFrame:
+def load_ai4i(filepath: str | Path) -> pd.DataFrame:
     """
     Load the AI4I Predictive Maintenance dataset and map to automotive fields.
 
@@ -49,7 +49,8 @@ def load_ai4i(filepath: Union[str, Path]) -> pd.DataFrame:
 
     return df
 
-def load_simulated(filepath: Union[str, Path]) -> pd.DataFrame:
+
+def load_simulated(filepath: str | Path) -> pd.DataFrame:
     """
     Load simulated telemetry data (CSV or JSONL).
 
@@ -60,16 +61,17 @@ def load_simulated(filepath: Union[str, Path]) -> pd.DataFrame:
         pd.DataFrame: Dataframe containing the simulated telemetry with unified column names.
     """
     filepath = Path(filepath)
-    
-    if filepath.suffix == '.jsonl':
+
+    if filepath.suffix == ".jsonl":
         df = pd.read_json(filepath, lines=True)
     else:
         df = pd.read_csv(filepath)
-        
+
     df["source"] = "simulated"
     return df
 
-def load_cmapss(filepath: Union[str, Path], subset: str = "FD001") -> pd.DataFrame:
+
+def load_cmapss(filepath: str | Path, subset: str = "FD001") -> pd.DataFrame:
     """
     Load the C-MAPSS dataset (turbofan engine degradation) and map to automotive fields.
     Adds a Remaining Useful Life (RUL) column for regression tasks.
@@ -108,7 +110,9 @@ def load_cmapss(filepath: Union[str, Path], subset: str = "FD001") -> pd.DataFra
         dfs.append(_load_single_file(filepath, subset))
 
     if not dfs:
-        raise FileNotFoundError(f"No C-MAPSS files found at {filepath} for subset {subset}")
+        raise FileNotFoundError(
+            f"No C-MAPSS files found at {filepath} for subset {subset}"
+        )
 
     df = pd.concat(dfs, ignore_index=True)
 
@@ -133,7 +137,7 @@ def load_cmapss(filepath: Union[str, Path], subset: str = "FD001") -> pd.DataFra
     df = df.rename(columns=rename_dict)
 
     df["source"] = "cmapss"
-    
+
     if "vehicle_id" in df.columns:
         df["vehicle_id"] = "CMAPSS-" + df["vehicle_id"].astype(str)
 
