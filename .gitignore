@@ -31,6 +31,8 @@ node_modules/
 frontend/.next/
 frontend/out/
 frontend/build/
+frontend/*.tsbuildinfo
+.vercel/
 
 # Environment & Config
 .env

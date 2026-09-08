@@ -8,7 +8,7 @@ The project is an engineering and machine-learning prototype—not a certified d
 
 ## Project status
 
-**Planning and initial scaffolding.** The repository currently defines the intended modules and CI workflows. Most application, training, simulator, and deployment files are placeholders and are being implemented in the build order described below. Setup and run commands will be finalized as each component becomes executable.
+**Planning and initial scaffolding.** The frontend runs locally as a styled dashboard shell with empty states; see [frontend setup](frontend/README.md). Most application, training, simulator, and deployment files are placeholders and are being implemented in the build order described below.
 
 ## Product goals
 
@@ -110,9 +110,10 @@ pip install -r requirements.txt
 
 cd frontend
 npm ci
+npm run dev
 ```
 
-Do not expect `docker compose up`, the API server, training commands, or the dashboard to work until their placeholder files are completed. This section will be replaced with verified one-command setup and run instructions during the telemetry/backend milestones.
+Open http://localhost:3000 for the frontend shell. It runs independently of the backend and does not yet display telemetry or predictions. See [frontend/README.md](frontend/README.md) for lint, type-check, and production build commands. Docker Compose, the API server, and training entry points remain under development.
 
 ## Intended API
 

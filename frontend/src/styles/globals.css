@@ -1,1 +1,22 @@
-/* Global styles, Tailwind base layer */
+/* Shared dark theme, accessible focus states, and Tailwind layers. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-silver antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent text-canvas;
+  }
+
+  a:focus-visible {
+    @apply rounded-sm outline outline-2 outline-offset-4 outline-accent;
+  }
+}
