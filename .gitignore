@@ -39,9 +39,6 @@ frontend/build/
 .env.test.local
 .env.production.local
 
-# Generated Diagrams (rebuild with: python scripts/render_diagrams.py)
-docs/diagrams/*.svg
-
 # IDE & OS
 .vscode/
 .idea/
