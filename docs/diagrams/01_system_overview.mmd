@@ -1,0 +1,60 @@
+graph TB
+    subgraph Sources["Data Sources"]
+        AI4I["AI4I CSV<br/>(failure labels)"]
+        CMAPSS["C-MAPSS TXT<br/>(RUL sequences)"]
+        SIM["Simulator<br/>(live telemetry)"]
+    end
+
+    subgraph ML["ml/ — ML Layer"]
+        LOAD["loaders.py"]
+        PREP["preprocessing.py"]
+        FEAT["feature_engineering.py"]
+        TRAIN["train_*.py"]
+        ART["artifacts/<br/>saved models"]
+        PRED["predictor.py"]
+        SHAP_E["shap_explainer.py"]
+        DEV_E["deviation_explainer.py"]
+        HEALTH["health_score.py"]
+    end
+
+    subgraph Backend["backend/ — FastAPI"]
+        WS_IN["WebSocket<br/>/ws/{vehicle_id}"]
+        REST_IN["POST<br/>/telemetry/ingest"]
+        INF_SVC["inference_service.py"]
+        ALERT_SVC["alert_service.py"]
+        RPT_SVC["report_service.py"]
+        DB["PostgreSQL"]
+        WS_OUT["WebSocket<br/>broadcast"]
+        REST_OUT["REST responses"]
+    end
+
+    subgraph Frontend["frontend/ — Next.js"]
+        WS_HOOK["useTelemetrySocket"]
+        API_LIB["api.ts"]
+        DASH["Dashboard<br/>Components"]
+    end
+
+    AI4I --> LOAD
+    CMAPSS --> LOAD
+    LOAD --> PREP --> FEAT --> TRAIN --> ART
+
+    SIM -->|WebSocket| WS_IN
+    SIM -->|HTTP POST| REST_IN
+
+    ART -->|load once| PRED
+    SHAP_E --> PRED
+    DEV_E --> PRED
+    HEALTH --> PRED
+
+    WS_IN --> INF_SVC
+    REST_IN --> INF_SVC
+    INF_SVC -->|calls| PRED
+    INF_SVC --> DB
+    INF_SVC --> ALERT_SVC --> DB
+    INF_SVC --> WS_OUT
+    INF_SVC --> REST_OUT
+
+    DB --> RPT_SVC --> REST_OUT
+
+    WS_OUT --> WS_HOOK --> DASH
+    REST_OUT --> API_LIB --> DASH

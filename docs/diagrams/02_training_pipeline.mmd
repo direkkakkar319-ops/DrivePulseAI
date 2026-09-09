@@ -1,0 +1,40 @@
+flowchart LR
+    subgraph Input
+        A["data/failure_classification/raw/<br/>predictive_maintenance.csv"]
+        B["data/RUL_score/raw/<br/>train_FD001.txt"]
+        C["data/anomly_detection/raw/<br/>simulator output"]
+    end
+
+    subgraph Loaders["ml/src/data/loaders.py"]
+        L1["load_ai4i()"]
+        L2["load_cmapss()"]
+        L3["load_simulated()"]
+    end
+
+    subgraph Transform["ml/src/data/"]
+        P["preprocessing.py<br/>clean → scale → split"]
+        F["feature_engineering.py<br/>rolling stats, interactions"]
+    end
+
+    subgraph Train["ml/src/training/"]
+        T1["train_anomaly.py"]
+        T2["train_failure.py"]
+        T3["train_rul.py"]
+        MLF["mlflow_utils.py<br/>log params + metrics"]
+    end
+
+    subgraph Output
+        ART1["ml/artifacts/<br/>anomaly_detector.joblib"]
+        ART2["ml/artifacts/<br/>failure_classifier.joblib"]
+        ART3["ml/artifacts/<br/>rul_regressor.joblib"]
+        MLDB["MLflow Tracking DB<br/>(PostgreSQL mlflow)"]
+    end
+
+    A --> L1 --> P
+    B --> L2 --> P
+    C --> L3 --> P
+    P --> F --> T1 & T2 & T3
+    T1 & T2 & T3 --> MLF --> MLDB
+    T1 --> ART1
+    T2 --> ART2
+    T3 --> ART3

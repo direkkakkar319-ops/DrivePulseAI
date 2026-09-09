@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant FE as Frontend
+    participant ROUTE as GET /reports/{vehicle_id}
+    participant RPT as report_service.py
+    participant DB as PostgreSQL
+    participant FE2 as MaintenanceReportView
+
+    FE->>ROUTE: request report for SIM-001
+    ROUTE->>RPT: generate_report("SIM-001")
+    RPT->>DB: SELECT last N predictions<br/>WHERE vehicle_id = "SIM-001"<br/>ORDER BY timestamp DESC
+    DB-->>RPT: prediction history + alerts
+    
+    Note over RPT: Aggregate:<br/>- avg health score trend<br/>- top recurring failure risks<br/>- sensors with worst contributions<br/>- unresolved alerts
+
+    RPT-->>ROUTE: MaintenanceReport
+    ROUTE-->>FE: JSON response
+    FE->>FE2: render report

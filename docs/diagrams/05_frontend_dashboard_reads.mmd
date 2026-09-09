@@ -1,0 +1,35 @@
+flowchart LR
+    subgraph Frontend
+        PAGE["Dashboard page load"]
+        API["api.ts<br/>fetchVehicles()<br/>fetchLatestPrediction()"]
+        HOOK["useTelemetrySocket<br/>for live stream"]
+        GAUGE["HealthScoreGauge"]
+        CHART["SensorLiveChart"]
+        RISK["FailureRiskCard"]
+        EXPLAIN["ExplainabilityPanel"]
+        ALERTS["AlertPanel"]
+    end
+
+    subgraph Backend_REST["Backend REST"]
+        V_ROUTE["GET /vehicles/"]
+        P_ROUTE["GET /predictions/{id}/latest"]
+        R_ROUTE["GET /reports/{id}"]
+        DB["PostgreSQL"]
+    end
+
+    subgraph Backend_WS["Backend WS"]
+        WS_STREAM["ws://.../ws/{vehicle_id}<br/>live broadcast"]
+    end
+
+    PAGE --> API
+    API --> V_ROUTE --> DB
+    API --> P_ROUTE --> DB
+
+    PAGE --> HOOK --> WS_STREAM
+
+    V_ROUTE -->|"Vehicle[]"| API
+    P_ROUTE -->|PredictionResponse| API
+    WS_STREAM -->|"PredictionResponse stream"| HOOK
+
+    API --> GAUGE & RISK & EXPLAIN & ALERTS
+    HOOK --> CHART & GAUGE

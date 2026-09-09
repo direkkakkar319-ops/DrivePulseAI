@@ -1,0 +1,32 @@
+flowchart TB
+    INPUT["telemetry_dict<br/>{speed, rpm, voltage, ...}"]
+    
+    subgraph predictor.py
+        LOAD["Lazy-load models<br/>(first call only)"]
+        
+        subgraph Parallel["All 3 models"]
+            AD["AnomalyDetector.predict()"]
+            FC["FailureClassifier.predict()"]
+            RUL["RULRegressor.predict()"]
+        end
+        
+        subgraph Explainers
+            DEV["deviation_explainer.explain()<br/>→ z-scores per sensor"]
+            SHAP_X["shap_explainer.explain()<br/>→ SHAP values per sensor"]
+        end
+        
+        MERGE["Merge explanations"]
+        HS["health_score.compute_health_score()<br/>→ weighted combination"]
+        BUILD["Build PredictionResult"]
+    end
+
+    OUTPUT["PredictionResult<br/>{anomaly_score, failure_prob,<br/>rul_estimate, health_score,<br/>explanation, contributions,<br/>confidence, source}"]
+
+    INPUT --> LOAD --> Parallel
+    AD --> DEV
+    FC --> SHAP_X
+    DEV & SHAP_X --> MERGE
+    Parallel --> HS
+    MERGE --> BUILD
+    HS --> BUILD
+    BUILD --> OUTPUT
