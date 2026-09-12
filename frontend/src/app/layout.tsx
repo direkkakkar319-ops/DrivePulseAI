@@ -1,8 +1,9 @@
-// Root layout — shared nav/shell across pages
+// Shared document metadata and styles for the product website.
+import "../styles/globals.css";
 export const metadata = {
-  title: "DrivePulse AI",
+  title: "DrivePulse AI — Know your car. Stay ahead.",
   description:
-    "Explainable vehicle health digital twin and predictive maintenance platform.",
+    "Meet DrivePulse AI: an app in development that turns vehicle signals into clear, explainable health and maintenance insights.",
 };
 
 export default function RootLayout({
