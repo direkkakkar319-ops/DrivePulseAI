@@ -1,4 +1,5 @@
 // Per-vehicle detail page
+
 import Link from "next/link";
 
 export default function VehicleDetailPage({
