@@ -1,0 +1,99 @@
+# Purpose: Run a Vercel build validation and deploy a preview environment on every
+# pull request. Posts the preview URL as a PR comment so reviewers can inspect the
+# live frontend before merging.
+#
+# Required GitHub Secrets:
+#   VERCEL_TOKEN      — API token from vercel.com/account/tokens
+#   VERCEL_ORG_ID     — orgId from .vercel/project.json (run `vercel link` locally)
+#   VERCEL_PROJECT_ID — projectId from .vercel/project.json
+
+name: vercel-preview
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/vercel-ci.yml"
+  # Also allow manual triggers for debugging
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  vercel-preview:
+    name: Build & Deploy Preview
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to post PR comments
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # Pull Vercel project settings (env vars, build config) so the build
+      # matches production exactly. --yes skips interactive prompts.
+      - name: Pull Vercel Environment Info
+        working-directory: ./frontend
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      # `vercel build` runs the Next.js build inside the Vercel build pipeline,
+      # catching any Vercel-specific config errors that plain `next build` won't.
+      # Output lands in .vercel/output/ for the deploy step.
+      - name: Build Project with Vercel CLI
+        working-directory: ./frontend
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      # Deploy the prebuilt output — avoids a double build and keeps CI fast.
+      # We capture the deployment URL for the PR comment step.
+      - name: Deploy Preview to Vercel
+        id: deploy
+        working-directory: ./frontend
+        run: |
+          PREVIEW_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+
+      # Post the preview URL as a PR comment so reviewers can click straight to it.
+      # The comment is updated (not duplicated) on re-runs via find-comment logic.
+      - name: Find Existing Preview Comment
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        if: github.event_name == 'pull_request'
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- vercel-preview-comment -->"
+
+      - name: Post or Update Preview URL Comment
+        uses: peter-evans/create-or-update-comment@v4
+        if: github.event_name == 'pull_request'
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- vercel-preview-comment -->
+            ## Vercel Preview Deployment
+
+            | Field | Value |
+            |---|---|
+            | **Status** | Deployed |
+            | **Preview URL** | ${{ steps.deploy.outputs.preview_url }} |
+            | **Commit** | `${{ github.sha }}` |
+            | **Branch** | `${{ github.head_ref }}` |
+
+            > _This comment is automatically updated on each push to this PR._
