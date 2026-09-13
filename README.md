@@ -211,22 +211,6 @@ docker compose up --build
 
 ---
 
-## 🗺️ Commercial SaaS Roadmap
-
-- [x] High-frequency telemetry ingestion schemas & data validation
-- [x] Unified data loaders for AI4I & C-MAPSS predictive maintenance benchmarks
-- [ ] Leakage-guarded time-series preprocessing & feature engineering pipeline
-- [ ] Isolation Forest anomaly detection with Z-Score Deviation Explainer
-- [ ] XGBoost component failure prediction with SHAP TreeExplainer integration
-- [ ] Live WebSocket vehicle streaming with fault injection simulator
-- [ ] Next.js dark luxury dashboard with real-time health gauge and waterfall SHAP charts
-- [ ] **B2B SaaS Multi-Tenancy:** Organization/fleet workspace isolation at the database layer
-- [ ] **Role-Based Access Control (RBAC):** Fleet Manager, Technician, and Driver role authorization
-- [ ] **Webhook & Telematics Ingestion:** Direct integrations with Geotab, Samsara, and OEM Connected Vehicle APIs
-- [ ] **Subscription & Fleet Billing:** Tiered per-vehicle monthly billing powered by Stripe
-
----
-
 ## 👨‍💻 Authors & Core Contributors
 
 * **Direk Kakkar** — [GitHub](https://github.com/direkkakkar319-ops)

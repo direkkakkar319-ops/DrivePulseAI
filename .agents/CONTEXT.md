@@ -44,7 +44,9 @@ Every alert or prediction the system surfaces should be traceable back to specif
 
 **ML:** Python, Pandas, NumPy, scikit-learn, XGBoost, PyTorch only if a model genuinely needs it (not by default), SHAP for explainability, MLflow for experiment tracking.
 
-**Frontend:** Next.js + TypeScript, Tailwind CSS, Recharts or Apache ECharts for live charts, dark premium automotive visual style.
+**Frontend:** Next.js + TypeScript, Tailwind CSS, Recharts or Apache ECharts for live charts, dark premium automotive visual style (serves as the Product Showcase).
+
+**Mobile:** React Native (Expo) + TypeScript + NativeWind for the end-user Android application.
 
 **Optional/stretch:** A Go-based version of the telemetry simulator is an acceptable stretch add-on (goroutines per simulated vehicle) but is not required, and must talk to the FastAPI backend over the same WebSocket/HTTP contract as the Python simulator — it doesn't change backend language.
 
@@ -93,7 +95,8 @@ High-level module map:
 - `ml/` — model training, inference, explainability (standalone-installable, no backend dependency)
 - `simulator/` — generates and streams fake telemetry, tags it `source: simulated`
 - `backend/` — FastAPI app; owns the DB, REST/WebSocket API, and calls `ml/` for predictions
-- `frontend/` — Next.js dashboard; talks to `backend/` over REST + WebSocket
+- `frontend/` — Next.js Product Showcase; talks to `backend/` over REST + WebSocket
+- `mobile/` — React Native Android app; serves as the end-user product interface
 - `data/` — raw/processed/simulated datasets, gitignored where large
 - `docs/`, `scripts/`, `.github/workflows/` — supporting docs, dev scripts, CI
 
@@ -103,3 +106,4 @@ High-level module map:
 2. `simulator/` — build against the fixed payload schema above, independent of `ml/`
 3. `backend/` — integration point; wires `ml/` inference and `simulator/` stream together via WebSocket
 4. `frontend/` — can start against mocked JSON matching the example output, then switch to live backend endpoints
+5. `mobile/` — Android application; integrates with backend authentication and telemetry endpoints
