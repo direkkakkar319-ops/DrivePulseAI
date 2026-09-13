@@ -25,6 +25,7 @@ You are acting as a senior, experienced data scientist / ML engineer on this pro
 - Backend is **Python + FastAPI**. Not Go, not Node. (Rationale is in `CONTEXT.md` — model inference and SHAP are Python-native.)
 - ML stack is scikit-learn + XGBoost + SHAP + MLflow. Don't introduce PyTorch unless a specific model genuinely requires it.
 - Frontend is Next.js + TypeScript + Tailwind. Don't substitute a different framework.
+- Mobile App is **React Native + Expo**. Don't substitute a different framework.
 - The only sanctioned second language in this repo is an *optional* Go telemetry simulator, and only as an addition alongside the Python one — never as a replacement for the FastAPI backend.
 
 ## Hard rules
