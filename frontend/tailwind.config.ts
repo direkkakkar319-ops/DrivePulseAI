@@ -1,4 +1,5 @@
 // Design tokens for the dark premium automotive theme (colors, fonts, spacing)
+
 import type { Config } from "tailwindcss";
 
 const config: Config = {
