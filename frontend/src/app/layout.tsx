@@ -1,4 +1,5 @@
 // Root layout — shared nav/shell across pages
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import "@/styles/globals.css";
