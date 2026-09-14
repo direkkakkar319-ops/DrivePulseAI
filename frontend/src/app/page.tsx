@@ -14,7 +14,6 @@ import {
   Waves,
 } from "lucide-react";
 
-import GitHubLink from "../components/GitHubLink";
 
 const features = [
   {
@@ -160,12 +159,9 @@ export default function Home() {
           <a href="#how-it-works">How it works</a>
           <a href="#questions">FAQs</a>
         </nav>
-        <div className="header-actions">
-          <a className="header-cta" href="#the-app">
-            Meet the app <ArrowUpRight size={15} />
-          </a>
-          <GitHubLink />
-        </div>
+        <a className="header-cta" href="#possibilities">
+          Meet the app <ArrowUpRight size={15} />
+        </a>
       </header>
       <main id="main-content">
         <section className="hero wrap" aria-labelledby="hero-title">
@@ -185,7 +181,7 @@ export default function Home() {
               in one app.
             </p>
             <div className="hero-actions">
-              <a className="button primary" href="#the-app">
+              <a className="button primary" href="#possibilities">
                 Discover the app <ArrowUpRight size={18} />
               </a>
               <a className="text-link" href="#how-it-works">
@@ -267,7 +263,7 @@ export default function Home() {
                 The planned app connects the dots, so you can focus on the
                 bigger picture.
               </p>
-              <a className="text-link" href="#the-app">
+              <a className="text-link" href="#possibilities">
                 Get to know DrivePulse <MoveUpRight size={16} />
               </a>
             </div>
@@ -297,36 +293,6 @@ export default function Home() {
                   </div>
                 </article>
               ))}
-            </div>
-          </div>
-        </section>
-        <section id="the-app" className="section wrap">
-          <div className="app-banner">
-            <div className="banner-art" aria-hidden="true">
-              <Activity strokeWidth={0.7} />
-              <span className="banner-cross">+</span>
-            </div>
-            <div className="banner-copy">
-              <p className="eyebrow">MEET YOUR NEXT CO-PILOT</p>
-              <h2>
-                A clearer road
-                <br />
-                <span>starts here.</span>
-              </h2>
-              <p>
-                Vehicle health. Explained.
-                <br />
-                DrivePulse AI is currently in development.
-              </p>
-              <a
-                className="button primary"
-                href="https://github.com/direkkakkar319-ops/DrivePulseAI"
-              >
-                Follow the project <ArrowUpRight size={18} />
-              </a>
-              <small>
-                App preview is illustrative. Downloads aren’t available yet.
-              </small>
             </div>
           </div>
         </section>
