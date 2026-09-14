@@ -6,6 +6,10 @@ frontend:
   - changed-files:
       - any-glob-to-any-file: 'frontend/**/*'
 
+mobile:
+  - changed-files:
+      - any-glob-to-any-file: 'mobile/**/*'
+
 ml:
   - changed-files:
       - any-glob-to-any-file: 'ml/**/*'
