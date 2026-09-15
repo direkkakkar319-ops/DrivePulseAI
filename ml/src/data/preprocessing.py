@@ -2,7 +2,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from loaders import load_ai4i, load_cmapss, load_simulated
 from sklearn.preprocessing import StandardScaler
 
 
@@ -46,13 +45,13 @@ class PreProcessing:
 
         # Impute sensor dropouts (ffill + bfill)
         if fill_dropouts:
-            fill_cols = [c for c in cleaned.columns if c not in ["vehicle_id", "source"]]
+            fill_cols = [
+                c for c in cleaned.columns if c not in ["vehicle_id", "source"]
+            ]
             if fill_cols:
                 if "vehicle_id" in cleaned.columns:
                     cleaned[fill_cols] = (
-                        cleaned.groupby("vehicle_id")[fill_cols]
-                        .ffill()
-                        .bfill()
+                        cleaned.groupby("vehicle_id")[fill_cols].ffill().bfill()
                     )
                 else:
                     cleaned[fill_cols] = cleaned[fill_cols].ffill().bfill()
@@ -111,7 +110,9 @@ class PreProcessing:
         return scaled, scaler
 
     @staticmethod
-    def make_time_windows(df: pd.DataFrame, window_size: int, step: int = 1) -> np.ndarray:
+    def make_time_windows(
+        df: pd.DataFrame, window_size: int, step: int = 1
+    ) -> np.ndarray:
         """
         Create overlapping time windows for sequential data (e.g., C-MAPSS sequences).
         Ensures that windows do not cross the boundary of different 'vehicle_id's.
@@ -126,27 +127,31 @@ class PreProcessing:
         """
         exclude_cols = ["source", "timestamp"]
         feature_cols = [c for c in df.columns if c not in exclude_cols]
-        
+
         windows = []
-        
+
         if "vehicle_id" in df.columns:
             for _, group in df.groupby("vehicle_id"):
-                group_data = group[feature_cols].drop(columns=["vehicle_id"], errors="ignore").values
+                group_data = (
+                    group[feature_cols]
+                    .drop(columns=["vehicle_id"], errors="ignore")
+                    .values
+                )
                 for i in range(0, len(group_data) - window_size + 1, step):
                     windows.append(group_data[i : i + window_size])
         else:
             group_data = df[feature_cols].values
             for i in range(0, len(group_data) - window_size + 1, step):
                 windows.append(group_data[i : i + window_size])
-                
+
         return np.array(windows)
 
     @staticmethod
     def train_val_test_split(
-        df: pd.DataFrame, 
-        val_frac: float = 0.15, 
-        test_frac: float = 0.15, 
-        time_ordered: bool = False
+        df: pd.DataFrame,
+        val_frac: float = 0.15,
+        test_frac: float = 0.15,
+        time_ordered: bool = False,
     ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Split the DataFrame into train, validation, and test sets.
@@ -156,7 +161,7 @@ class PreProcessing:
             df: Input DataFrame.
             val_frac: Fraction of data for validation.
             test_frac: Fraction of data for testing.
-            time_ordered: If True, performs a sequential split to prevent future data leakage. 
+            time_ordered: If True, performs a sequential split to prevent future data leakage.
                           If False, performs a random shuffle split.
 
         Returns:
@@ -170,27 +175,21 @@ class PreProcessing:
             n_total = len(df)
             n_train = int(n_total * (1.0 - val_frac - test_frac))
             n_val = int(n_total * val_frac)
-            
+
             train_df = df.iloc[:n_train].copy()
             val_df = df.iloc[n_train : n_train + n_val].copy()
             test_df = df.iloc[n_train + n_val :].copy()
         else:
             # Random split for independent/static data
             from sklearn.model_selection import train_test_split
-            
+
             train_df, temp_df = train_test_split(
-                df, 
-                test_size=(val_frac + test_frac), 
-                shuffle=True, 
-                random_state=42
+                df, test_size=(val_frac + test_frac), shuffle=True, random_state=42
             )
-            
+
             val_ratio = val_frac / (val_frac + test_frac)
             val_df, test_df = train_test_split(
-                temp_df, 
-                train_size=val_ratio, 
-                shuffle=True, 
-                random_state=42
+                temp_df, train_size=val_ratio, shuffle=True, random_state=42
             )
-            
+
         return train_df, val_df, test_df
