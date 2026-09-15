@@ -13,7 +13,7 @@ class PreProcessing:
         df: pd.DataFrame,
         drop_duplicates: bool = True,
         fill_dropouts: bool = True,
-        fill_remaining_numeric: str | float | int | None = "median",
+        fill_remaining_numeric: str | float | None = "median",
     ) -> pd.DataFrame:
         """
         Clean telemetry and predictive maintenance datasets.
