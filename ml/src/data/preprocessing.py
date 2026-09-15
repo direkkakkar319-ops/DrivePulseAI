@@ -111,8 +111,36 @@ class PreProcessing:
 
         return scaled, scaler
 
+    @staticmethod
+    def make_time_windows(df: pd.DataFrame, window_size: int, step: int = 1) -> np.ndarray:
+        """
+        Create overlapping time windows for sequential data (e.g., C-MAPSS sequences).
+        Ensures that windows do not cross the boundary of different 'vehicle_id's.
 
-    # def make_time_windows(df, window_size, step) -> np.ndarray:
+        Args:
+            df: Input DataFrame.
+            window_size: The number of timesteps in each window.
+            step: The number of timesteps to advance for the next window.
+
+        Returns:
+            np.ndarray: A 3D numpy array of shape (num_windows, window_size, num_features).
+        """
+        exclude_cols = ["source", "timestamp"]
+        feature_cols = [c for c in df.columns if c not in exclude_cols]
+        
+        windows = []
+        
+        if "vehicle_id" in df.columns:
+            for _, group in df.groupby("vehicle_id"):
+                group_data = group[feature_cols].drop(columns=["vehicle_id"], errors="ignore").values
+                for i in range(0, len(group_data) - window_size + 1, step):
+                    windows.append(group_data[i : i + window_size])
+        else:
+            group_data = df[feature_cols].values
+            for i in range(0, len(group_data) - window_size + 1, step):
+                windows.append(group_data[i : i + window_size])
+                
+        return np.array(windows)
 
 
     # def train_val_test_split(df, val_frac, test_frac, time_ordered=False):
