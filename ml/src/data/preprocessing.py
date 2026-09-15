@@ -4,6 +4,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from loaders import load_ai4i, load_cmapss, load_simulated
+from sklearn.preprocessing import StandardScaler
 
 
 class PreProcessing:
@@ -76,8 +77,40 @@ class PreProcessing:
 
         return cleaned
 
-    # def scale(df, scaler=None)-> (pd.DataFrame, scaler):
-    
+    @staticmethod
+    def scale(df: pd.DataFrame, scaler: Any = None) -> tuple[pd.DataFrame, Any]:
+        """
+        Scale numeric features using StandardScaler.
+        Fits a new scaler if none is provided (for training).
+        Otherwise, uses the provided scaler (for validation/test - never fit on val/test).
+
+        Args:
+            df: Input DataFrame to scale.
+            scaler: A fitted scikit-learn scaler. If None, a new StandardScaler is fitted.
+
+        Returns:
+            tuple[pd.DataFrame, Any]: The scaled DataFrame and the scaler used.
+        """
+        if df.empty:
+            return df.copy(), scaler
+
+        scaled = df.copy()
+
+        exclude_cols = ["vehicle_id", "source", "timestamp"]
+        numeric_cols = scaled.select_dtypes(include=[np.number]).columns
+        cols_to_scale = [col for col in numeric_cols if col not in exclude_cols]
+
+        if not cols_to_scale:
+            return scaled, scaler
+
+        if scaler is None:
+            scaler = StandardScaler()
+            scaled[cols_to_scale] = scaler.fit_transform(scaled[cols_to_scale])
+        else:
+            scaled[cols_to_scale] = scaler.transform(scaled[cols_to_scale])
+
+        return scaled, scaler
+
 
     # def make_time_windows(df, window_size, step) -> np.ndarray:
 
