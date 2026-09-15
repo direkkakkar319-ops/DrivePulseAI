@@ -142,13 +142,56 @@ class PreProcessing:
                 
         return np.array(windows)
 
+    @staticmethod
+    def train_val_test_split(
+        df: pd.DataFrame, 
+        val_frac: float = 0.15, 
+        test_frac: float = 0.15, 
+        time_ordered: bool = False
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """
+        Split the DataFrame into train, validation, and test sets.
+        Includes a guard against data leakage for time-series data.
 
-    # def train_val_test_split(df, val_frac, test_frac, time_ordered=False):
+        Args:
+            df: Input DataFrame.
+            val_frac: Fraction of data for validation.
+            test_frac: Fraction of data for testing.
+            time_ordered: If True, performs a sequential split to prevent future data leakage. 
+                          If False, performs a random shuffle split.
 
+        Returns:
+            tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: (train, val, test) DataFrames.
+        """
+        if val_frac + test_frac >= 1.0:
+            raise ValueError("val_frac + test_frac must be strictly less than 1.0")
 
-# clean = PreProcessing.clean
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-ai4i_path = PROJECT_ROOT / "data" / "failure_classification" / "raw" / "predictive_maintenance.csv"
-cmapss_path = PROJECT_ROOT / "data" / "RUL_score" / "raw"
-simulated_path = PROJECT_ROOT / "data" / "anomly_detection" / "raw"
+        if time_ordered:
+            # Sequential split (no shuffling) to guard against time leakage
+            n_total = len(df)
+            n_train = int(n_total * (1.0 - val_frac - test_frac))
+            n_val = int(n_total * val_frac)
+            
+            train_df = df.iloc[:n_train].copy()
+            val_df = df.iloc[n_train : n_train + n_val].copy()
+            test_df = df.iloc[n_train + n_val :].copy()
+        else:
+            # Random split for independent/static data
+            from sklearn.model_selection import train_test_split
+            
+            train_df, temp_df = train_test_split(
+                df, 
+                test_size=(val_frac + test_frac), 
+                shuffle=True, 
+                random_state=42
+            )
+            
+            val_ratio = val_frac / (val_frac + test_frac)
+            val_df, test_df = train_test_split(
+                temp_df, 
+                train_size=val_ratio, 
+                shuffle=True, 
+                random_state=42
+            )
+            
+        return train_df, val_df, test_df
