@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const router = useRouter();
-  
+
   // Dummy data
   const vehicles = [
     { id: 'SIM-001', score: 73 },
@@ -16,7 +16,7 @@ export default function HomeScreen() {
         data={vehicles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.card}
             onPress={() => router.push(`/(main)/vehicle/${item.id}`)}
           >
