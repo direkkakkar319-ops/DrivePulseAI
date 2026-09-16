@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+
 from src.data.loaders import load_simulated
 
 
@@ -35,8 +36,7 @@ def test_load_simulated_single_jsonl(tmp_path: Path):
         {"ENGINE_RPM ()": 2100, "VEHICLE_SPEED ()": 65},
     ]
     with open(jsonl_file, "w", encoding="utf-8") as f:
-        for r in records:
-            f.write(json.dumps(r) + "\n")
+        f.writelines(json.dumps(r) + "\n" for r in records)
 
     df = load_simulated(jsonl_file)
     assert len(df) == 2
