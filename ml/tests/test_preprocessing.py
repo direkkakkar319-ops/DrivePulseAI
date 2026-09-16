@@ -253,6 +253,8 @@ def test_train_val_test_split_missing_timestamp_raises():
         df, time_ordered=True, assume_sorted=True
     )
     assert len(train) == 70
+    assert len(val) == 15
+    assert len(test) == 15
 
 
 def test_train_val_test_split_per_vehicle():
