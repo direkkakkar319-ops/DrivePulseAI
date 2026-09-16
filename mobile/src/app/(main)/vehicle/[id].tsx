@@ -8,14 +8,14 @@ export default function VehicleDetailScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Digital Twin: {id}</Text>
-      
+
       {/* Placeholder for Health Gauge and Chart */}
       <View style={styles.placeholderBox}>
         <Text style={styles.boxText}>Live Telemetry Stream</Text>
       </View>
 
-      <Button 
-        title="View Maintenance Report" 
+      <Button
+        title="View Maintenance Report"
         onPress={() => router.push(`/(main)/report/${id}`)}
       />
     </View>

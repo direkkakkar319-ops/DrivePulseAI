@@ -7,7 +7,7 @@ export default function ReportScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AI Report: {id}</Text>
-      
+
       <View style={styles.card}>
         <Text style={styles.cardText}>
           No recent anomalies detected. Battery voltage and Engine RPM are within normal operational baseline.

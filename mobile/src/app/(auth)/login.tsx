@@ -17,19 +17,19 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>DrivePulseAI</Text>
-      
-      <TextInput 
-        style={styles.input} 
-        placeholder="Email or Username" 
-        placeholderTextColor="#888" 
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email or Username"
+        placeholderTextColor="#888"
       />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Password" 
-        placeholderTextColor="#888" 
-        secureTextEntry 
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#888"
+        secureTextEntry
       />
-      
+
       <TouchableOpacity style={styles.button} onPress={handleManualLogin}>
         <Text style={styles.buttonText}>Log In</Text>
       </TouchableOpacity>
