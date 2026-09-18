@@ -275,3 +275,176 @@ def test_train_val_test_split_per_vehicle():
     assert len(test) == 20
     assert set(train["vehicle_id"]) == {"A", "B"}
     assert set(test["vehicle_id"]) == {"A", "B"}
+
+
+def test_clean_per_vehicle_bfill_no_cross_vehicle_leakage():
+    # Vehicle A has all-NaNs and leading-NaNs; vehicle B has valid readings.
+    # Vehicle A must NOT receive values backward-filled from Vehicle B.
+    df = pd.DataFrame(
+        {
+            "vehicle_id": ["A", "A", "B", "B"],
+            "timestamp": [1, 2, 1, 2],
+            "speed": [np.nan, np.nan, 50.0, 60.0],
+            "rpm": [np.nan, 800.0, 1500.0, 1600.0],
+        }
+    )
+    cleaned = PreProcessing.clean(
+        df, drop_duplicates=False, fill_dropouts=True, fill_remaining_numeric=None
+    )
+
+    # Vehicle A speed had only NaNs, so within vehicle A it remains NaN
+    veh_a = cleaned[cleaned["vehicle_id"] == "A"].sort_values("timestamp")
+    assert veh_a["speed"].isna().all()
+    # Vehicle A rpm: row 0 leading NaN should be backward-filled from row 1 (800.0), NOT from B
+    assert (veh_a["rpm"] == 800.0).all()
+
+    # Vehicle B should preserve its values
+    veh_b = cleaned[cleaned["vehicle_id"] == "B"].sort_values("timestamp")
+    assert list(veh_b["speed"]) == [50.0, 60.0]
+    assert list(veh_b["rpm"]) == [1500.0, 1600.0]
+
+
+def test_clean_incomplete_imputer_stats_no_eval_refit():
+    # When imputer_stats is supplied for val/test, columns missing from imputer_stats
+    # must NOT silently refit median/mean from the val/test frame.
+    df_eval = pd.DataFrame(
+        {
+            "speed": [100.0, np.nan],
+            "rpm": [5000.0, np.nan],
+        }
+    )
+    # Train stats only provide speed=20.0, rpm was omitted
+    train_stats = {"speed": 20.0}
+
+    cleaned_eval = PreProcessing.clean(
+        df_eval,
+        fill_dropouts=False,
+        fill_remaining_numeric="median",
+        imputer_stats=train_stats,
+    )
+
+    # Speed was present in imputer_stats -> filled with 20.0
+    assert cleaned_eval.loc[1, "speed"] == 20.0
+    # RPM was omitted -> must remain NaN, NOT filled with 5000.0 from df_eval
+    assert pd.isna(cleaned_eval.loc[1, "rpm"])
+
+
+def test_clean_all_null_numeric_column_preserved_as_nan():
+    # If a numeric column has no observed values, median/mean must leave it as NaN
+    # rather than inventing arbitrary numbers (e.g. 0.0), and omit from stats.
+    df = pd.DataFrame(
+        {
+            "speed": [10.0, 20.0, np.nan],
+            "all_null_sensor": [np.nan, np.nan, np.nan],
+        }
+    )
+    cleaned_median, stats_median = PreProcessing.clean(
+        df,
+        fill_dropouts=False,
+        fill_remaining_numeric="median",
+        return_imputer_stats=True,
+    )
+    assert cleaned_median["all_null_sensor"].isna().all()
+    assert "all_null_sensor" not in stats_median
+    assert stats_median["speed"] == 15.0
+
+    cleaned_mean, stats_mean = PreProcessing.clean(
+        df,
+        fill_dropouts=False,
+        fill_remaining_numeric="mean",
+        return_imputer_stats=True,
+    )
+    assert cleaned_mean["all_null_sensor"].isna().all()
+    assert "all_null_sensor" not in stats_mean
+    assert stats_mean["speed"] == 15.0
+
+
+def test_exclude_cols_additive_across_methods():
+    df = pd.DataFrame(
+        {
+            "vehicle_id": ["A", "A"],
+            "timestamp": [1, 2],
+            "speed": [10.0, 20.0],
+            "failure": [0, 1],
+            "rul": [50.0, 40.0],
+            "custom_aux": [100.0, 200.0],
+        }
+    )
+
+    # 1. clean: exclude_cols should add to default exclusions (labels + meta)
+    cleaned = PreProcessing.clean(
+        df,
+        drop_duplicates=False,
+        fill_dropouts=False,
+        fill_remaining_numeric="median",
+        exclude_cols=["custom_aux"],
+        return_imputer_stats=True,
+    )[0]
+    # speed should be in features; custom_aux, failure, rul, vehicle_id, timestamp excluded
+    assert "speed" in cleaned.columns
+
+    # 2. scale: custom_aux, failure, rul, vehicle_id must not be scaled
+    scaled, _ = PreProcessing.scale(df, exclude_cols=["custom_aux"])
+    assert np.isclose(scaled["speed"].iloc[0], -1.0)
+    assert scaled["custom_aux"].iloc[0] == 100.0
+    assert scaled["failure"].iloc[0] == 0
+    assert scaled["rul"].iloc[0] == 50.0
+
+    # 3. make_time_windows: custom_aux, failure, rul must not be windowed
+    windows = PreProcessing.make_time_windows(
+        df, window_size=2, step=1, exclude_cols=["custom_aux"]
+    )
+    # Only 1 feature should be windowed: speed
+    assert windows.shape == (1, 2, 1)
+
+
+def test_train_val_test_split_zero_fractions():
+    df = pd.DataFrame({"timestamp": range(20), "val": range(20)})
+
+    # time_ordered=True with val_frac=0.0
+    train, val, test = PreProcessing.train_val_test_split(
+        df, val_frac=0.0, test_frac=0.2, time_ordered=True
+    )
+    assert len(val) == 0
+    assert len(train) == 16
+    assert len(test) == 4
+
+    # time_ordered=True with test_frac=0.0
+    train, val, test = PreProcessing.train_val_test_split(
+        df, val_frac=0.2, test_frac=0.0, time_ordered=True
+    )
+    assert len(test) == 0
+    assert len(train) == 16
+    assert len(val) == 4
+
+    # time_ordered=True with both zero
+    train, val, test = PreProcessing.train_val_test_split(
+        df, val_frac=0.0, test_frac=0.0, time_ordered=True
+    )
+    assert len(val) == 0
+    assert len(test) == 0
+    assert len(train) == 20
+
+    # time_ordered=False with val_frac=0.0
+    train, val, test = PreProcessing.train_val_test_split(
+        df, val_frac=0.0, test_frac=0.2, time_ordered=False
+    )
+    assert len(val) == 0
+    assert len(train) == 16
+    assert len(test) == 4
+
+    # time_ordered=False with test_frac=0.0
+    train, val, test = PreProcessing.train_val_test_split(
+        df, val_frac=0.2, test_frac=0.0, time_ordered=False
+    )
+    assert len(test) == 0
+    assert len(train) == 16
+    assert len(val) == 4
+
+    # time_ordered=False with both zero
+    train, val, test = PreProcessing.train_val_test_split(
+        df, val_frac=0.0, test_frac=0.0, time_ordered=False
+    )
+    assert len(val) == 0
+    assert len(test) == 0
+    assert len(train) == 20

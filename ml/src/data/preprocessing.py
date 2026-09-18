@@ -37,8 +37,8 @@ class PreProcessing:
             fill_remaining_numeric: Strategy for residual numeric nulls ('median', 'mean',
                 int/float constant, or None).
             feature_cols: Specific columns to impute. If None, derives from non-excluded columns.
-            exclude_cols: Columns to exclude from imputation. Defaults to metadata and
-                targets unless impute_targets is True.
+            exclude_cols: Additional columns to exclude from imputation (additive with
+                default metadata and targets unless impute_targets is True).
             impute_targets: Whether to allow imputation on target columns ('failure', 'rul').
                 Defaults to False to prevent label fabrication.
             imputer_stats: Pre-computed statistics dict for residual filling (e.g. from train).
@@ -72,21 +72,23 @@ class PreProcessing:
         if feature_cols is not None:
             impute_cols = [c for c in feature_cols if c in cleaned.columns]
         else:
+            excl = set(DEFAULT_META_COLS)
+            if not impute_targets:
+                excl.update(DEFAULT_TARGET_COLS)
             if exclude_cols is not None:
-                excl = set(exclude_cols)
-            else:
-                excl = set(DEFAULT_META_COLS)
-                if not impute_targets:
-                    excl.update(DEFAULT_TARGET_COLS)
+                excl.update(exclude_cols)
             impute_cols = [c for c in cleaned.columns if c not in excl]
 
         # Impute sensor dropouts: ffill preserves causality across communication drops,
         # followed by bfill for leading missing values before the first valid sensor broadcast.
         if fill_dropouts and impute_cols:
             if "vehicle_id" in cleaned.columns:
-                cleaned[impute_cols] = (
-                    cleaned.groupby("vehicle_id")[impute_cols].ffill().bfill()
-                )
+                cleaned[impute_cols] = cleaned.groupby("vehicle_id")[
+                    impute_cols
+                ].ffill()
+                cleaned[impute_cols] = cleaned.groupby("vehicle_id")[
+                    impute_cols
+                ].bfill()
             else:
                 cleaned[impute_cols] = cleaned[impute_cols].ffill().bfill()
 
@@ -111,14 +113,29 @@ class PreProcessing:
             ]
 
             for col in numeric_impute_cols:
-                if imputer_stats is not None and col in imputer_stats:
-                    fill_val = imputer_stats[col]
-                elif fill_remaining_numeric == "median":
+                # If pre-computed imputer_stats are provided (e.g. from training split),
+                # strictly use those stats and never recompute median/mean on val/test data.
+                # Columns omitted from imputer_stats are not imputed, preventing leakage.
+                if imputer_stats is not None:
+                    if col in imputer_stats:
+                        fill_val = float(imputer_stats[col])
+                        computed_stats[col] = fill_val
+                        if cleaned[col].isnull().any():
+                            cleaned[col] = cleaned[col].fillna(fill_val)
+                    continue
+
+                if fill_remaining_numeric == "median":
                     non_null = cleaned[col].dropna()
-                    fill_val = float(non_null.median()) if not non_null.empty else 0.0
+                    if non_null.empty:
+                        # Leave all-null column as NaN; do not invent plausible sensor values (e.g. 0.0)
+                        continue
+                    fill_val = float(non_null.median())
                 elif fill_remaining_numeric == "mean":
                     non_null = cleaned[col].dropna()
-                    fill_val = float(non_null.mean()) if not non_null.empty else 0.0
+                    if non_null.empty:
+                        # Leave all-null column as NaN; do not invent plausible sensor values (e.g. 0.0)
+                        continue
+                    fill_val = float(non_null.mean())
                 else:
                     fill_val = float(fill_remaining_numeric)
 
@@ -148,7 +165,8 @@ class PreProcessing:
             df: Input DataFrame to scale.
             scaler: A fitted scikit-learn scaler. If None, a new StandardScaler is fitted.
             feature_cols: Optional explicit list of feature columns to scale.
-            exclude_cols: Optional columns to exclude from scaling.
+            exclude_cols: Optional additional columns to exclude from scaling
+                (additive with default metadata and targets).
 
         Returns:
             tuple[pd.DataFrame, Any]: Scaled DataFrame and fitted/used scaler.
@@ -165,10 +183,9 @@ class PreProcessing:
                 if col in scaled.columns and np.issubdtype(scaled[col].dtype, np.number)
             ]
         else:
+            excl = set(DEFAULT_META_COLS + DEFAULT_TARGET_COLS)
             if exclude_cols is not None:
-                excl = set(exclude_cols)
-            else:
-                excl = set(DEFAULT_META_COLS + DEFAULT_TARGET_COLS)
+                excl.update(exclude_cols)
 
             numeric_cols = scaled.select_dtypes(include=[np.number]).columns
             cols_to_scale = [col for col in numeric_cols if col not in excl]
@@ -204,7 +221,8 @@ class PreProcessing:
             window_size: Number of timesteps in each window.
             step: Timesteps to advance for next window.
             feature_cols: Explicit list of feature column names to include in window tensor.
-            exclude_cols: Columns to exclude from windows.
+            exclude_cols: Additional columns to exclude from windows (additive
+                with default metadata and targets).
 
         Returns:
             np.ndarray: A 3D numpy array of shape (num_windows, window_size, num_features).
@@ -221,10 +239,9 @@ class PreProcessing:
                 if c in df.columns and np.issubdtype(df[c].dtype, np.number)
             ]
         else:
+            excl = set(DEFAULT_META_COLS + DEFAULT_TARGET_COLS)
             if exclude_cols is not None:
-                excl = set(exclude_cols)
-            else:
-                excl = set(DEFAULT_META_COLS + DEFAULT_TARGET_COLS)
+                excl.update(exclude_cols)
 
             numeric_cols = df.select_dtypes(include=[np.number]).columns
             active_cols = [c for c in numeric_cols if c not in excl]
@@ -309,12 +326,29 @@ class PreProcessing:
                     if has_timestamp:
                         group = group.sort_values(by=timestamp_col)
                     n = len(group)
-                    n_train = int(n * (1.0 - val_frac - test_frac))
-                    n_val = int(n * val_frac)
-
-                    train_parts.append(group.iloc[:n_train])
-                    val_parts.append(group.iloc[n_train : n_train + n_val])
-                    test_parts.append(group.iloc[n_train + n_val :])
+                    if val_frac == 0.0 and test_frac == 0.0:
+                        train_parts.append(group)
+                        val_parts.append(group.iloc[0:0])
+                        test_parts.append(group.iloc[0:0])
+                    elif val_frac == 0.0:
+                        n_test = int(n * test_frac)
+                        n_train = n - n_test
+                        train_parts.append(group.iloc[:n_train])
+                        val_parts.append(group.iloc[0:0])
+                        test_parts.append(group.iloc[n_train:])
+                    elif test_frac == 0.0:
+                        n_val = int(n * val_frac)
+                        n_train = n - n_val
+                        train_parts.append(group.iloc[:n_train])
+                        val_parts.append(group.iloc[n_train:])
+                        test_parts.append(group.iloc[0:0])
+                    else:
+                        n_val = int(n * val_frac)
+                        n_test = int(n * test_frac)
+                        n_train = n - n_val - n_test
+                        train_parts.append(group.iloc[:n_train])
+                        val_parts.append(group.iloc[n_train : n_train + n_val])
+                        test_parts.append(group.iloc[n_train + n_val :])
 
                 train_df = (
                     pd.concat(train_parts, ignore_index=True)
@@ -338,29 +372,74 @@ class PreProcessing:
                     else df.reset_index(drop=True)
                 )
                 n_total = len(sorted_df)
-                n_train = int(n_total * (1.0 - val_frac - test_frac))
-                n_val = int(n_total * val_frac)
-
-                train_df = sorted_df.iloc[:n_train].copy()
-                val_df = sorted_df.iloc[n_train : n_train + n_val].copy()
-                test_df = sorted_df.iloc[n_train + n_val :].copy()
+                if val_frac == 0.0 and test_frac == 0.0:
+                    train_df = sorted_df.copy()
+                    val_df = sorted_df.iloc[0:0].copy()
+                    test_df = sorted_df.iloc[0:0].copy()
+                elif val_frac == 0.0:
+                    n_test = int(n_total * test_frac)
+                    n_train = n_total - n_test
+                    train_df = sorted_df.iloc[:n_train].copy()
+                    val_df = sorted_df.iloc[0:0].copy()
+                    test_df = sorted_df.iloc[n_train:].copy()
+                elif test_frac == 0.0:
+                    n_val = int(n_total * val_frac)
+                    n_train = n_total - n_val
+                    train_df = sorted_df.iloc[:n_train].copy()
+                    val_df = sorted_df.iloc[n_train:].copy()
+                    test_df = sorted_df.iloc[0:0].copy()
+                else:
+                    n_val = int(n_total * val_frac)
+                    n_test = int(n_total * test_frac)
+                    n_train = n_total - n_val - n_test
+                    train_df = sorted_df.iloc[:n_train].copy()
+                    val_df = sorted_df.iloc[n_train : n_train + n_val].copy()
+                    test_df = sorted_df.iloc[n_train + n_val :].copy()
         else:
             from sklearn.model_selection import train_test_split
 
-            train_df, temp_df = train_test_split(
-                df,
-                test_size=(val_frac + test_frac),
-                shuffle=True,
-                random_state=random_state,
-            )
+            if val_frac == 0.0 and test_frac == 0.0:
+                train_df = df.copy().reset_index(drop=True)
+                val_df = df.iloc[0:0].copy().reset_index(drop=True)
+                test_df = df.iloc[0:0].copy().reset_index(drop=True)
+            elif val_frac == 0.0:
+                train_df, test_df = train_test_split(
+                    df,
+                    test_size=test_frac,
+                    shuffle=True,
+                    random_state=random_state,
+                )
+                val_df = df.iloc[0:0].copy().reset_index(drop=True)
+                train_df = train_df.reset_index(drop=True)
+                test_df = test_df.reset_index(drop=True)
+            elif test_frac == 0.0:
+                train_df, val_df = train_test_split(
+                    df,
+                    test_size=val_frac,
+                    shuffle=True,
+                    random_state=random_state,
+                )
+                test_df = df.iloc[0:0].copy().reset_index(drop=True)
+                train_df = train_df.reset_index(drop=True)
+                val_df = val_df.reset_index(drop=True)
+            else:
+                train_df, temp_df = train_test_split(
+                    df,
+                    test_size=(val_frac + test_frac),
+                    shuffle=True,
+                    random_state=random_state,
+                )
 
-            val_ratio = val_frac / (val_frac + test_frac)
-            val_df, test_df = train_test_split(
-                temp_df, train_size=val_ratio, shuffle=True, random_state=random_state
-            )
+                val_ratio = val_frac / (val_frac + test_frac)
+                val_df, test_df = train_test_split(
+                    temp_df,
+                    train_size=val_ratio,
+                    shuffle=True,
+                    random_state=random_state,
+                )
 
-            train_df = train_df.reset_index(drop=True)
-            val_df = val_df.reset_index(drop=True)
-            test_df = test_df.reset_index(drop=True)
+                train_df = train_df.reset_index(drop=True)
+                val_df = val_df.reset_index(drop=True)
+                test_df = test_df.reset_index(drop=True)
 
         return train_df, val_df, test_df
