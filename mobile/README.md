@@ -1,56 +1,72 @@
-# Welcome to your Expo app 👋
+# DrivePulseAI mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native / Expo SDK 57 Android app. Use Node.js 22.13 or newer.
 
-## Get started
+## Local password authentication
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Start the backend using [its setup instructions](../backend/README.md), then:
 
 ```bash
-npm run reset-project
+cd mobile
+npm ci
+cp .env.example .env
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+`EXPO_PUBLIC_API_URL` defaults to `http://10.0.2.2:8000` on Android emulators.
+For a physical phone, use your computer's LAN IP and keep both devices on the
+same network. For a browser preview, set it to `http://localhost:8000`.
+Restart Metro after changing environment variables. Use HTTPS outside local development.
 
-### Other setup steps
+The app opens on login. Create an account with an email and a password of at least
+12 characters. Authentication protects the main routes, stores the native session
+in SecureStore, checks it on startup/foreground, and clears expired sessions.
+Logout revokes the session on the backend; if the server cannot be reached, it
+reports an error so you can retry. Web preview uses memory-only sessions and
+requires login after reload. Existing vehicle screens still contain mock data.
+Password signup validates credentials but does not verify email ownership.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Google sign-in on Android
 
-## Learn more
+1. Configure an OAuth consent screen in Google Cloud and add test users if needed.
+2. Create a **Web application** OAuth client. Set its public client ID in both
+   `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (mobile `.env`) and `GOOGLE_WEB_CLIENT_ID`
+   (backend `.env`). Never put a client secret in an `EXPO_PUBLIC_` variable.
+3. Create an **Android** OAuth client in the same project for package
+   `com.drivepulseai.mobile` and the SHA-1 of the signing certificate used for your
+   build. Register the production signing certificate separately when applicable.
+4. Build a native development app with the Android SDK and emulator/device ready:
 
-To learn more about developing your project with Expo, look at the following resources:
+   ```bash
+   npx expo run:android
+   ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Nitro Google Sign-In uses Android Credential Manager and native autolinking.
+An explicit Web client ID is used, so Firebase configuration files are not required.
+The package config plugin is omitted for this Android-only integration: its
+non-Firebase branch only configures iOS, and requires an iOS URL scheme. Google
+sign-in appears only on Android when a client ID is configured and the app is
+not running in Expo Go. Password login can be tried in Expo Go. Google sign-in
+for iOS and web is outside this issue's Android scope.
 
-## Join the community
+The backend verifies the Google ID token before issuing an application session.
+Cancelling Google sign-in leaves you on login. Accounts using the same email
+are not automatically linked; use password login for an existing password account.
 
-Join our community of developers creating universal apps.
+References: [Expo Google authentication](https://docs.expo.dev/guides/google-authentication/),
+[Nitro Expo setup](https://react-native-nitro-google-sign-in.github.io/docs/setup/expo/).
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Verification
+
+```bash
+npm run lint
+npx tsc --noEmit
+```
+
+On an emulator/device, check signup, wrong password, duplicate signup, relaunch,
+logout, opening a protected deep link while logged out, Google cancellation,
+and successful Google login. Live Google testing needs your project configuration.
+
+Auth files: `src/auth/` contains secure storage and Google integration;
+`src/store/authStore.tsx` manages the session; `src/api/client.ts` calls the API;
+`src/types/auth.ts` mirrors backend contracts. `src/app/_layout.tsx` gates routes.

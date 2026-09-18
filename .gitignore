@@ -12,6 +12,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .coverage
+*.db
 htmlcov/
 
 # Jupyter Notebook Runs & Checkpoints
