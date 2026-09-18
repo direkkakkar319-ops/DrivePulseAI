@@ -3,6 +3,7 @@
 React Native / Expo SDK 57 Android app. Use Node.js 22.13 or newer.
 
 ## Local password authentication
+## Password authentication
 
 Start the backend using [its setup instructions](../backend/README.md), then:
 
