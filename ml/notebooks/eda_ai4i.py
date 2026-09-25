@@ -41,7 +41,11 @@ import pandas as pd
 
 # --- Resolve imports so the script runs from repo root OR ml/ (no hardcoded abs paths). ---
 THIS_FILE = Path(__file__).resolve()
-REPO_ROOT = THIS_FILE.parents[2] if THIS_FILE.parents[2].name != "notebooks" else THIS_FILE.parents[2]
+REPO_ROOT = (
+    THIS_FILE.parents[2]
+    if THIS_FILE.parents[2].name != "notebooks"
+    else THIS_FILE.parents[2]
+)
 # Layout is <root>/ml/notebooks/01_eda_ai4i.py -> ml dir is parent of notebooks.
 ML_DIR = THIS_FILE.parents[1]
 for candidate in (ML_DIR, REPO_ROOT / "ml"):
@@ -53,14 +57,20 @@ for candidate in (ML_DIR, REPO_ROOT / "ml"):
 from src.data.loaders import load_ai4i  # noqa: E402
 from src.data.preprocessing import PreProcessing  # noqa: E402
 
-DEFAULT_CSV = REPO_ROOT / "data" / "failure_classification" / "raw" / "predictive_maintenance.csv"
+DEFAULT_CSV = (
+    REPO_ROOT / "data" / "failure_classification" / "raw" / "predictive_maintenance.csv"
+)
 FIG_DIR = REPO_ROOT / "ml" / "reports" / "figures" / "ai4i"
 
 # Canonical sensor columns in both naming variants (loader alias -> raw CSV header).
 COLUMN_ALIASES: dict[str, list[str]] = {
     "engine_rpm": ["engine_rpm", "Rotational speed [rpm]", "Rotational speed"],
     "engine_load": ["engine_load_pct", "Torque [Nm]", "Torque"],
-    "coolant_temp": ["coolant_temp_c", "Process temperature [K]", "Process temperature"],
+    "coolant_temp": [
+        "coolant_temp_c",
+        "Process temperature [K]",
+        "Process temperature",
+    ],
     "intake_air_temp": ["intake_air_temp_c", "Air temperature [K]", "Air temperature"],
     "vibration": ["vibration", "Tool wear [min]", "Tool wear"],
     "failure": ["failure", "Machine failure"],
@@ -94,7 +104,9 @@ def load_and_profile(csv_path: Path) -> pd.DataFrame:
     """Load via production loader and print shape/dtypes/missing/duplicates."""
     # Use the production loader so EDA reflects what training will actually see.
     df = load_ai4i(csv_path)
-    print(f"[load] rows={len(df)} cols={len(df.columns)} source={df['source'].unique().tolist()}")
+    print(
+        f"[load] rows={len(df)} cols={len(df.columns)} source={df['source'].unique().tolist()}"
+    )
 
     print("\n--- dtypes ---")
     print(df.dtypes.to_string())
@@ -121,7 +133,9 @@ def clean_and_verify(df: pd.DataFrame) -> pd.DataFrame:
     # clean() sorts by vehicle_id/timestamp and imputes sensor dropouts; targets
     # ('failure','rul') are excluded from imputation by default to avoid label fabrication.
     cleaned, stats = PreProcessing.clean(df, return_imputer_stats=True)
-    print(f"\n[clean] rows {len(df)} -> {len(cleaned)} | imputer stats: {stats or 'none needed'}")
+    print(
+        f"\n[clean] rows {len(df)} -> {len(cleaned)} | imputer stats: {stats or 'none needed'}"
+    )
     assert len(cleaned) == len(df.drop_duplicates()), "Unexpected row loss in clean()"
     return cleaned
 
@@ -147,7 +161,9 @@ def analyse_target(df: pd.DataFrame) -> None:
         # Leakage check: if OR(modes) == failure exactly, modes must be EXCLUDED
         # from classifier features (they are the label decomposed, not inputs).
         union = df[modes].max(axis=1)
-        print(f"[leakage] P(union(modes) == failure) = {(union == df[fail]).mean():.4f}")
+        print(
+            f"[leakage] P(union(modes) == failure) = {(union == df[fail]).mean():.4f}"
+        )
 
     # Machine type (L/M/H) vs failure rate: categorical signal worth one-hot encoding.
     try:
@@ -186,7 +202,16 @@ def plot_target_bars(df: pd.DataFrame) -> None:
 # ---------------------------------------------------------------------------
 def plot_univariate(df: pd.DataFrame) -> None:
     """Histograms for each sensor: shape, skew, and candidate outliers."""
-    sensors = [_col(df, c) for c in ("engine_rpm", "engine_load", "coolant_temp", "intake_air_temp", "vibration")]
+    sensors = [
+        _col(df, c)
+        for c in (
+            "engine_rpm",
+            "engine_load",
+            "coolant_temp",
+            "intake_air_temp",
+            "vibration",
+        )
+    ]
     fig, axes = plt.subplots(2, 3, figsize=(13, 7))
     for ax, col in zip(axes.flat, sensors):
         # 50 bins is enough to reveal skew/bimodality at n=10k without noise.
@@ -207,12 +232,23 @@ def plot_univariate(df: pd.DataFrame) -> None:
 def plot_by_class(df: pd.DataFrame) -> None:
     """Boxplots per sensor split by failure: which sensors separate the classes."""
     fail = _col(df, "failure")
-    sensors = [_col(df, c) for c in ("engine_rpm", "engine_load", "coolant_temp", "intake_air_temp", "vibration")]
+    sensors = [
+        _col(df, c)
+        for c in (
+            "engine_rpm",
+            "engine_load",
+            "coolant_temp",
+            "intake_air_temp",
+            "vibration",
+        )
+    ]
     fig, axes = plt.subplots(2, 3, figsize=(13, 7))
     for ax, col in zip(axes.flat, sensors):
         # Boxplot per class directly shows median shift / spread change on failure.
         data = [df.loc[df[fail] == 0, col], df.loc[df[fail] == 1, col]]
-        ax.boxplot(data, tick_labels=["ok", "fail"], showfliers=False)  # Hide fliers: dedicated outlier plot below.
+        ax.boxplot(
+            data, tick_labels=["ok", "fail"], showfliers=False
+        )  # Hide fliers: dedicated outlier plot below.
         ax.set_title(f"{col} by class")
     axes.flat[-1].axis("off")
     fig.suptitle("Sensor separation between ok vs failure")
@@ -224,7 +260,16 @@ def plot_by_class(df: pd.DataFrame) -> None:
 
 def plot_correlation(df: pd.DataFrame) -> None:
     """Pearson correlation heatmap (matplotlib only): redundancy + leakage screen."""
-    sensors = [_col(df, c) for c in ("engine_rpm", "engine_load", "coolant_temp", "intake_air_temp", "vibration")]
+    sensors = [
+        _col(df, c)
+        for c in (
+            "engine_rpm",
+            "engine_load",
+            "coolant_temp",
+            "intake_air_temp",
+            "vibration",
+        )
+    ]
     fail = _col(df, "failure")
     corr = df[sensors + [fail]].corr(numeric_only=True)
 
@@ -236,7 +281,9 @@ def plot_correlation(df: pd.DataFrame) -> None:
     ax.set_yticks(range(len(corr.columns)), corr.columns)
     for i in range(len(corr.columns)):
         for j in range(len(corr.columns)):
-            ax.text(j, i, f"{corr.values[i, j]:.2f}", ha="center", va="center", fontsize=8)
+            ax.text(
+                j, i, f"{corr.values[i, j]:.2f}", ha="center", va="center", fontsize=8
+            )
     ax.set_title("Pearson correlation (sensors + failure)")
     fig.colorbar(im, ax=ax, label="r")
     _savefig("05_correlation.png")
@@ -272,10 +319,20 @@ def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
     # Scatter: temp_diff vs power coloured by class -- visual check that the
     # derived space separates failures better than any single raw sensor.
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.scatter(feats.loc[feats.failure == 0, "power_proxy"],
-                feats.loc[feats.failure == 0, "temp_diff"], s=4, alpha=0.3, label="ok")
-    ax.scatter(feats.loc[feats.failure == 1, "power_proxy"],
-                feats.loc[feats.failure == 1, "temp_diff"], s=10, alpha=0.8, label="fail")
+    ax.scatter(
+        feats.loc[feats.failure == 0, "power_proxy"],
+        feats.loc[feats.failure == 0, "temp_diff"],
+        s=4,
+        alpha=0.3,
+        label="ok",
+    )
+    ax.scatter(
+        feats.loc[feats.failure == 1, "power_proxy"],
+        feats.loc[feats.failure == 1, "temp_diff"],
+        s=10,
+        alpha=0.8,
+        label="fail",
+    )
     ax.set_xlabel("power_proxy (rpm * torque)")
     ax.set_ylabel("temp_diff (process - air)")
     ax.set_title("Derived space: power vs temperature rise")
@@ -302,7 +359,16 @@ def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
 def screen_outliers(df: pd.DataFrame) -> None:
     """Count IQR outliers per sensor; EDA reports them, training decides handling."""
     # IQR rule (not z-score): robust to the heavy skew seen in rpm/torque.
-    sensors = [_col(df, c) for c in ("engine_rpm", "engine_load", "coolant_temp", "intake_air_temp", "vibration")]
+    sensors = [
+        _col(df, c)
+        for c in (
+            "engine_rpm",
+            "engine_load",
+            "coolant_temp",
+            "intake_air_temp",
+            "vibration",
+        )
+    ]
     print("\n--- IQR outlier share per sensor (inform, do not drop yet) ---")
     for col in sensors:
         q1, q3 = df[col].quantile([0.25, 0.75])
@@ -338,24 +404,33 @@ def print_recommendations() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="EDA for AI4I failure-classification data.")
-    parser.add_argument("--csv", type=Path, default=DEFAULT_CSV, help="Path to predictive_maintenance.csv")
-    parser.add_argument("--no-show", action="store_true", help="Only save figures (default behaviour).")
+    parser = argparse.ArgumentParser(
+        description="EDA for AI4I failure-classification data."
+    )
+    parser.add_argument(
+        "--csv",
+        type=Path,
+        default=DEFAULT_CSV,
+        help="Path to predictive_maintenance.csv",
+    )
+    parser.add_argument(
+        "--no-show", action="store_true", help="Only save figures (default behaviour)."
+    )
     args = parser.parse_args()
 
     if not args.csv.exists():
         sys.exit(f"CSV not found: {args.csv} (pass --csv PATH)")
 
-    df = load_and_profile(args.csv)      # Step 1: production loader + profile.
-    df = clean_and_verify(df)            # Step 2: production cleaning + verify.
-    plot_target_bars(df)                 # Imbalance visualisation.
-    analyse_target(df)                   # Rates, modes, leakage check, Type split.
-    plot_univariate(df)                  # Per-sensor distributions.
-    plot_by_class(df)                    # Class-conditional separation.
-    plot_correlation(df)                 # Redundancy / leakage screen.
-    prototype_features(df)               # Candidate features + separation proof.
-    screen_outliers(df)                  # IQR outlier census.
-    print_recommendations()              # Actionable handoff to notebooks 03/04.
+    df = load_and_profile(args.csv)  # Step 1: production loader + profile.
+    df = clean_and_verify(df)  # Step 2: production cleaning + verify.
+    plot_target_bars(df)  # Imbalance visualisation.
+    analyse_target(df)  # Rates, modes, leakage check, Type split.
+    plot_univariate(df)  # Per-sensor distributions.
+    plot_by_class(df)  # Class-conditional separation.
+    plot_correlation(df)  # Redundancy / leakage screen.
+    prototype_features(df)  # Candidate features + separation proof.
+    screen_outliers(df)  # IQR outlier census.
+    print_recommendations()  # Actionable handoff to notebooks 03/04.
     print(f"\n[done] figures saved to {FIG_DIR}")
 
 
