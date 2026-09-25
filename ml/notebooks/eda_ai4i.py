@@ -54,8 +54,8 @@ for candidate in (ML_DIR, REPO_ROOT / "ml"):
             sys.path.insert(0, str(candidate))
         break
 
-from src.data.loaders import load_ai4i  # noqa: E402
-from src.data.preprocessing import PreProcessing  # noqa: E402
+from src.data.loaders import load_ai4i
+from src.data.preprocessing import PreProcessing
 
 DEFAULT_CSV = (
     REPO_ROOT / "data" / "failure_classification" / "raw" / "predictive_maintenance.csv"
