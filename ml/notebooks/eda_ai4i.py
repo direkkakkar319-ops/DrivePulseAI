@@ -1,7 +1,7 @@
 """EDA for the AI4I predictive-maintenance dataset (failure classification).
 
 Run from the repo root:
-    python ml/notebooks/01_eda_ai4i.py [--csv PATH] [--no-show]
+    python ml/notebooks/eda_ai4i.py [--csv PATH] [--no-show]
 
 What this script does:
   1. Loads data through the production loader `load_ai4i()` (ml/src/data/loaders.py).
@@ -39,14 +39,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# --- Resolve imports so the script runs from repo root OR ml/ (no hardcoded abs paths). ---
+# --- Resolve imports so the script runs from repo root OR ml/. ---
 THIS_FILE = Path(__file__).resolve()
-REPO_ROOT = (
-    THIS_FILE.parents[2]
-    if THIS_FILE.parents[2].name != "notebooks"
-    else THIS_FILE.parents[2]
-)
-# Layout is <root>/ml/notebooks/01_eda_ai4i.py -> ml dir is parent of notebooks.
+# Layout is <root>/ml/notebooks/eda_ai4i.py -> parents[2] is the repo root.
+REPO_ROOT = THIS_FILE.parents[2]
 ML_DIR = THIS_FILE.parents[1]
 for candidate in (ML_DIR, REPO_ROOT / "ml"):
     if (candidate / "src" / "data" / "loaders.py").exists():
@@ -105,7 +101,8 @@ def load_and_profile(csv_path: Path) -> pd.DataFrame:
     # Use the production loader so EDA reflects what training will actually see.
     df = load_ai4i(csv_path)
     print(
-        f"[load] rows={len(df)} cols={len(df.columns)} source={df['source'].unique().tolist()}"
+        f"[load] rows={len(df)} cols={len(df.columns)} "
+        f"source={df['source'].unique().tolist()}"
     )
 
     print("\n--- dtypes ---")
@@ -131,10 +128,11 @@ def load_and_profile(csv_path: Path) -> pd.DataFrame:
 def clean_and_verify(df: pd.DataFrame) -> pd.DataFrame:
     """Run PreProcessing.clean() and confirm no rows lost / NaNs introduced."""
     # clean() sorts by vehicle_id/timestamp and imputes sensor dropouts; targets
-    # ('failure','rul') are excluded from imputation by default to avoid label fabrication.
+    # ('failure','rul') are excluded by default to avoid label fabrication.
     cleaned, stats = PreProcessing.clean(df, return_imputer_stats=True)
     print(
-        f"\n[clean] rows {len(df)} -> {len(cleaned)} | imputer stats: {stats or 'none needed'}"
+        f"\n[clean] rows {len(df)} -> {len(cleaned)} "
+        f"| imputer stats: {stats or 'none needed'}"
     )
     assert len(cleaned) == len(df.drop_duplicates()), "Unexpected row loss in clean()"
     return cleaned
@@ -318,7 +316,7 @@ def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
 
     # Scatter: temp_diff vs power coloured by class -- visual check that the
     # derived space separates failures better than any single raw sensor.
-    fig, ax = plt.subplots(figsize=(7, 5))
+    _fig, ax = plt.subplots(figsize=(7, 5))
     ax.scatter(
         feats.loc[feats.failure == 0, "power_proxy"],
         feats.loc[feats.failure == 0, "temp_diff"],
@@ -343,7 +341,7 @@ def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
     # strongest single predictor and a future RUL proxy.
     feats["wear_bin"] = pd.qcut(feats["wear"], q=10, duplicates="drop")
     rate_by_wear = feats.groupby("wear_bin", observed=True)["failure"].mean()
-    fig2, ax2 = plt.subplots(figsize=(8, 4))
+    _fig2, ax2 = plt.subplots(figsize=(8, 4))
     rate_by_wear.plot(kind="bar", ax=ax2)
     ax2.set_title("Failure rate by tool-wear decile")
     ax2.set_ylabel("failure rate")
