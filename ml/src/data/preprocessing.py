@@ -109,7 +109,7 @@ class PreProcessing:
                 )
 
             numeric_impute_cols = [
-                c for c in impute_cols if np.issubdtype(cleaned[c].dtype, np.number)
+                c for c in impute_cols if pd.api.types.is_numeric_dtype(cleaned[c])
             ]
 
             for col in numeric_impute_cols:
@@ -180,7 +180,7 @@ class PreProcessing:
             cols_to_scale = [
                 col
                 for col in feature_cols
-                if col in scaled.columns and np.issubdtype(scaled[col].dtype, np.number)
+                if col in scaled.columns and pd.api.types.is_numeric_dtype(scaled[col])
             ]
         else:
             excl = set(DEFAULT_META_COLS + DEFAULT_TARGET_COLS)
@@ -236,7 +236,7 @@ class PreProcessing:
             active_cols = [
                 c
                 for c in feature_cols
-                if c in df.columns and np.issubdtype(df[c].dtype, np.number)
+                if c in df.columns and pd.api.types.is_numeric_dtype(df[c])
             ]
         else:
             excl = set(DEFAULT_META_COLS + DEFAULT_TARGET_COLS)
