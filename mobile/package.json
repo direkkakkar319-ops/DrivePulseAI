@@ -4,8 +4,11 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~57.0.18",
+    "@react-native-firebase/app": "^26.4.0",
+    "@react-native-firebase/auth": "^26.4.0",
     "expo": "~57.0.22",
     "expo-constants": "~57.0.18",
+    "expo-dev-client": "~57.0.19",
     "expo-device": "~57.0.2",
     "expo-font": "~57.0.4",
     "expo-glass-effect": "~57.0.3",
@@ -34,9 +37,9 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
+    "android": "expo run:android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint"
