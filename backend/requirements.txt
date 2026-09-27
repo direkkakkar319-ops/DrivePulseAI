@@ -13,3 +13,7 @@ websockets>=12.0
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 ruff>=0.1.0
+
+# Firebase managed authentication and API testing
+firebase-admin>=7,<8
+httpx>=0.28,<1

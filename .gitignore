@@ -44,3 +44,8 @@ frontend/build/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Server-only Firebase credentials
+**/*firebase-adminsdk*.json
+backend/service-account*.json
+backend/.secrets/
