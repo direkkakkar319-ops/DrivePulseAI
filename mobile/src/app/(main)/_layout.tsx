@@ -7,7 +7,7 @@ export default function MainLayout() {
       headerTintColor: '#fff',
       contentStyle: { backgroundColor: '#000' }
     }}>
-      <Stack.Screen name="index" options={{ title: 'Vehicles' }} />
+      <Stack.Screen name="dashboard" options={{ title: 'Your account' }} />
       <Stack.Screen name="vehicle/[id]" options={{ title: 'Vehicle Details' }} />
       <Stack.Screen name="report/[id]" options={{ title: 'Maintenance Report' }} />
     </Stack>
