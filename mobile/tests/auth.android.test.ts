@@ -1,13 +1,17 @@
 // Exercise the Firebase boundary without contacting the real project or sending email.
 import { authService } from '../src/api/auth.android';
 import {
-  createUserWithEmailAndPassword, getAuth, getIdToken, onIdTokenChanged,
+  createUserWithEmailAndPassword, getAuth, getIdToken, GoogleAuthProvider, onIdTokenChanged,
   reload, sendEmailVerification, sendPasswordResetEmail,
-  signInWithEmailAndPassword, signOut, updateProfile,
+  signInWithCredential, signInWithEmailAndPassword, signOut, updateProfile,
 } from '@react-native-firebase/auth';
+import { getGoogleIdToken } from '../src/auth/google';
+
+jest.mock('../src/auth/google', () => ({ getGoogleIdToken: jest.fn() }));
 
 jest.mock('@react-native-firebase/auth', () => ({
   getAuth: jest.fn(), getIdToken: jest.fn(), onIdTokenChanged: jest.fn(),
+  GoogleAuthProvider: { credential: jest.fn() }, signInWithCredential: jest.fn(),
   reload: jest.fn(), sendEmailVerification: jest.fn(), sendPasswordResetEmail: jest.fn(),
   signInWithEmailAndPassword: jest.fn(), createUserWithEmailAndPassword: jest.fn(), signOut: jest.fn(), updateProfile: jest.fn(),
 }));
@@ -28,6 +32,46 @@ it('trims email but preserves password exactly for login and signup', async () =
   expect(signInWithEmailAndPassword).toHaveBeenCalledWith(auth, 'user@example.com', ' password ');
   expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(auth, 'user@example.com', ' password ');
   expect(updateProfile).toHaveBeenCalledWith(auth.currentUser, { displayName: 'Driver' });
+});
+
+it('exchanges the Google credential with Firebase and publishes the Firebase identity', async () => {
+  const credential = { providerId: 'google.com', token: 'google-id-token' };
+  (getGoogleIdToken as jest.Mock).mockResolvedValue('google-id-token');
+  (GoogleAuthProvider.credential as jest.Mock).mockReturnValue(credential);
+  (onIdTokenChanged as jest.Mock).mockReturnValue(jest.fn());
+  (signInWithCredential as jest.Mock).mockImplementation(async () => {
+    auth.currentUser = { ...user, emailVerified: true };
+  });
+  const listener = jest.fn();
+  const stop = authService.subscribe(listener);
+  await authService.signInWithGoogle();
+  expect(GoogleAuthProvider.credential).toHaveBeenCalledWith('google-id-token');
+  expect(signInWithCredential).toHaveBeenCalledWith(auth, credential);
+  expect(listener).toHaveBeenLastCalledWith({ ...user, emailVerified: true });
+  expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
+  stop();
+});
+
+it('leaves Firebase untouched when the Google picker is cancelled', async () => {
+  auth.currentUser = null;
+  (getGoogleIdToken as jest.Mock).mockResolvedValue(null);
+  await authService.signInWithGoogle();
+  expect(signInWithCredential).not.toHaveBeenCalled();
+  expect(auth.currentUser).toBeNull();
+});
+
+it('does not publish a session when Firebase rejects a Google credential', async () => {
+  auth.currentUser = null;
+  (getGoogleIdToken as jest.Mock).mockResolvedValue('google-id-token');
+  const failure = { code: 'auth/account-exists-with-different-credential' };
+  (signInWithCredential as jest.Mock).mockRejectedValue(failure);
+  (onIdTokenChanged as jest.Mock).mockReturnValue(jest.fn());
+  const listener = jest.fn();
+  const stop = authService.subscribe(listener);
+  await expect(authService.signInWithGoogle()).rejects.toEqual(failure);
+  expect(listener).not.toHaveBeenCalled();
+  expect(auth.currentUser).toBeNull();
+  stop();
 });
 
 it('does not issue API tokens for signed-out or unverified accounts', async () => {

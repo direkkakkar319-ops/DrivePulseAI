@@ -15,7 +15,10 @@ export function authErrorMessage(error: unknown): string {
     case 'auth/user-disabled': return 'This account has been disabled.';
     case 'auth/user-token-expired':
     case 'auth/invalid-user-token': return 'Your session has expired. Please log out and sign in again.';
-    case 'auth/operation-not-allowed': return 'Email/password login is not enabled yet. Please contact support.';
+    case 'auth/operation-not-allowed': return 'This sign-in method is not enabled yet. Please contact support.';
+    case 'auth/account-exists-with-different-credential': return 'Use your existing sign-in method for this email. Linking sign-in methods is not available yet.';
+    case 'auth/google-sign-in-failed': return 'Google sign-in failed. Please try again or use your password.';
+    case 'auth/google-sign-in-unavailable': return 'Google sign-in is unavailable in this build. Please use your password.';
     default:
       // A bounded SDK error code helps diagnose device-only failures without
       // exposing the raw error message, email, password, or tokens.

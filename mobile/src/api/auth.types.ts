@@ -9,6 +9,7 @@ export interface AuthUser {
 export interface AuthService {
   subscribe: (listener: (user: AuthUser | null) => void) => () => void;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<{ uid: string; profileSaved: boolean }>;
   saveUsername: (uid: string, username: string) => Promise<void>;
   sendVerification: () => Promise<void>;

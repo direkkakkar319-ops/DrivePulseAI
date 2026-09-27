@@ -50,22 +50,56 @@ def load_ai4i(filepath: str | Path) -> pd.DataFrame:
     return df
 
 
-def load_simulated(filepath: str | Path) -> pd.DataFrame:
+def load_simulated(
+    filepath: str | Path,
+    pattern: str = "*.csv",
+) -> pd.DataFrame:
     """
-    Load simulated telemetry data (CSV or JSONL).
+    Load simulated telemetry data (CSV or JSONL), either from a single file or a directory.
 
     Args:
-        filepath: Path to the simulated data file.
+        filepath: Path to the simulated data file or directory containing files.
+        pattern: Glob pattern when loading from a directory (default: "*.csv").
 
     Returns:
-        pd.DataFrame: Dataframe containing the simulated telemetry with unified column names.
+        pd.DataFrame: Dataframe containing the simulated telemetry with unified column names and source label.
     """
     filepath = Path(filepath)
 
-    if filepath.suffix == ".jsonl":
-        df = pd.read_json(filepath, lines=True)
+    def _load_single(f: Path) -> pd.DataFrame:
+        if f.suffix == ".jsonl":
+            sub_df = pd.read_json(f, lines=True)
+        else:
+            sub_df = pd.read_csv(f)
+        if "vehicle_id" not in sub_df.columns:
+            sub_df["vehicle_id"] = f"SIM-{f.stem}"
+        return sub_df
+
+    if filepath.is_dir():
+        files = sorted(filepath.glob(pattern))
+        if not files and pattern == "*.csv":
+            files = sorted(filepath.glob("*.jsonl"))
+        if not files:
+            raise FileNotFoundError(f"No matching files found in directory: {filepath}")
+        dfs = [_load_single(f) for f in files]
+        df = pd.concat(dfs, ignore_index=True)
+    elif filepath.is_file():
+        df = _load_single(filepath)
     else:
-        df = pd.read_csv(filepath)
+        raise FileNotFoundError(f"File or directory not found: {filepath}")
+
+    mapping = {
+        "ENGINE_RUN_TINE ()": "timestamp",
+        "ENGINE_RPM ()": "engine_rpm",
+        "VEHICLE_SPEED ()": "speed_kmph",
+        "ENGINE_LOAD ()": "engine_load_pct",
+        "COOLANT_TEMPERATURE ()": "coolant_temp_c",
+        "INTAKE_AIR_TEMP ()": "intake_air_temp_c",
+        "CONTROL_MODULE_VOLTAGE ()": "battery_voltage",
+        "THROTTLE ()": "throttle_pct",
+    }
+    rename_dict = {k: v for k, v in mapping.items() if k in df.columns}
+    df = df.rename(columns=rename_dict)
 
     df["source"] = "simulated"
     return df

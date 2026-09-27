@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { authService } from '@/api/auth';
 import { authErrorMessage } from '@/api/auth-errors';
+import { googleAvailable } from '@/auth/google';
 import { AuthButton, AuthForm, AuthInput, AuthMessage, AuthPasswordInput } from '@/components/auth-form';
 import { useAuthStore } from '@/store/authStore';
 
@@ -55,6 +56,16 @@ export default function LoginScreen() {
     }
   }
 
+  async function googleLogin() {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    setMessage('');
+    try { await authService.signInWithGoogle(); }
+    catch (failure) { setError(authErrorMessage(failure)); }
+    finally { setBusy(false); }
+  }
+
   const title = mode === 'signup' ? 'Create your account' : mode === 'reset' ? 'Reset your password' : 'Welcome back';
   return (
     <AuthForm title={title} subtitle={mode === 'signup' ? 'Sign up with your email. You will verify it before entering the app.' : mode === 'reset' ? 'Enter your account email to request a reset link.' : 'Log in to your DrivePulseAI account.'}>
@@ -64,6 +75,7 @@ export default function LoginScreen() {
       <AuthMessage message={error} error />
       <AuthMessage message={message} />
       <AuthButton title={mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Send reset link' : 'Log in'} onPress={submit} loading={busy} />
+      {mode === 'login' && googleAvailable && <AuthButton title="Continue with Google" secondary disabled={busy} onPress={googleLogin} />}
       {mode === 'login' && <AuthButton title="Forgot password?" secondary disabled={busy} onPress={() => changeMode('reset')} />}
       <AuthButton title={mode === 'login' ? 'Create an account' : 'Back to login'} secondary disabled={busy} onPress={() => changeMode(mode === 'login' ? 'signup' : 'login')} />
     </AuthForm>

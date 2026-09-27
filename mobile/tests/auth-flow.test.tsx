@@ -11,9 +11,10 @@ import { UsernameSaveNotice } from '../src/components/username-save-notice';
 import VerifyEmailScreen from '../src/app/verify-email';
 
 jest.mock('../src/api/client', () => ({ syncProfile: jest.fn() }));
+jest.mock('../src/auth/google', () => ({ googleAvailable: true }));
 
 jest.mock('../src/api/auth', () => ({ authService: {
-  subscribe: jest.fn(), signIn: jest.fn(), signUp: jest.fn(), saveUsername: jest.fn(),
+  subscribe: jest.fn(), signIn: jest.fn(), signInWithGoogle: jest.fn(), signUp: jest.fn(), saveUsername: jest.fn(),
   resetPassword: jest.fn(), sendVerification: jest.fn(), refreshUser: jest.fn(), signOut: jest.fn(),
 } }));
 
@@ -68,6 +69,30 @@ it('shows a failed login instead of navigating past authentication', async () =>
   await fireEvent.press(screen.getByText('Log in'));
   expect(await screen.findByText('The email or password is incorrect.')).toBeTruthy();
   expect(authService.signIn).toHaveBeenCalledWith('user@example.com', 'incorrect');
+});
+
+it('enters protected routes only after Google establishes a verified Firebase session', async () => {
+  (authService.signInWithGoogle as jest.Mock).mockImplementation(async () => {
+    notify({ ...unverified, emailVerified: true });
+  });
+  await render(<AuthProvider><LoginScreen /><RootNavigator /></AuthProvider>);
+  await act(async () => notify(null));
+  await fireEvent.press(screen.getByText('Continue with Google'));
+  expect(authService.signInWithGoogle).toHaveBeenCalledTimes(1);
+  expect(screen.getByText('route:(main)')).toBeTruthy();
+  expect(authService.signIn).not.toHaveBeenCalled();
+});
+
+it('keeps routes closed after Google cancellation or an account conflict', async () => {
+  (authService.signInWithGoogle as jest.Mock).mockResolvedValueOnce(undefined)
+    .mockRejectedValueOnce({ code: 'auth/account-exists-with-different-credential' });
+  await render(<AuthProvider><LoginScreen /><RootNavigator /></AuthProvider>);
+  await act(async () => notify(null));
+  await fireEvent.press(screen.getByText('Continue with Google'));
+  expect(screen.queryByText('route:(main)')).toBeNull();
+  await fireEvent.press(screen.getByText('Continue with Google'));
+  expect(await screen.findByText(/Use your existing sign-in method/)).toBeTruthy();
+  expect(screen.queryByText('route:(main)')).toBeNull();
 });
 
 it('requires a username and submits exactly the three signup fields', async () => {

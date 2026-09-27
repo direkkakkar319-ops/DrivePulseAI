@@ -36,7 +36,8 @@
           "imageWidth": 76
         }
       ],
-      "@react-native-firebase/app"
+      "@react-native-firebase/app",
+      "react-native-nitro-google-signin"
     ],
     "experiments": {
       "typedRoutes": true,

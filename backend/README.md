@@ -5,7 +5,7 @@ Firebase remains responsible for passwords, email verification, login, and sessi
 
 ## Implemented flow
 
-1. The Android app signs in with Firebase and verifies its email.
+1. The Android app signs in with Firebase (email/password or Google) and has a verified email.
 2. The account screen obtains a fresh Firebase ID token and sends
    `PUT /api/v1/users/me` with `Authorization: Bearer <ID token>` and no body.
 3. The Firebase Admin SDK checks the signature, expiry, audience/project, issuer,
@@ -52,6 +52,21 @@ interface and keeps its data in the `drivepulse_postgres` Docker volume.
 The existing SQLite setting must be replaced with a PostgreSQL URL; SQLite data
 is not imported or deleted by this implementation.
 
+### Transition from the custom authentication prototype
+
+Firebase replaces the `/auth/*` password/Google/session API introduced in PR #28.
+The mobile app exchanges Google credentials with Firebase; the server accepts
+only Firebase bearer tokens. Custom password hashes and `auth_sessions` are no
+longer used. Device logout clears the Firebase session but does not revoke already
+issued ID tokens; administrative revocation is a separate operation.
+
+Use a fresh PostgreSQL database/schema for `alembic upgrade head`. The prototype's
+`users` table (`id`, `password_hash`, `google_subject`) is incompatible with the
+Firebase profile table, and this initial migration does not convert it. Preserve
+any existing database. If it contains real accounts, plan an explicit identity/data
+migration before rollout; existing passwords and custom sessions do not automatically
+become Firebase accounts. No existing database is deleted or migrated by this merge.
+
 ### Firebase server credentials
 
 For local development, in Firebase project `drivepulse-d2034`, open **Project
@@ -88,8 +103,9 @@ Set `EXPO_PUBLIC_API_URL` in `mobile/.env` to the backend URL and restart Metro:
 - Android emulator: `http://10.0.2.2:8000`.
 - Deployed service: its `https://...` URL.
 
-Then run `npm start` inside `mobile/` and open the existing Android development
-build. These changes use its existing native modules and do not require a new APK.
+Then run `npm start` inside `mobile/`. Rebuild the Android development APK after
+this merge because Google sign-in adds native modules; later API URL changes only
+require restarting Metro.
 Native requests do not require CORS; web clients must be listed explicitly in
 `CORS_ORIGINS`, a JSON array. Production API traffic must use HTTPS.
 

@@ -1,10 +1,11 @@
 # DrivePulseAI Android app
 
-React Native + Expo frontend with Firebase email/password authentication.
+React Native + Expo frontend with Firebase email/password and Android Google authentication.
 
 ## Implemented
 
 - Signup with exactly Username, Email, and Password; email/password login.
+- Google sign-in through Android Credential Manager, exchanged for a Firebase session.
 - Show/hide password controls on signup and login.
 - Username stored in the Firebase Auth `displayName` profile field. It is not
   unique and cannot be used instead of email to log in.
@@ -28,8 +29,8 @@ as described in [the backend setup](../backend/README.md). Client-side guards do
 permission checks.
 
 FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
-Live use requires server credentials and a reachable API. Google sign-in and cloud
-deployment remain subsequent steps. Vehicle/report routes still contain prototype placeholders.
+Live use requires server credentials and a reachable API. Cloud deployment remains
+a subsequent step. Vehicle/report routes still contain prototype placeholders.
 iOS and web authentication have not been configured; they display a setup message.
 The Firebase Auth config plugin only adds iOS setup in the installed version, so
 it is omitted for this Android integration. Add it with the iOS Firebase config
@@ -56,6 +57,24 @@ If only the profile write fails, the account still exists: the verification/acco
 screen offers **Retry saving username**, without recreating the account. That
 retry draft is held only in memory, so retry before closing the app or logging out.
 Existing accounts are not assigned a username automatically.
+
+### Google sign-in
+
+1. Enable **Google** in Firebase Authentication for `drivepulse-d2034`.
+2. Register the SHA-1/SHA-256 fingerprints for each development/release signing
+   key against `com.drivepulseai.app`, then download the updated `google-services.json`.
+3. Set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` in `mobile/.env` to the **Web** OAuth
+   client ID from that same project. Leave it empty to hide the Google button.
+4. Rebuild the Android development APK: this merge adds the native
+   `react-native-nitro-google-signin` and `react-native-nitro-modules` packages.
+
+The Google ID token is exchanged with Firebase using `signInWithCredential`.
+FastAPI receives only the resulting Firebase ID token through the same profile API
+used by email/password accounts; there is no separate `/auth/google` backend.
+Google's display name becomes the initial profile username. Cancelling the account
+picker leaves the session unchanged. Account linking is not implemented; if Firebase
+reports an existing account with a different credential, use its existing sign-in method.
+Google provider settings, client IDs, and signing fingerprints need a real-device check.
 
 Login and logout publish the SDK's current account after the operation succeeds,
 as well as listening for token events, so navigation does not depend solely on
@@ -131,9 +150,9 @@ email delivery, native compilation, or Android back-stack/deep-link behavior.
 7. Repeat signup/login, verification, and session refresh on target Indian Wi-Fi
    and mobile networks before relying on the integration for real users.
 
-For future Google sign-in, add the relevant Android signing fingerprints to Firebase,
-enable Google as a provider, download the updated configuration, and implement the
-native sign-in flow. The previous fake Google button has been removed.
+8. With Google configured, sign in and confirm the Firebase UID matches the synced
+   PostgreSQL profile. Log out and cancel the Google picker: protected routes must
+   remain closed. Also test provider/configuration failures and account conflicts.
 
 ## References
 

@@ -1,9 +1,10 @@
 // Android Firebase Auth adapter; the native SDK owns credentials and persistence.
 import {
-  createUserWithEmailAndPassword, getAuth, getIdToken, onIdTokenChanged,
+  createUserWithEmailAndPassword, getAuth, getIdToken, GoogleAuthProvider, onIdTokenChanged,
   reload, sendEmailVerification, sendPasswordResetEmail,
-  signInWithEmailAndPassword, signOut, updateProfile, type User,
+  signInWithCredential, signInWithEmailAndPassword, signOut, updateProfile, type User,
 } from '@react-native-firebase/auth';
+import { getGoogleIdToken } from '@/auth/google';
 import type { AuthService, AuthUser } from './auth.types';
 
 function snapshot(user: User | null): AuthUser | null {
@@ -32,6 +33,12 @@ export const authService: AuthService = {
     await signInWithEmailAndPassword(getAuth(), email.trim(), password);
     // The SDK has updated currentUser when this resolves. Keep navigation in
     // sync even if the separate native token event is delayed.
+    publishCurrentUser();
+  },
+  async signInWithGoogle() {
+    const idToken = await getGoogleIdToken();
+    if (!idToken) return; // Dismissing Google's account picker leaves the session unchanged.
+    await signInWithCredential(getAuth(), GoogleAuthProvider.credential(idToken));
     publishCurrentUser();
   },
   async signUp(email, password, username) {

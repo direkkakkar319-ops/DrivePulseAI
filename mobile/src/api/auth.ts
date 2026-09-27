@@ -8,6 +8,7 @@ const unavailable = (): never => {
 export const authService: AuthService = {
   subscribe: unavailable,
   signIn: unavailable,
+  signInWithGoogle: unavailable,
   signUp: unavailable,
   saveUsername: unavailable,
   sendVerification: unavailable,
