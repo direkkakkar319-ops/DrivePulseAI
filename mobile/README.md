@@ -1,56 +1,142 @@
-# Welcome to your Expo app 👋
+# DrivePulseAI Android app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native + Expo frontend with Firebase email/password authentication.
 
-## Get started
+## Implemented
 
-1. Install dependencies
+- Signup with exactly Username, Email, and Password; email/password login.
+- Show/hide password controls on signup and login.
+- Username stored in the Firebase Auth `displayName` profile field. It is not
+  unique and cannot be used instead of email to log in.
+- Verification screen with send/resend and a check-verification action.
+- Password reset through Firebase-hosted email links.
+- Native Firebase session persistence and logout on this device.
+- Protected routes: signed-out users see login; unverified users see verification;
+  only verified users enter the account area.
+- Account screen replaces the old dummy vehicle scores.
 
-   ```bash
-   npm install
-   ```
+Firebase stores authentication accounts, including email and the explicitly saved
+display name. It stores passwords using its salted, modified scrypt hashing
+scheme. Password text exists temporarily in the form state while typing; we do
+not persist it ourselves. The native SDK manages session persistence and tokens.
+`src/api/auth.android.ts` owns Firebase operations;
+`src/store/authStore.ts` shares account state; `src/app/_layout.tsx` guards routes.
+The account screen now sends a fresh token to FastAPI to synchronize the minimal
+PostgreSQL profile. `src/api/client.ts` sends bearer tokens, limits retries, and
+handles server/network failures. Configure `EXPO_PUBLIC_API_URL` in `mobile/.env`
+as described in [the backend setup](../backend/README.md). Client-side guards do not replace server-side token and
+permission checks.
 
-2. Start the app
+FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
+Live use requires server credentials and a reachable API. Google sign-in and cloud
+deployment remain subsequent steps. Vehicle/report routes still contain prototype placeholders.
+iOS and web authentication have not been configured; they display a setup message.
+The Firebase Auth config plugin only adds iOS setup in the installed version, so
+it is omitted for this Android integration. Add it with the iOS Firebase config
+when implementing iOS support.
 
-   ```bash
-   npx expo start
-   ```
+## Firebase setup
 
-In the output, you'll find options to open the app in a
+1. Use project `drivepulse-d2034` and enable **Authentication → Sign-in method →
+   Email/Password**. Passwordless email-link sign-in is not required.
+2. Register the Android package `com.drivepulseai.app`.
+3. Download its `google-services.json` into this `mobile/` directory.
+   `app.json` references this file. It is client configuration, not an Admin SDK
+   service-account private key. Never put an Admin SDK key in the mobile app.
+4. Review the Firebase password policy and email-enumeration protection settings.
+   The SDK enforces the configured password policy during signup.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Verification/reset links open Firebase's hosted page in a browser. After verifying,
+return to the app and tap **I have verified my email**. No legacy Dynamic Links
+configuration is needed for this flow. Signup deliberately asks the user to send
+verification from that screen so email-delivery failures can be retried.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Account creation and saving `displayName` are two separate Firebase requests.
+If only the profile write fails, the account still exists: the verification/account
+screen offers **Retry saving username**, without recreating the account. That
+retry draft is held only in memory, so retry before closing the app or logging out.
+Existing accounts are not assigned a username automatically.
 
-## Get a fresh project
+Login and logout publish the SDK's current account after the operation succeeds,
+as well as listening for token events, so navigation does not depend solely on
+the timing of the native event. Unverified users can sign in but remain on the
+verification screen. Firebase errors are shown with friendly messages; otherwise
+unrecognized `auth/...` codes are displayed without raw SDK errors or credentials.
 
-When you're ready, run:
+## Install and build
+
+Use Node.js 22.13 or newer and run commands from `mobile/`:
 
 ```bash
-npm run reset-project
+npm ci
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+This app now uses native Firebase modules and must run in an Android development
+build. **Expo Go cannot load these modules.**
 
-### Other setup steps
+For a local build, install the Expo-compatible Android Studio/SDK and JDK, connect
+an Android device with USB debugging (or start an emulator), then run:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+npm run android
+```
 
-## Learn more
+Alternatively, use Expo's EAS cloud build service (requires an Expo account):
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npx eas-cli login
+npx eas-cli build --platform android --profile development
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+The EAS CLI will ask to link/create an Expo project on the first build. The
+`development` profile in `eas.json` produces an installable APK. Install it on your
+Android phone. To serve the JavaScript during development, run:
 
-## Join the community
+```bash
+npm start
+```
 
-Join our community of developers creating universal apps.
+Connect the phone and development computer to the same network and open the
+project using the installed development app. Rebuild the APK whenever native
+packages or Firebase native configuration change.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Checks
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm test -- --runInBand
+npx expo export --platform android --output-dir /tmp/drivepulse-android-export
+```
+
+If local generated route types are stale after adding routes, briefly run
+`npm start` to regenerate `.expo/types/router.d.ts`, then rerun TypeScript.
+
+Tests mock Firebase and native navigation. They check authentication errors,
+verification, account creation validation, token retrieval, session restoration,
+and which route groups are exposed. They do not prove live Firebase connectivity,
+email delivery, native compilation, or Android back-stack/deep-link behavior.
+
+## Manual acceptance on an Android device
+
+1. Sign up with a username and an email you own. Check the password eye toggle.
+   Confirm the account and display name appear in Firebase Auth.
+2. Send the verification email and try entering the app before verification: access
+   must remain restricted. Check that signed-out deep links cannot open main routes.
+3. Follow the email link, return, and check verification. The account screen appears.
+4. Close and reopen the app: the signed-in account should be restored.
+5. Log out: back navigation and direct links must not reopen protected screens.
+   Log in again with the exact same email/password and confirm the account returns.
+6. Try an incorrect password, a password reset, and an offline login.
+7. Repeat signup/login, verification, and session refresh on target Indian Wi-Fi
+   and mobile networks before relying on the integration for real users.
+
+For future Google sign-in, add the relevant Android signing fingerprints to Firebase,
+enable Google as a provider, download the updated configuration, and implement the
+native sign-in flow. The previous fake Google button has been removed.
+
+## References
+
+- [Expo Firebase integration](https://docs.expo.dev/guides/using-firebase/)
+- [React Native Firebase setup](https://rnfirebase.io/)
+- [Firebase Android setup](https://firebase.google.com/docs/android/setup)

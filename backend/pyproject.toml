@@ -6,6 +6,8 @@ requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["postgres: requires a dedicated TEST_DATABASE_URL PostgreSQL database"]
 asyncio_mode = "strict"
 
 [tool.ruff]
