@@ -29,7 +29,14 @@ class Settings(BaseSettings):
             raise ValueError(
                 "DATABASE_URL must use postgresql:// or postgresql+psycopg2://"
             )
-        return value
+        # SQLAlchemy 2.1 defaults plain PostgreSQL URLs to psycopg (v3).
+        # Our declared driver is psycopg2; keep API and migrations consistent.
+        # Replace only the scheme to preserve encoded credentials/query options.
+        return SecretStr(
+            value.get_secret_value().replace(
+                "postgresql://", "postgresql+psycopg2://", 1
+            )
+        )
 
 
 @lru_cache
