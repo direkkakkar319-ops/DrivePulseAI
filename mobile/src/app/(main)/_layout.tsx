@@ -1,15 +1,15 @@
 import { Stack } from 'expo-router';
 import { Alert, Pressable, Text } from 'react-native';
 import { useState } from 'react';
-import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/api/auth';
+import { authErrorMessage } from '@/api/auth-errors';
 
 export default function MainLayout() {
-  const { logout } = useAuthStore();
   const [busy, setBusy] = useState(false);
   async function signOut() {
     setBusy(true);
-    try { await logout(); }
-    catch (error) { Alert.alert('Could not log out', error instanceof Error ? error.message : 'Please try again.'); }
+    try { await authService.signOut(); }
+    catch (error) { Alert.alert('Could not log out', authErrorMessage(error)); }
     finally { setBusy(false); }
   }
   return (
@@ -21,7 +21,7 @@ export default function MainLayout() {
       </Pressable>,
       contentStyle: { backgroundColor: '#000' }
     }}>
-      <Stack.Screen name="index" options={{ title: 'Vehicles' }} />
+      <Stack.Screen name="dashboard" options={{ title: 'Your account' }} />
       <Stack.Screen name="vehicle/[id]" options={{ title: 'Vehicle Details' }} />
       <Stack.Screen name="report/[id]" options={{ title: 'Maintenance Report' }} />
     </Stack>

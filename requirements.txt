@@ -22,3 +22,7 @@ pytest>=7.4.0
 pytest-asyncio>=0.21.0
 ruff>=0.1.0
 pre-commit>=3.5.0
+
+# Managed auth validation and API test client (also listed in backend/requirements.txt)
+firebase-admin>=7,<8
+httpx>=0.28,<1

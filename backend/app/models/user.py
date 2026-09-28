@@ -1,27 +1,21 @@
-"""User identities and hashed, revocable application sessions."""
+"""Minimal app profile keyed by Firebase UID, without authentication secrets."""
 
-import uuid
+from datetime import datetime
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 
 
-class User(Base):
+class UserProfile(Base):
     __tablename__ = "users"
-
-    id: Mapped[str] = mapped_column(
-        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    firebase_uid: Mapped[str] = mapped_column(String(128), primary_key=True)
+    email: Mapped[str] = mapped_column(Text, nullable=False)
+    username: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    email: Mapped[str] = mapped_column(String(254), unique=True)
-    password_hash: Mapped[str | None] = mapped_column(String(255))
-    google_subject: Mapped[str | None] = mapped_column(String(255), unique=True)
-
-
-class AuthSession(Base):
-    __tablename__ = "auth_sessions"
-
-    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
-    expires_at: Mapped[int]
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
