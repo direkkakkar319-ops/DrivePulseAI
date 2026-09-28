@@ -1,4 +1,4 @@
-// API profile contract; mirrored by backend/app/schemas/user.py and mobile/src/api/profile.types.ts.
+// PostgreSQL profile response from the authenticated FastAPI /api/v1/users/me endpoint.
 export interface UserProfile {
   firebase_uid: string;
   email: string;

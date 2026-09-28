@@ -1,151 +1,151 @@
-"""Authentication integration tests against an isolated database."""
+"""API authentication failures and the Firebase Admin verification boundary."""
 
-import time
-from unittest.mock import patch
+from collections.abc import Iterator
+from unittest.mock import Mock
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Session
-from sqlalchemy.pool import StaticPool
+from firebase_admin import auth
+from google.auth.exceptions import DefaultCredentialsError
 
-from app.config import settings
-from app.database import Base, get_db
-from app.main import app
-from app.models.user import AuthSession, User
-from app.services import auth_service
-
-CREDS = {"email": "driver@example.com", "password": "a-long-test-password"}
+from app.api import deps
+from app.config import Settings
+from app.core import firebase
+from app.main import create_app
 
 
 @pytest.fixture
-def client():
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+def client() -> Iterator[TestClient]:
+    settings = Settings(
+        _env_file=None,
+        database_url="postgresql://test:test@localhost/unused",
+        cors_origins=[],
     )
-    Base.metadata.create_all(engine)
-    with Session(engine) as db:
-        app.dependency_overrides[get_db] = lambda: db
-        with TestClient(app) as client:
-            yield client, db
-    app.dependency_overrides.clear()
-    engine.dispose()
+    with TestClient(create_app(settings)) as value:
+        yield value
 
 
-def headers(response):
-    return {"Authorization": f"Bearer {response.json()['access_token']}"}
-
-
-def test_signup_login_and_logout(client):
-    api, db = client
-    registered = api.post("/auth/register", json=CREDS)
-    assert registered.status_code == 201
-    assert registered.headers["cache-control"] == "no-store"
-    assert set(registered.json()["user"]) == {"id", "email"}
-    assert (
-        api.get("/auth/me", headers=headers(registered)).json()["email"]
-        == CREDS["email"]
-    )
-    user = db.scalar(select(User))
-    assert user.password_hash != CREDS["password"]
-    session = db.scalar(select(AuthSession))
-    assert session.token_hash != registered.json()["access_token"]
-    logged_in = api.post("/auth/login", json={**CREDS, "email": "DRIVER@example.com"})
-    assert logged_in.status_code == 200
-    assert logged_in.json()["access_token"] != registered.json()["access_token"]
-    assert api.post("/auth/logout", headers=headers(registered)).status_code == 204
-    assert api.get("/auth/me", headers=headers(registered)).status_code == 401
-    assert api.get("/auth/me", headers=headers(logged_in)).status_code == 200
-
-
-@pytest.mark.parametrize("email", [CREDS["email"], "missing@example.com"])
-def test_wrong_credentials(client, email):
-    api, _ = client
-    api.post("/auth/register", json=CREDS)
-    response = api.post("/auth/login", json={"email": email, "password": "wrong"})
+@pytest.mark.parametrize("authorization", [None, "Basic abc", "Bearer"])
+def test_missing_bearer_is_401(client: TestClient, authorization: str | None) -> None:
+    headers = {"Authorization": authorization} if authorization else {}
+    response = client.put("/api/v1/users/me", headers=headers)
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid email or password."
+    assert response.headers["www-authenticate"] == "Bearer"
 
 
-def test_registration_validation_and_duplicate(client):
-    api, _ = client
-    assert (
-        api.post("/auth/register", json={**CREDS, "password": "short"}).status_code
-        == 422
+@pytest.mark.parametrize("verified", [False, None, "true", 1])
+def test_unverified_claim_cannot_access_storage(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, verified: object
+) -> None:
+    monkeypatch.setattr(
+        deps,
+        "verify_token",
+        lambda *_: {
+            "uid": "one",
+            "email": "one@example.com",
+            "email_verified": verified,
+        },
     )
-    assert api.post("/auth/register", json={**CREDS, "email": "bad"}).status_code == 422
-    api.post("/auth/register", json=CREDS)
+    response = client.put("/api/v1/users/me", headers={"Authorization": "Bearer token"})
+    assert response.status_code == 403
+
+
+@pytest.mark.parametrize("uid", [None, "", 123, "a" * 129])
+def test_invalid_identity_is_rejected(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, uid: object
+) -> None:
+    monkeypatch.setattr(
+        deps,
+        "verify_token",
+        lambda *_: {"uid": uid, "email": "one@example.com", "email_verified": True},
+    )
     assert (
-        api.post(
-            "/auth/register", json={**CREDS, "email": "DRIVER@example.com"}
+        client.get(
+            "/api/v1/users/me", headers={"Authorization": "Bearer token"}
         ).status_code
-        == 409
+        == 401
     )
-
-
-def test_protected_endpoint_and_expiry(client):
-    api, db = client
-    assert api.get("/auth/me").status_code == 401
-    assert (
-        api.get("/auth/me", headers={"Authorization": "Bearer fake"}).status_code == 401
-    )
-    response = api.post("/auth/register", json=CREDS)
-    session = db.scalar(select(AuthSession))
-    session.expires_at = int(time.time()) - 1
-    db.commit()
-    assert api.get("/auth/me", headers=headers(response)).status_code == 401
-
-
-def test_google_verified_identity_and_repeat_login(client, monkeypatch):
-    api, db = client
-    monkeypatch.setattr(settings, "google_web_client_id", "test-client")
-    claims = {"sub": "google-subject", "email": CREDS["email"], "email_verified": True}
-    with patch.object(
-        auth_service.id_token, "verify_oauth2_token", return_value=claims
-    ) as verify:
-        first = api.post("/auth/google", json={"id_token": "signed-token"})
-        second = api.post("/auth/google", json={"id_token": "signed-token"})
-    assert first.status_code == second.status_code == 200
-    assert first.json()["user"] == second.json()["user"]
-    assert verify.call_args.kwargs["audience"] == "test-client"
-    assert db.scalar(select(User)).google_subject == "google-subject"
-    assert api.post("/auth/login", json=CREDS).status_code == 401
-
-
-def test_google_does_not_link_unverified_password_account(client, monkeypatch):
-    api, _ = client
-    api.post("/auth/register", json=CREDS)
-    monkeypatch.setattr(settings, "google_web_client_id", "test-client")
-    claims = {"sub": "google-subject", "email": CREDS["email"], "email_verified": True}
-    with patch.object(
-        auth_service.id_token, "verify_oauth2_token", return_value=claims
-    ):
-        assert api.post("/auth/google", json={"id_token": "token"}).status_code == 409
 
 
 @pytest.mark.parametrize(
-    "claims",
+    "failure",
     [
-        {"sub": "sub", "email": CREDS["email"], "email_verified": False},
-        {"email": CREDS["email"], "email_verified": True},
-        {"sub": "sub", "email_verified": True},
+        auth.InvalidIdTokenError("invalid signature or wrong project"),
+        auth.ExpiredIdTokenError("expired", cause=None),
+        auth.RevokedIdTokenError("revoked"),
+        auth.UserDisabledError("disabled"),
+        auth.UserNotFoundError("deleted"),
     ],
 )
-def test_google_rejects_incomplete_identity(client, monkeypatch, claims):
-    api, _ = client
-    monkeypatch.setattr(settings, "google_web_client_id", "test-client")
-    with patch.object(
-        auth_service.id_token, "verify_oauth2_token", return_value=claims
-    ):
-        assert api.post("/auth/google", json={"id_token": "token"}).status_code == 401
+def test_rejected_tokens_never_reach_database(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, failure: Exception
+) -> None:
+    monkeypatch.setattr(firebase, "get_firebase_app", lambda *_: object())
+    verifier = Mock(side_effect=failure)
+    monkeypatch.setattr(firebase.auth, "verify_id_token", verifier)
+    response = client.put(
+        "/api/v1/users/me", headers={"Authorization": "Bearer invalid-token"}
+    )
+    assert response.status_code == 401
+    assert "invalid-token" not in response.text
+    assert verifier.call_args.kwargs["check_revoked"] is True
 
 
-def test_google_invalid_token_and_missing_config(client, monkeypatch):
-    api, _ = client
-    monkeypatch.setattr(settings, "google_web_client_id", "")
-    assert api.post("/auth/google", json={"id_token": "token"}).status_code == 503
-    monkeypatch.setattr(settings, "google_web_client_id", "test-client")
-    with patch.object(
-        auth_service.id_token, "verify_oauth2_token", side_effect=ValueError
-    ):
-        assert api.post("/auth/google", json={"id_token": "invalid"}).status_code == 401
+def test_verification_uses_configured_project_and_revocation_check(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    app = object()
+    initialize = Mock(return_value=app)
+    verifier = Mock(return_value={"uid": "trusted"})
+    monkeypatch.setattr(firebase, "get_firebase_app", initialize)
+    monkeypatch.setattr(firebase.auth, "verify_id_token", verifier)
+    assert firebase.verify_token("opaque-token", "expected-project") == {
+        "uid": "trusted"
+    }
+    initialize.assert_called_once_with("expected-project")
+    verifier.assert_called_once_with("opaque-token", app=app, check_revoked=True)
+
+
+def test_credentials_failure_is_safe_503(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        firebase,
+        "get_firebase_app",
+        Mock(side_effect=DefaultCredentialsError("private server details")),
+    )
+    response = client.put("/api/v1/users/me", headers={"Authorization": "Bearer token"})
+    assert response.status_code == 503
+    assert "private server details" not in response.text
+
+
+def test_emulator_cannot_bypass_validation(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("FIREBASE_AUTH_EMULATOR_HOST", "localhost:9099")
+    firebase.get_firebase_app.cache_clear()
+    with pytest.raises(RuntimeError, match="emulator mode"):
+        firebase.get_firebase_app("test-project")
+
+
+def test_sqlite_config_is_rejected() -> None:
+    with pytest.raises(ValueError, match="DATABASE_URL must use postgresql"):
+        Settings(_env_file=None, database_url="sqlite:///old.db")
+
+
+def test_database_failure_does_not_expose_connection_details(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from sqlalchemy.exc import OperationalError
+
+    monkeypatch.setattr(
+        deps,
+        "verify_token",
+        lambda *_: {"uid": "one", "email": "one@example.com", "email_verified": True},
+    )
+
+    def unavailable() -> None:
+        raise OperationalError("private SQL", {}, Exception("private credentials"))
+
+    client.app.dependency_overrides[deps.get_db] = unavailable
+    response = client.put("/api/v1/users/me", headers={"Authorization": "Bearer token"})
+    assert response.status_code == 503
+    assert response.json() == {"detail": "Profile storage unavailable"}

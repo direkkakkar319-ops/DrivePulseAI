@@ -1,73 +1,161 @@
-# DrivePulseAI mobile
+# DrivePulseAI Android app
 
-React Native / Expo SDK 57 Android app. Use Node.js 22.13 or newer.
+React Native + Expo frontend with Firebase email/password and Android Google authentication.
 
-## Local password authentication
-## Password authentication
+## Implemented
 
-Start the backend using [its setup instructions](../backend/README.md), then:
+- Signup with exactly Username, Email, and Password; email/password login.
+- Google sign-in through Android Credential Manager, exchanged for a Firebase session.
+- Show/hide password controls on signup and login.
+- Username stored in the Firebase Auth `displayName` profile field. It is not
+  unique and cannot be used instead of email to log in.
+- Verification screen with send/resend and a check-verification action.
+- Password reset through Firebase-hosted email links.
+- Native Firebase session persistence and logout on this device.
+- Protected routes: signed-out users see login; unverified users see verification;
+  only verified users enter the account area.
+- Account screen replaces the old dummy vehicle scores.
+
+Firebase stores authentication accounts, including email and the explicitly saved
+display name. It stores passwords using its salted, modified scrypt hashing
+scheme. Password text exists temporarily in the form state while typing; we do
+not persist it ourselves. The native SDK manages session persistence and tokens.
+`src/api/auth.android.ts` owns Firebase operations;
+`src/store/authStore.ts` shares account state; `src/app/_layout.tsx` guards routes.
+The account screen now sends a fresh token to FastAPI to synchronize the minimal
+PostgreSQL profile. `src/api/client.ts` sends bearer tokens, limits retries, and
+handles server/network failures. Configure `EXPO_PUBLIC_API_URL` in `mobile/.env`
+as described in [the backend setup](../backend/README.md). Client-side guards do not replace server-side token and
+permission checks.
+
+FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
+Live use requires server credentials and a reachable API. Cloud deployment remains
+a subsequent step. Vehicle/report routes still contain prototype placeholders.
+iOS and web authentication have not been configured; they display a setup message.
+The Firebase Auth config plugin only adds iOS setup in the installed version, so
+it is omitted for this Android integration. Add it with the iOS Firebase config
+when implementing iOS support.
+
+## Firebase setup
+
+1. Use project `drivepulse-d2034` and enable **Authentication → Sign-in method →
+   Email/Password**. Passwordless email-link sign-in is not required.
+2. Register the Android package `com.drivepulseai.app`.
+3. Download its `google-services.json` into this `mobile/` directory.
+   `app.json` references this file. It is client configuration, not an Admin SDK
+   service-account private key. Never put an Admin SDK key in the mobile app.
+4. Review the Firebase password policy and email-enumeration protection settings.
+   The SDK enforces the configured password policy during signup.
+
+Verification/reset links open Firebase's hosted page in a browser. After verifying,
+return to the app and tap **I have verified my email**. No legacy Dynamic Links
+configuration is needed for this flow. Signup deliberately asks the user to send
+verification from that screen so email-delivery failures can be retried.
+
+Account creation and saving `displayName` are two separate Firebase requests.
+If only the profile write fails, the account still exists: the verification/account
+screen offers **Retry saving username**, without recreating the account. That
+retry draft is held only in memory, so retry before closing the app or logging out.
+Existing accounts are not assigned a username automatically.
+
+### Google sign-in
+
+1. Enable **Google** in Firebase Authentication for `drivepulse-d2034`.
+2. Register the SHA-1/SHA-256 fingerprints for each development/release signing
+   key against `com.drivepulseai.app`, then download the updated `google-services.json`.
+3. Set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` in `mobile/.env` to the **Web** OAuth
+   client ID from that same project. Leave it empty to hide the Google button.
+4. Rebuild the Android development APK: this merge adds the native
+   `react-native-nitro-google-signin` and `react-native-nitro-modules` packages.
+
+The Google ID token is exchanged with Firebase using `signInWithCredential`.
+FastAPI receives only the resulting Firebase ID token through the same profile API
+used by email/password accounts; there is no separate `/auth/google` backend.
+Google's display name becomes the initial profile username. Cancelling the account
+picker leaves the session unchanged. Account linking is not implemented; if Firebase
+reports an existing account with a different credential, use its existing sign-in method.
+Google provider settings, client IDs, and signing fingerprints need a real-device check.
+
+Login and logout publish the SDK's current account after the operation succeeds,
+as well as listening for token events, so navigation does not depend solely on
+the timing of the native event. Unverified users can sign in but remain on the
+verification screen. Firebase errors are shown with friendly messages; otherwise
+unrecognized `auth/...` codes are displayed without raw SDK errors or credentials.
+
+## Install and build
+
+Use Node.js 22.13 or newer and run commands from `mobile/`:
 
 ```bash
-cd mobile
 npm ci
-cp .env.example .env
+```
+
+This app now uses native Firebase modules and must run in an Android development
+build. **Expo Go cannot load these modules.**
+
+For a local build, install the Expo-compatible Android Studio/SDK and JDK, connect
+an Android device with USB debugging (or start an emulator), then run:
+
+```bash
+npm run android
+```
+
+Alternatively, use Expo's EAS cloud build service (requires an Expo account):
+
+```bash
+npx eas-cli login
+npx eas-cli build --platform android --profile development
+```
+
+The EAS CLI will ask to link/create an Expo project on the first build. The
+`development` profile in `eas.json` produces an installable APK. Install it on your
+Android phone. To serve the JavaScript during development, run:
+
+```bash
 npm start
 ```
 
-`EXPO_PUBLIC_API_URL` defaults to `http://10.0.2.2:8000` on Android emulators.
-For a physical phone, use your computer's LAN IP and keep both devices on the
-same network. For a browser preview, set it to `http://localhost:8000`.
-Restart Metro after changing environment variables. Use HTTPS outside local development.
+Connect the phone and development computer to the same network and open the
+project using the installed development app. Rebuild the APK whenever native
+packages or Firebase native configuration change.
 
-The app opens on login. Create an account with an email and a password of at least
-12 characters. Authentication protects the main routes, stores the native session
-in SecureStore, checks it on startup/foreground, and clears expired sessions.
-Logout revokes the session on the backend; if the server cannot be reached, it
-reports an error so you can retry. Web preview uses memory-only sessions and
-requires login after reload. Existing vehicle screens still contain mock data.
-Password signup validates credentials but does not verify email ownership.
-
-## Google sign-in on Android
-
-1. Configure an OAuth consent screen in Google Cloud and add test users if needed.
-2. Create a **Web application** OAuth client. Set its public client ID in both
-   `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (mobile `.env`) and `GOOGLE_WEB_CLIENT_ID`
-   (backend `.env`). Never put a client secret in an `EXPO_PUBLIC_` variable.
-3. Create an **Android** OAuth client in the same project for package
-   `com.drivepulseai.mobile` and the SHA-1 of the signing certificate used for your
-   build. Register the production signing certificate separately when applicable.
-4. Build a native development app with the Android SDK and emulator/device ready:
-
-   ```bash
-   npx expo run:android
-   ```
-
-Nitro Google Sign-In uses Android Credential Manager and native autolinking.
-An explicit Web client ID is used, so Firebase configuration files are not required.
-The package config plugin is omitted for this Android-only integration: its
-non-Firebase branch only configures iOS, and requires an iOS URL scheme. Google
-sign-in appears only on Android when a client ID is configured and the app is
-not running in Expo Go. Password login can be tried in Expo Go. Google sign-in
-for iOS and web is outside this issue's Android scope.
-
-The backend verifies the Google ID token before issuing an application session.
-Cancelling Google sign-in leaves you on login. Accounts using the same email
-are not automatically linked; use password login for an existing password account.
-
-References: [Expo Google authentication](https://docs.expo.dev/guides/google-authentication/),
-[Nitro Expo setup](https://react-native-nitro-google-sign-in.github.io/docs/setup/expo/).
-
-## Verification
+## Checks
 
 ```bash
 npm run lint
 npx tsc --noEmit
+npm test -- --runInBand
+npx expo export --platform android --output-dir /tmp/drivepulse-android-export
 ```
 
-On an emulator/device, check signup, wrong password, duplicate signup, relaunch,
-logout, opening a protected deep link while logged out, Google cancellation,
-and successful Google login. Live Google testing needs your project configuration.
+If local generated route types are stale after adding routes, briefly run
+`npm start` to regenerate `.expo/types/router.d.ts`, then rerun TypeScript.
 
-Auth files: `src/auth/` contains secure storage and Google integration;
-`src/store/authStore.tsx` manages the session; `src/api/client.ts` calls the API;
-`src/types/auth.ts` mirrors backend contracts. `src/app/_layout.tsx` gates routes.
+Tests mock Firebase and native navigation. They check authentication errors,
+verification, account creation validation, token retrieval, session restoration,
+and which route groups are exposed. They do not prove live Firebase connectivity,
+email delivery, native compilation, or Android back-stack/deep-link behavior.
+
+## Manual acceptance on an Android device
+
+1. Sign up with a username and an email you own. Check the password eye toggle.
+   Confirm the account and display name appear in Firebase Auth.
+2. Send the verification email and try entering the app before verification: access
+   must remain restricted. Check that signed-out deep links cannot open main routes.
+3. Follow the email link, return, and check verification. The account screen appears.
+4. Close and reopen the app: the signed-in account should be restored.
+5. Log out: back navigation and direct links must not reopen protected screens.
+   Log in again with the exact same email/password and confirm the account returns.
+6. Try an incorrect password, a password reset, and an offline login.
+7. Repeat signup/login, verification, and session refresh on target Indian Wi-Fi
+   and mobile networks before relying on the integration for real users.
+
+8. With Google configured, sign in and confirm the Firebase UID matches the synced
+   PostgreSQL profile. Log out and cancel the Google picker: protected routes must
+   remain closed. Also test provider/configuration failures and account conflicts.
+
+## References
+
+- [Expo Firebase integration](https://docs.expo.dev/guides/using-firebase/)
+- [React Native Firebase setup](https://rnfirebase.io/)
+- [Firebase Android setup](https://firebase.google.com/docs/android/setup)

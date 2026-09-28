@@ -12,7 +12,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .coverage
-*.db
 htmlcov/
 
 # Jupyter Notebook Runs & Checkpoints
@@ -46,4 +45,7 @@ frontend/build/
 .DS_Store
 Thumbs.db
 
-.ipynb_checkpoints/
+# Server-only Firebase credentials
+**/*firebase-adminsdk*.json
+backend/service-account*.json
+backend/.secrets/

@@ -35,3 +35,7 @@ jobs:
         working-directory: ./mobile
         run: |
           npx tsc --noEmit
+
+      - name: Authentication tests
+        working-directory: ./mobile
+        run: npm test -- --runInBand

@@ -1,0 +1,24 @@
+# Upload only the mobile application for EAS builds from this monorepo.
+/*
+!/mobile
+/mobile/node_modules/
+/mobile/.expo/
+/mobile/android/
+/mobile/ios/
+/mobile/dist/
+/mobile/web-build/
+/mobile/coverage/
+/mobile/.env*
+!/mobile/.env.example
+/mobile/credentials.json
+/mobile/*.jks
+/mobile/*.keystore
+/mobile/*.p8
+/mobile/*.p12
+/mobile/*.pem
+/mobile/*firebase-adminsdk*.json
+/mobile/*.tsbuildinfo
+/mobile/npm-debug.*
+/mobile/yarn-debug.*
+/mobile/yarn-error.*
+/mobile/.DS_Store

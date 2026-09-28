@@ -10,6 +10,23 @@ jobs:
   test-and-lint:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: drivepulse
+          POSTGRES_PASSWORD: drivepulse_test
+          POSTGRES_DB: drivepulse_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U drivepulse -d drivepulse_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg2://drivepulse:drivepulse_test@127.0.0.1:5432/drivepulse_test
+      TEST_DATABASE_URL: postgresql+psycopg2://drivepulse:drivepulse_test@127.0.0.1:5432/drivepulse_test
+      FIREBASE_PROJECT_ID: drivepulse-d2034
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
