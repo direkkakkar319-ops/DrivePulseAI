@@ -60,7 +60,7 @@ class FailureClassifier:
             return RandomForestClassifier(**{**defaults, **params})
 
     @staticmethod
-    def _build_xgb(X, y, random_state: int, n_iter: int, params: dict):
+    def _build_xgb(X, y, random_state: int, n_iter: int, params: dict, beta: float=2.0):
         search_space = {
             "n_estimators": [100, 200, 300, 500],
             "max_depth": [3, 4, 5, 6, 8],
@@ -71,7 +71,7 @@ class FailureClassifier:
 
         xgb_exp = SklearnCvExperiment(
             estimator=XGBClassifier(eval_metric="logloss", random_state=random_state),
-            scoring=f1_score,
+            scoring=partial(f1_score, beta=beta, zero_division=0),
             cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state),
             X=X,
             y=y,
@@ -178,3 +178,11 @@ if __name__ == "__main__":
     df_preprocessed = PreProcessing.clean(df_raw)
     df_feat = FeatureEngineering.add_ai4i_features(df_preprocessed, drop_leakage=True) 
     feature_cols = FeatureEngineering.ai4i_model_columns(df_feat)
+    print("="*40)
+    print(df_raw.head())
+    print("="*40)
+    print(df_preprocessed.head())
+    print("="*40)
+    print(df_feat.head())
+    print("="*40)
+    print(feature_cols)
