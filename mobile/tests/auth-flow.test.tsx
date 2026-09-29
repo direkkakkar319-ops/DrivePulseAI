@@ -6,38 +6,73 @@ import { syncProfile } from '../src/api/client';
 import { AuthProvider } from '../src/store/authStore';
 import { RootNavigator } from '../src/app/_layout';
 import LoginScreen from '../src/app/(auth)/login';
-import Dashboard from '../src/app/(main)/dashboard';
+import { AccountDetails } from '../src/app/(main)/(tabs)/account';
+import { ProfileSyncProvider } from '../src/hooks/use-profile-sync';
+function Dashboard() {
+  return (
+    <ProfileSyncProvider>
+      <AccountDetails />
+    </ProfileSyncProvider>
+  );
+}
 import { UsernameSaveNotice } from '../src/components/username-save-notice';
 import VerifyEmailScreen from '../src/app/verify-email';
 
 jest.mock('../src/api/client', () => ({ syncProfile: jest.fn() }));
 jest.mock('../src/auth/google', () => ({ googleAvailable: true }));
 
-jest.mock('../src/api/auth', () => ({ authService: {
-  subscribe: jest.fn(), signIn: jest.fn(), signInWithGoogle: jest.fn(), signUp: jest.fn(), saveUsername: jest.fn(),
-  resetPassword: jest.fn(), sendVerification: jest.fn(), refreshUser: jest.fn(), signOut: jest.fn(),
-} }));
+jest.mock('../src/api/auth', () => ({
+  authService: {
+    subscribe: jest.fn(),
+    signIn: jest.fn(),
+    signInWithGoogle: jest.fn(),
+    signUp: jest.fn(),
+    saveUsername: jest.fn(),
+    resetPassword: jest.fn(),
+    sendVerification: jest.fn(),
+    refreshUser: jest.fn(),
+    signOut: jest.fn(),
+  },
+}));
 
 // Test which screen groups our real root layout exposes, without native navigation.
 jest.mock('expo-router', () => {
   const React = require('react');
   const { Text } = require('react-native');
   const Stack = ({ children }: { children: React.ReactNode }) => children;
-  Stack.Protected = ({ guard, children }: { guard: boolean; children: React.ReactNode }) => guard ? children : null;
+  Stack.Protected = ({ guard, children }: { guard: boolean; children: React.ReactNode }) =>
+    guard ? children : null;
   Stack.Screen = ({ name }: { name: string }) => React.createElement(Text, null, `route:${name}`);
-  return { Stack, DarkTheme: {}, ThemeProvider: ({ children }: { children: React.ReactNode }) => children };
+  return {
+    useLocalSearchParams: () => ({}),
+    Stack,
+    DarkTheme: {},
+    ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  };
 });
 
 let notify: (user: AuthUser | null) => void;
-const unverified = { uid: 'test-user', email: 'user@example.com', emailVerified: false, displayName: null };
+const unverified = {
+  uid: 'test-user',
+  email: 'user@example.com',
+  emailVerified: false,
+  displayName: null,
+};
 
 beforeEach(() => {
   jest.resetAllMocks();
-  (authService.subscribe as jest.Mock).mockImplementation((listener) => { notify = listener; return jest.fn(); });
+  (authService.subscribe as jest.Mock).mockImplementation((listener) => {
+    notify = listener;
+    return jest.fn();
+  });
 });
 
 it('waits for restoration and gates routes for logged-out, unverified, verified, and logged-out-again states', async () => {
-  await render(<AuthProvider><RootNavigator /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>,
+  );
   expect(screen.getByLabelText('Restoring your session')).toBeTruthy();
   expect(screen.queryByText('route:(main)')).toBeNull();
   await act(async () => notify(null));
@@ -55,15 +90,25 @@ it('waits for restoration and gates routes for logged-out, unverified, verified,
 });
 
 it('keeps all routes closed if authentication initialization fails', async () => {
-  (authService.subscribe as jest.Mock).mockImplementation(() => { throw new Error('configuration'); });
-  await render(<AuthProvider><RootNavigator /></AuthProvider>);
+  (authService.subscribe as jest.Mock).mockImplementation(() => {
+    throw new Error('configuration');
+  });
+  await render(
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>,
+  );
   expect(screen.getByText(/Open the Android development build/)).toBeTruthy();
   expect(screen.queryByText('route:(main)')).toBeNull();
 });
 
 it('shows a failed login instead of navigating past authentication', async () => {
   (authService.signIn as jest.Mock).mockRejectedValue({ code: 'auth/invalid-credential' });
-  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+    </AuthProvider>,
+  );
   await fireEvent.changeText(screen.getByLabelText('Email'), 'user@example.com');
   await fireEvent.changeText(screen.getByLabelText('Password'), 'incorrect');
   await fireEvent.press(screen.getByText('Log in'));
@@ -75,7 +120,12 @@ it('enters protected routes only after Google establishes a verified Firebase se
   (authService.signInWithGoogle as jest.Mock).mockImplementation(async () => {
     notify({ ...unverified, emailVerified: true });
   });
-  await render(<AuthProvider><LoginScreen /><RootNavigator /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+      <RootNavigator />
+    </AuthProvider>,
+  );
   await act(async () => notify(null));
   await fireEvent.press(screen.getByText('Continue with Google'));
   expect(authService.signInWithGoogle).toHaveBeenCalledTimes(1);
@@ -84,9 +134,15 @@ it('enters protected routes only after Google establishes a verified Firebase se
 });
 
 it('keeps routes closed after Google cancellation or an account conflict', async () => {
-  (authService.signInWithGoogle as jest.Mock).mockResolvedValueOnce(undefined)
+  (authService.signInWithGoogle as jest.Mock)
+    .mockResolvedValueOnce(undefined)
     .mockRejectedValueOnce({ code: 'auth/account-exists-with-different-credential' });
-  await render(<AuthProvider><LoginScreen /><RootNavigator /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+      <RootNavigator />
+    </AuthProvider>,
+  );
   await act(async () => notify(null));
   await fireEvent.press(screen.getByText('Continue with Google'));
   expect(screen.queryByText('route:(main)')).toBeNull();
@@ -97,7 +153,11 @@ it('keeps routes closed after Google cancellation or an account conflict', async
 
 it('requires a username and submits exactly the three signup fields', async () => {
   (authService.signUp as jest.Mock).mockResolvedValue({ uid: unverified.uid, profileSaved: true });
-  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+    </AuthProvider>,
+  );
   await fireEvent.press(screen.getByText('Create an account'));
   expect(screen.queryByLabelText('Confirm password')).toBeNull();
   await fireEvent.changeText(screen.getByLabelText('Email'), 'user@example.com');
@@ -111,7 +171,11 @@ it('requires a username and submits exactly the three signup fields', async () =
 });
 
 it('toggles password visibility without changing its value and hides it on mode changes', async () => {
-  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+    </AuthProvider>,
+  );
   await fireEvent.changeText(screen.getByLabelText('Password'), ' secret ');
   expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
   await fireEvent.press(screen.getByLabelText('Show password'));
@@ -127,7 +191,11 @@ it('toggles password visibility without changing its value and hides it on mode 
 
 it('offers password recovery without requesting a password', async () => {
   (authService.resetPassword as jest.Mock).mockResolvedValue(undefined);
-  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+    </AuthProvider>,
+  );
   await fireEvent.press(screen.getByText('Forgot password?'));
   expect(screen.queryByLabelText('Password')).toBeNull();
   await fireEvent.changeText(screen.getByLabelText('Email'), 'user@example.com');
@@ -137,7 +205,12 @@ it('offers password recovery without requesting a password', async () => {
 
 it('keeps verification pending until Firebase confirms it', async () => {
   (authService.refreshUser as jest.Mock).mockResolvedValue(unverified);
-  await render(<AuthProvider><VerifyEmailScreen /><RootNavigator /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <VerifyEmailScreen />
+      <RootNavigator />
+    </AuthProvider>,
+  );
   await act(async () => notify(unverified));
   await fireEvent.press(screen.getByText('I have verified my email'));
   expect(await screen.findByText(/Your email is not verified yet/)).toBeTruthy();
@@ -147,13 +220,17 @@ it('keeps verification pending until Firebase confirms it', async () => {
   expect(await screen.findByText('route:(main)')).toBeTruthy();
 });
 
-
 it('keeps profile-save failures visible after signup navigation and retries safely', async () => {
   (authService.signUp as jest.Mock).mockImplementation(async () => {
     notify(unverified);
     return { uid: unverified.uid, profileSaved: false };
   });
-  await render(<AuthProvider><LoginScreen /><UsernameSaveNotice /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+      <UsernameSaveNotice />
+    </AuthProvider>,
+  );
   await fireEvent.press(screen.getByText('Create an account'));
   await fireEvent.changeText(screen.getByLabelText('Username'), 'Driver');
   await fireEvent.changeText(screen.getByLabelText('Email'), unverified.email);
@@ -170,7 +247,13 @@ it('allows the same verified account to log in after using the logout button', a
   const verified = { ...unverified, emailVerified: true };
   (authService.signOut as jest.Mock).mockImplementation(async () => notify(null));
   (authService.signIn as jest.Mock).mockImplementation(async () => notify(verified));
-  await render(<AuthProvider><LoginScreen /><Dashboard /><RootNavigator /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <LoginScreen />
+      <Dashboard />
+      <RootNavigator />
+    </AuthProvider>,
+  );
   await act(async () => notify(verified));
   await fireEvent.press(screen.getByText('Log out'));
   expect(screen.getByText('route:(auth)')).toBeTruthy();
@@ -182,10 +265,15 @@ it('allows the same verified account to log in after using the logout button', a
   expect(authService.signUp).not.toHaveBeenCalled();
 });
 
-
 it('keeps Firebase login available when the backend is offline and can retry profile sync', async () => {
-  (syncProfile as jest.Mock).mockRejectedValueOnce(new Error('Account service is offline')).mockResolvedValueOnce({ firebase_uid: unverified.uid });
-  await render(<AuthProvider><Dashboard /></AuthProvider>);
+  (syncProfile as jest.Mock)
+    .mockRejectedValueOnce(new Error('Account service is offline'))
+    .mockResolvedValueOnce({ firebase_uid: unverified.uid });
+  await render(
+    <AuthProvider>
+      <Dashboard />
+    </AuthProvider>,
+  );
   await act(async () => notify({ ...unverified, emailVerified: true }));
   expect(await screen.findByText('Account service is offline')).toBeTruthy();
   expect(authService.signOut).not.toHaveBeenCalled();
