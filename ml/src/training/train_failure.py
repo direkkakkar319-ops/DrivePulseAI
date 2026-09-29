@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import sys
+import time
+import functools
+import traceback
 from pathlib import Path
 
 _file_path = Path(__file__).resolve()
@@ -18,13 +21,14 @@ for _p in [_ml_dir, _repo_dir, _src_dir, _data_dir]:
 import joblib
 import pandas as pd
 import numpy as np
-
+from functools import partial
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import fbeta_score, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.metrics import precision_recall_curve
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold
+
 from hyperactive.experiment.integrations import SklearnCvExperiment
 from hyperactive.opt.gfo import BayesianOptimizer
 
@@ -34,13 +38,17 @@ from xgboost import XGBClassifier
 class FailureClassifier:
     MODELS = ("logreg", "rf", "xgb")
 
-    def __init__(self,model:str, threshold:float=0.3, random_state:int=42, **params)->None:
+    def __init__(self,model:str, threshold:float=0.3, random_state:int=42, n_iter:int=50, beta:float=2.0,**params)->None:
         if model not in self.MODELS:
             raise ValueError(f"model not in {self.MODELS}")
         self.model_name = model
         self.threshold = threshold
-
-        if self.model!="xgb":
+        self.beta = beta
+        self.random_state = random_state
+        self.n_iter = n_iter
+        self.beta = beta
+        self.params = params
+        if self.model_name!="xgb":
             self.model=self._build(model, random_state, params)
         else:
             self.model = None
@@ -49,12 +57,12 @@ class FailureClassifier:
     def _build(model:str, random_state:int, params:dict)->object:
         if model == "logreg":
             defaults = {"class_weight": "balanced", "max_iter": 1000}
-            return LogesticRegression(**{**defaults, **params})
+            return LogisticRegression(**{**defaults, **params})
 
-        if model == "rf":
+        elif model == "rf":
             defaults = {
                 "n_estimators": 200,
-                "scale_pos_weight": DEFAULT_SCALE_POS_WEIGHT,
+                "class_weight": "balanced",
                 "random_state": random_state,
             }
             return RandomForestClassifier(**{**defaults, **params})
@@ -71,7 +79,7 @@ class FailureClassifier:
 
         xgb_exp = SklearnCvExperiment(
             estimator=XGBClassifier(eval_metric="logloss", random_state=random_state),
-            scoring=partial(f1_score, beta=beta, zero_division=0),
+            scoring=partial(fbeta_score, beta=beta, zero_division=0),
             cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state),
             X=X,
             y=y,
@@ -83,9 +91,8 @@ class FailureClassifier:
         return XGBClassifier(eval_metric="logloss", random_state=random_state, **{**best_params, **params})
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> FailureClassifier:
-        if model=="xgb":
-            self.model._build_xgb(X, y, self.random_state, self.n_iter, self.params)
-
+        if self.model_name=="xgb":
+            self.model = self._build_xgb(X, y, self.random_state, self.n_iter, self.params)
         self.model.fit(X, y)
         return self
 
@@ -101,7 +108,7 @@ class FailureClassifier:
             "accuracy": float(accuracy_score(y, pred)),
             "precision": float(precision_score(y, pred, zero_division=0)),
             "recall": float(recall_score(y, pred, zero_division=0)),
-            "f1": float(f1_score(y, pred, zero_division=0)),
+            f"f{self.beta:g}_score": float(fbeta_score(y, pred, beta=self.beta, zero_division=0))
         }
 
         print(f"[{self.model_name}] threshold={self.threshold:.3f}")
@@ -175,14 +182,74 @@ if __name__ == "__main__":
         print(f"Error: Dataset not found at {csv_path}")
         sys.exit(1)
 
+        import time
+    import functools
+    import traceback
+
+
+    def track_model_run(func):
+        """Wraps a model-training function to log results, time execution,
+        and prevent one model's failure from crashing the others."""
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            name = func.__name__
+            print(f"\n{'='*50}\nRunning {name}...\n{'='*50}")
+
+            start = time.perf_counter()
+            try:
+                result = func(*args, **kwargs)
+            except Exception as e:
+                elapsed = time.perf_counter() - start
+                print(f"[FAILED] {name} raised {type(e).__name__}: {e}")
+                print(f"  time elapsed: {elapsed:.2f}s")
+                traceback.print_exc()
+                return None
+
+            elapsed = time.perf_counter() - start
+            print(f"[OK] {name} finished in {elapsed:.2f}s")
+
+            if isinstance(result, dict):
+                for k, v in result.items():
+                    if isinstance(v, (int, float)):
+                        print(f"    {k}: {v:.4f}")
+                    else:
+                        print(f"    {k}: {v}")
+
+            return result
+        return wrapper
     df_preprocessed = PreProcessing.clean(df_raw)
     df_feat = FeatureEngineering.add_ai4i_features(df_preprocessed, drop_leakage=True) 
     feature_cols = FeatureEngineering.ai4i_model_columns(df_feat)
-    print("="*40)
-    print(df_raw.head())
-    print("="*40)
-    print(df_preprocessed.head())
-    print("="*40)
-    print(df_feat.head())
-    print("="*40)
-    print(feature_cols)
+    
+    X = df_feat[feature_cols]
+    y = df_feat["failure"]    
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    
+    @track_model_run
+    def logreg_model():    
+        clf = FailureClassifier(model="logreg")
+        clf.fit(X_train, y_train)
+        output = clf.evaluate(X_test, y_test)
+        clf.save(path=r"E:\DrivePulseAI\ml\src\models\logreg_model.joblib")
+        return output
+
+    @track_model_run
+    def rf_model():
+        clf = FailureClassifier(model="rf")
+        clf.fit(X_train, y_train)
+        output = clf.evaluate(X_test, y_test)
+        clf.save(path=r"E:\DrivePulseAI\ml\src\models\rf_model.joblib")
+        return output
+
+    @track_model_run
+    def xgb_model():
+        clf = FailureClassifier(model="xgb")
+        clf.fit(X_train, y_train)
+        output = clf.evaluate(X_test, y_test)
+        clf.save(path=r"E:\DrivePulseAI\ml\src\models\xgb_model.joblib")
+        return output
+
+    logreg_model()
+    rf_model()
+    xgb_model()
