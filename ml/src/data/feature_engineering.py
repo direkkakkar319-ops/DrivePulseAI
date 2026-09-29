@@ -14,7 +14,11 @@ AI4I_WEAR_CLIFF: float = 195.0
 AI4I_COLUMN_ALIASES: dict[str, list[str]] = {
     "rpm": ["engine_rpm", "Rotational speed [rpm]", "Rotational speed"],
     "torque": ["engine_load_pct", "Torque [Nm]", "Torque"],
-    "process_temp": ["coolant_temp_c", "Process temperature [K]", "Process temperature"],
+    "process_temp": [
+        "coolant_temp_c",
+        "Process temperature [K]",
+        "Process temperature",
+    ],
     "air_temp": ["intake_air_temp_c", "Air temperature [K]", "Air temperature"],
     "wear": ["vibration", "Tool wear [min]", "Tool wear"],
     "failure": ["failure", "Machine failure"],
@@ -62,19 +66,20 @@ class FeatureEngineering:
                 out = pd.concat([out.drop(columns=[tcol]), dummies], axis=1)
 
         if drop_leakage:
-            out = out.drop(
-                columns=[c for c in AI4I_LEAKAGE_COLS if c in out.columns]
-            )
+            out = out.drop(columns=[c for c in AI4I_LEAKAGE_COLS if c in out.columns])
 
         return out
 
     @staticmethod
     def ai4i_model_columns(df: pd.DataFrame) -> list[str]:
         """Numeric classifier inputs. Call after add_ai4i_features."""
-        exclude = (
-            set(AI4I_LEAKAGE_COLS)
-            | {"failure", "Machine failure", "rul", "vehicle_id", "source"}
-        )
+        exclude = set(AI4I_LEAKAGE_COLS) | {
+            "failure",
+            "Machine failure",
+            "rul",
+            "vehicle_id",
+            "source",
+        }
         return [
             c
             for c in df.columns
