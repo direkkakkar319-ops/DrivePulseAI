@@ -260,9 +260,9 @@ if __name__ == "__main__":
         clf = FailureClassifier(model="logreg")
         clf.fit(X_train, y_train)
         output = clf.evaluate(X_test, y_test)
-        clf.save(
-            path=r"E:\DrivePulseAI\ml\src\models\failure_classification\logreg_model.joblib"
-        )
+        path=Path("ml/src/models/failure_classification/logreg_model.joblib")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        clf.save(path=path)
         return output
 
     @track_model_run
@@ -270,9 +270,9 @@ if __name__ == "__main__":
         clf = FailureClassifier(model="rf")
         clf.fit(X_train, y_train)
         output = clf.evaluate(X_test, y_test)
-        clf.save(
-            path=r"E:\DrivePulseAI\ml\src\models\failure_classification\rf_model.joblib"
-        )
+        path=Path("ml/src/models/failure_classification/rf_model.joblib")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        clf.save(path=path)
         return output
 
     @track_model_run
@@ -280,9 +280,9 @@ if __name__ == "__main__":
         clf = FailureClassifier(model="xgb")
         clf.fit(X_train, y_train)
         output = clf.evaluate(X_test, y_test)
-        clf.save(
-            path=r"E:\DrivePulseAI\ml\src\models\failure_classification\xgb_model.joblib"
-        )
+        path=Path("ml/src/models/failure_classification/xgb_model.joblib")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        clf.save(path=path)
         return output
 
     logreg_model()
