@@ -91,7 +91,11 @@ class FailureClassifier:
         }
 
         xgb_exp = SklearnCvExperiment(
-            estimator=XGBClassifier(eval_metric="logloss", random_state=random_state),
+            estimator=XGBClassifier(
+                eval_metric="logloss",
+                random_state=random_state,
+                scale_pos_weight=28.0,
+            ),
             scoring=partial(fbeta_score, beta=beta, zero_division=0),
             cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=random_state),
             X=X,
@@ -106,7 +110,7 @@ class FailureClassifier:
         return XGBClassifier(
             eval_metric="logloss",
             random_state=random_state,
-            **{**best_params, **params},
+            **{**{"scale_pos_weight": 28.0}, **best_params, **params},
         )
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> FailureClassifier:
@@ -235,13 +239,6 @@ if __name__ == "__main__":
             elapsed = time.perf_counter() - start
             print(f"[OK] {name} finished in {elapsed:.2f}s")
 
-            if isinstance(result, dict):
-                for k, v in result.items():
-                    if isinstance(v, (int, float)):
-                        print(f"    {k}: {v:.4f}")
-                    else:
-                        print(f"    {k}: {v}")
-
             return result
 
         return wrapper
@@ -253,15 +250,27 @@ if __name__ == "__main__":
     X = df_feat[feature_cols]
     y = df_feat["failure"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
+    )
+
+    # Logreg only: standardized copy, scaler fit on train. Trees use raw X.
+    X_train_scaled, _scaler = PreProcessing.scale(X_train)
+    X_test_scaled, _ = PreProcessing.scale(X_test, scaler=_scaler)
+
+    # Absolute save dir: same place no matter where you run from.
+    MODEL_DIR = _repo_dir / "ml" / "src" / "models" / "failure_classification"
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
     @track_model_run
     def logreg_model():
         clf = FailureClassifier(model="logreg")
-        clf.fit(X_train, y_train)
-        output = clf.evaluate(X_test, y_test)
-        path=Path("ml/src/models/failure_classification/logreg_model.joblib")
-        path.parent.mkdir(parents=True, exist_ok=True)
+        clf.fit(X_train_scaled, y_train)
+        output = clf.evaluate(X_test_scaled, y_test)
+        path = MODEL_DIR / "logreg_model.joblib"
         clf.save(path=path)
         return output
 
@@ -270,8 +279,7 @@ if __name__ == "__main__":
         clf = FailureClassifier(model="rf")
         clf.fit(X_train, y_train)
         output = clf.evaluate(X_test, y_test)
-        path=Path("ml/src/models/failure_classification/rf_model.joblib")
-        path.parent.mkdir(parents=True, exist_ok=True)
+        path = MODEL_DIR / "rf_model.joblib"
         clf.save(path=path)
         return output
 
@@ -279,9 +287,9 @@ if __name__ == "__main__":
     def xgb_model():
         clf = FailureClassifier(model="xgb")
         clf.fit(X_train, y_train)
+        clf.threshold = clf.suggest_threshold(X_val, y_val, min_recall=0.9)
         output = clf.evaluate(X_test, y_test)
-        path=Path("ml/src/models/failure_classification/xgb_model.joblib")
-        path.parent.mkdir(parents=True, exist_ok=True)
+        path = MODEL_DIR / "xgb_model.joblib"
         clf.save(path=path)
         return output
 
