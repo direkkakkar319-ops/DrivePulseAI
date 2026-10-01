@@ -4,6 +4,7 @@ import functools
 import sys
 import time
 import traceback
+from functools import partial
 from pathlib import Path
 
 _file_path = Path(__file__).resolve()
@@ -17,8 +18,6 @@ for _p in [_ml_dir, _repo_dir, _src_dir, _data_dir]:
     _p_str = str(_p)
     if _p_str not in sys.path:
         sys.path.insert(0, _p_str)
-
-from functools import partial
 
 import joblib
 import numpy as np
@@ -212,10 +211,6 @@ if __name__ == "__main__":
     else:
         print(f"Error: Dataset not found at {csv_path}")
         sys.exit(1)
-
-        import time
-    import functools
-    import traceback
 
     def track_model_run(func):
         """Wraps a model-training function to log results, time execution,

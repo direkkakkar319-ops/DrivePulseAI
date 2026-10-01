@@ -11,3 +11,9 @@ pythonpath = ["."]
 [tool.ruff]
 target-version = "py311"
 line-length = 88
+
+[tool.ruff.lint.per-file-ignores]
+# Scripts that bootstrap sys.path before third-party imports.
+"notebooks/*.py" = ["E402"]
+"src/training/*.py" = ["E402"]
+"src/models/failure_classifier.py" = ["E402"]
