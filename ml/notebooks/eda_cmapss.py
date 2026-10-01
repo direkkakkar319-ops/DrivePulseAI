@@ -33,10 +33,10 @@ for candidate in (ML_DIR, REPO_ROOT / "ml"):
             sys.path.insert(0, str(candidate))
         break
 
-from src.data.loaders import SENSOR_NAMES, load_cmapss  # noqa: E402
-from src.data.preprocessing import PreProcessing  # noqa: E402
+from sklearn.linear_model import LinearRegression
 
-from sklearn.linear_model import LinearRegression  # noqa: E402
+from src.data.loaders import SENSOR_NAMES, load_cmapss
+from src.data.preprocessing import PreProcessing
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data" / "RUL_score" / "raw"
 FIG_DIR = REPO_ROOT / "ml" / "reports" / "figures" / "cmapss"
