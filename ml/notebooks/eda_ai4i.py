@@ -53,6 +53,8 @@ COLUMN_ALIASES: dict[str, list[str]] = {
 }
 FAILURE_MODES = ["TWF", "HDF", "PWF", "OSF", "RNF"]
 
+REPORT_LINES: list[str] = []
+
 SENSORS = ("engine_rpm", "engine_load", "coolant_temp", "intake_air_temp", "vibration")
 
 
@@ -61,6 +63,11 @@ def _col(df: pd.DataFrame, canonical: str) -> str:
         if alias in df.columns:
             return alias
     raise KeyError(f"No variant of {canonical!r} found. Columns: {list(df.columns)}")
+
+
+def log(line: str = "") -> None:
+    print(line)
+    REPORT_LINES.append(line)
 
 
 def _savefig(name: str, no_show: bool = True) -> None:
@@ -78,27 +85,27 @@ def _sensors(df: pd.DataFrame) -> list[str]:
 
 def load_and_profile(csv_path: Path) -> pd.DataFrame:
     df = load_ai4i(csv_path)
-    print(
+    log(
         f"[load] rows={len(df)} cols={len(df.columns)} "
         f"source={df['source'].unique().tolist()}"
     )
-    print("\n--- dtypes ---")
-    print(df.dtypes.to_string())
-    print("\n--- head ---")
-    print(df.head(5).to_string())
-    print("\n--- missing values ---")
+    log("\n--- dtypes ---")
+    log(df.dtypes.to_string())
+    log("\n--- head ---")
+    log(df.head(5).to_string())
+    log("\n--- missing values ---")
     missing = df.isnull().sum()
-    print(missing.to_string() if missing.sum() else "none")
-    print(f"\n--- duplicated rows: {int(df.duplicated().sum())} ---")
-    print("\n--- describe (numeric) ---")
-    print(df.describe(include=[np.number]).T.to_string())
+    log(missing.to_string() if missing.sum() else "none")
+    log(f"\n--- duplicated rows: {int(df.duplicated().sum())} ---")
+    log("\n--- describe (numeric) ---")
+    log(df.describe(include=[np.number]).T.to_string())
     return df
 
 
 def clean_and_verify(df: pd.DataFrame) -> pd.DataFrame:
     # Targets are left out of imputation so labels never get fabricated.
     cleaned, stats = PreProcessing.clean(df, return_imputer_stats=True)
-    print(
+    log(
         f"\n[clean] rows {len(df)} -> {len(cleaned)} "
         f"| imputer stats: {stats or 'none needed'}"
     )
@@ -109,30 +116,30 @@ def clean_and_verify(df: pd.DataFrame) -> pd.DataFrame:
 def analyse_target(df: pd.DataFrame) -> None:
     fail = _col(df, "failure")
     rate = float(df[fail].mean())
-    print(f"\n[target] failure rate = {rate:.4f} ({int(df[fail].sum())}/{len(df)})")
+    log(f"\n[target] failure rate = {rate:.4f} ({int(df[fail].sum())}/{len(df)})")
 
     modes = [m for m in FAILURE_MODES if m in df.columns]
     if modes:
-        print("\n--- failure-mode counts (share of all failures) ---")
+        log("\n--- failure-mode counts (share of all failures) ---")
         n_fail = max(int(df[fail].sum()), 1)
         for m in modes:
-            print(f"{m}: {int(df[m].sum())} ({df[m].sum() / n_fail:.1%} of failures)")
+            log(f"{m}: {int(df[m].sum())} ({df[m].sum() / n_fail:.1%} of failures)")
         # Modes reconstruct the label, so they must stay out of the features.
         union = df[modes].max(axis=1)
-        print(
+        log(
             f"[leakage] P(union(modes) == failure) = {(union == df[fail]).mean():.4f}"
         )
 
     try:
         tcol = _col(df, "machine_type")
         ct = pd.crosstab(df[tcol], df[fail], normalize="index")
-        print("\n--- failure rate by machine Type ---")
-        print(ct.to_string())
+        log("\n--- failure rate by machine Type ---")
+        log(ct.to_string())
         ax = ct.plot(kind="bar", rot=0, title="Failure rate by machine Type")
         ax.set_ylabel("share")
         _savefig("03_failure_by_type.png")
     except KeyError:
-        print("[target] no machine-Type column; skipping Type breakdown.")
+        log("[target] no machine-Type column; skipping Type breakdown.")
 
 
 def plot_target_bars(df: pd.DataFrame) -> None:
@@ -161,8 +168,8 @@ def plot_univariate(df: pd.DataFrame) -> None:
     fig.suptitle("Sensor distributions (raw units)")
     _savefig("02_univariate_hist.png")
 
-    print("\n--- skew / kurtosis ---")
-    print(df[sensors].agg(["skew", "kurtosis"]).T.to_string())
+    log("\n--- skew / kurtosis ---")
+    log(df[sensors].agg(["skew", "kurtosis"]).T.to_string())
 
 
 def plot_by_class(df: pd.DataFrame) -> None:
@@ -177,8 +184,8 @@ def plot_by_class(df: pd.DataFrame) -> None:
     fig.suptitle("Sensor separation between ok vs failure")
     _savefig("04_box_by_class.png")
 
-    print("\n--- mean sensor value: ok vs failure ---")
-    print(df.groupby(fail)[sensors].mean().T.to_string())
+    log("\n--- mean sensor value: ok vs failure ---")
+    log(df.groupby(fail)[sensors].mean().T.to_string())
 
 
 def plot_correlation(df: pd.DataFrame) -> None:
@@ -198,8 +205,8 @@ def plot_correlation(df: pd.DataFrame) -> None:
     ax.set_title("Pearson correlation (sensors + failure)")
     fig.colorbar(im, ax=ax, label="r")
     _savefig("05_correlation.png")
-    print("\n--- correlation with failure (ranked) ---")
-    print(corr[fail].drop(fail).sort_values(key=np.abs, ascending=False).to_string())
+    log("\n--- correlation with failure (ranked) ---")
+    log(corr[fail].drop(fail).sort_values(key=np.abs, ascending=False).to_string())
 
 
 def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -216,8 +223,8 @@ def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
     feats["wear"] = df[wear]
     feats["failure"] = df[fail].values
 
-    print("\n--- candidate feature separation (mean ok vs failure) ---")
-    print(feats.groupby("failure").mean().T.to_string())
+    log("\n--- candidate feature separation (mean ok vs failure) ---")
+    log(feats.groupby("failure").mean().T.to_string())
 
     _fig, ax = plt.subplots(figsize=(7, 5))
     ax.scatter(
@@ -248,23 +255,23 @@ def prototype_features(df: pd.DataFrame) -> pd.DataFrame:
     ax2.set_title("Failure rate by tool-wear decile")
     ax2.set_ylabel("failure rate")
     _savefig("07_wear_binned_rate.png")
-    print("\n--- failure rate by wear decile ---")
-    print(rate_by_wear.to_string())
+    log("\n--- failure rate by wear decile ---")
+    log(rate_by_wear.to_string())
     return feats
 
 
 def screen_outliers(df: pd.DataFrame) -> None:
     sensors = _sensors(df)
-    print("\n--- IQR outlier share per sensor ---")
+    log("\n--- IQR outlier share per sensor ---")
     for col in sensors:
         q1, q3 = df[col].quantile([0.25, 0.75])
         iqr = q3 - q1
         share = ((df[col] < q1 - 1.5 * iqr) | (df[col] > q3 + 1.5 * iqr)).mean()
-        print(f"{col}: {share:.3%}")
+        log(f"{col}: {share:.3%}")
 
 
 def print_recommendations() -> None:
-    print(
+    log(
         """
 === FEATURE RECOMMENDATIONS (AI4I -> DrivePulse) ===
 1. Classifier inputs: temp_diff, power_proxy, Tool wear, Torque,
@@ -283,6 +290,20 @@ def print_recommendations() -> None:
    here. Those belong to the C-MAPSS/simulator side.
 """
     )
+
+
+def write_report() -> None:
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    (FIG_DIR / "REPORT.md").write_text(
+        "# AI4I EDA report (failure classification)\n\n"
+        "Generated by `ml/notebooks/eda_ai4i.py` via "
+        "`src.data.loaders.load_ai4i`.\n\n"
+        + "\n".join(f"    {ln}" if ln and not ln.startswith(("=", "-", "[")) else ln
+                    for ln in REPORT_LINES)
+        + "\n",
+        encoding="utf-8",
+    )
+    log(f"\n[done] figures + REPORT.md saved to {FIG_DIR}")
 
 
 def main() -> None:
@@ -313,7 +334,7 @@ def main() -> None:
     prototype_features(df)
     screen_outliers(df)
     print_recommendations()
-    print(f"\n[done] figures saved to {FIG_DIR}")
+    write_report()
 
 
 if __name__ == "__main__":
