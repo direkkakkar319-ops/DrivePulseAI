@@ -70,6 +70,13 @@ def log(line: str = "") -> None:
     REPORT_LINES.append(line)
 
 
+def clear_fig_dir() -> None:
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    for f in list(FIG_DIR.glob("*.png")) + [FIG_DIR / "REPORT.md"]:
+        if f.exists():
+            f.unlink()
+
+
 def _savefig(name: str, no_show: bool = True) -> None:
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     plt.tight_layout()
@@ -324,6 +331,7 @@ def main() -> None:
     if not args.csv.exists():
         sys.exit(f"CSV not found: {args.csv} (pass --csv PATH)")
 
+    clear_fig_dir()
     df = load_and_profile(args.csv)
     df = clean_and_verify(df)
     plot_target_bars(df)

@@ -33,7 +33,7 @@ for candidate in (ML_DIR, REPO_ROOT / "ml"):
             sys.path.insert(0, str(candidate))
         break
 
-from src.data.loaders import load_cmapss  # noqa: E402
+from src.data.loaders import SENSOR_NAMES, load_cmapss  # noqa: E402
 from src.data.preprocessing import PreProcessing  # noqa: E402
 
 from sklearn.linear_model import LinearRegression  # noqa: E402
@@ -41,16 +41,13 @@ from sklearn.linear_model import LinearRegression  # noqa: E402
 DEFAULT_DATA_DIR = REPO_ROOT / "data" / "RUL_score" / "raw"
 FIG_DIR = REPO_ROOT / "ml" / "reports" / "figures" / "cmapss"
 
-SENSORS_RAW = [f"sensor_{i}" for i in range(1, 22)]
+SENSORS = list(SENSOR_NAMES.values())
 SETTINGS = ["setting_1", "setting_2", "setting_3"]
+NUMBERS = {v: k for k, v in SENSOR_NAMES.items()}
 
 
 def _sensors(df: pd.DataFrame) -> list[str]:
-    mapping = {"sensor_2": "coolant_temp_c", "sensor_3": "intake_air_temp_c",
-               "sensor_4": "battery_voltage", "sensor_11": "engine_rpm",
-               "sensor_15": "vibration"}
-    cols = [mapping.get(c, c) for c in SENSORS_RAW]
-    return [c for c in cols if c in df.columns]
+    return [c for c in SENSORS if c in df.columns]
 
 
 # Subset operating envelope (NASA docs): FD001/FD003 = 1 condition,
@@ -68,6 +65,13 @@ REPORT_LINES: list[str] = []
 def log(line: str = "") -> None:
     print(line)
     REPORT_LINES.append(line)
+
+
+def clear_fig_dir() -> None:
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    for f in list(FIG_DIR.glob("*.png")) + [FIG_DIR / "REPORT.md"]:
+        if f.exists():
+            f.unlink()
 
 
 def _savefig(name: str, no_show: bool = True) -> None:
@@ -232,14 +236,13 @@ def plot_degradation(df: pd.DataFrame) -> None:
         "points while FD003 engines (1 condition) degrade monotonically. Raw "
         "levels mix regime jumps with wear - normalise per condition.")
 
-    trending = ["coolant_temp_c", "intake_air_temp_c", "battery_voltage",
-                "sensor_7", "engine_rpm", "sensor_12", "sensor_14", "vibration"]
+    trending = ["T24", "T30", "T50", "P30", "Ps30", "phi", "NRc", "BPR"]
     fig, axes = plt.subplots(2, 4, figsize=(15, 7))
     for ax, col in zip(axes.flat, trending):
         for vid in sample_ids:
             g = df[df["vehicle_id"] == vid].sort_values("timestamp")
             ax.plot(g["timestamp"].values, g[col].values, lw=1, label=vid[-8:])
-        ax.set_title(col, fontsize=9)
+        ax.set_title(f"{col} ({NUMBERS[col]})", fontsize=9)
         ax.set_xlabel("cycle")
     axes.flat[0].legend(fontsize=7)
     fig.suptitle("Sensor trajectories over engine life (monotonic = RUL signal)")
@@ -251,7 +254,7 @@ def plot_degradation(df: pd.DataFrame) -> None:
     fig2, axes2 = plt.subplots(2, 4, figsize=(15, 7))
     for ax, col in zip(axes2.flat, trending):
         ax.plot(means.index.values, means[col].values, marker=".", ms=3)
-        ax.set_title(f"{col} vs RUL", fontsize=9)
+        ax.set_title(f"{col} ({NUMBERS[col]}) vs RUL", fontsize=9)
         ax.set_xlabel("RUL")
         ax.invert_xaxis()  # time flows right -> left as RUL shrinks
     fig2.suptitle("Mean sensor value vs RUL (10-cycle bins, inverted axis = ageing)")
@@ -361,8 +364,7 @@ def prototype_features(df: pd.DataFrame) -> list[str]:
     # it must NEVER be a model input.
     sample_vid = df.groupby("vehicle_id")["timestamp"].max().idxmax()
     g = df[df["vehicle_id"] == sample_vid].sort_values("timestamp")
-    base_cols = ["battery_voltage", "sensor_7", "engine_rpm",
-                 "sensor_12", "sensor_14", "vibration"]
+    base_cols = ["T50", "P30", "Ps30", "phi", "NRc", "BPR"]
     feats = pd.DataFrame({"rul": g["rul"].values, "cycle": g["timestamp"].values})
     for c in base_cols:
         s = g[c].reset_index(drop=True)
@@ -402,7 +404,7 @@ def prototype_features(df: pd.DataFrame) -> list[str]:
     log(f"1. Base regressors (one keep per |r|>{thresh} cluster): {sorted(kept)}")
     log(f"2. ALWAYS drop {const_union}: flat in single-condition subsets, "
         "pure operating-point bias elsewhere. Matches the classic C-MAPSS "
-        "drop set (sensors 1/5/6/10/16/18/19 + setting_3, mod mapping).")
+        "drop set (T2/P2/P15/epr/farB/Nf_dmd/PCNfR_dmd + setting_3).")
     log("3. Do NOT feed raw setting_1/2/3 as plain regressors on mixed subsets; "
         "instead normalise sensors per operating condition (groupby-setting "
         "z-score) or add the condition id as a categorical effect.")
@@ -499,6 +501,7 @@ def main() -> None:
     if not Path(args.data_dir).exists():
         sys.exit(f"Data dir not found: {args.data_dir} (pass --data-dir PATH)")
 
+    clear_fig_dir()
     df = load_and_profile(args.data_dir, args.subset)
     df = clean_and_verify(df)
     analyse_target(df)

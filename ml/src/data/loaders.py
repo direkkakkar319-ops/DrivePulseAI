@@ -2,6 +2,34 @@ from pathlib import Path
 
 import pandas as pd
 
+# C-MAPSS sensor numbers mapped to their physical symbols (temperatures °R,
+# pressures psia, speeds rpm). Renaming to symbols keeps feature-importance
+# readable without losing the link to every C-MAPSS paper, which cites sensors
+# by number (reverse lookup: sensor_7 is P30, sensor_14 is NRc, ...).
+SENSOR_NAMES = {
+    "sensor_1": "T2",
+    "sensor_2": "T24",
+    "sensor_3": "T30",
+    "sensor_4": "T50",
+    "sensor_5": "P2",
+    "sensor_6": "P15",
+    "sensor_7": "P30",
+    "sensor_8": "Nf",
+    "sensor_9": "Nc",
+    "sensor_10": "epr",
+    "sensor_11": "Ps30",
+    "sensor_12": "phi",
+    "sensor_13": "NRf",
+    "sensor_14": "NRc",
+    "sensor_15": "BPR",
+    "sensor_16": "farB",
+    "sensor_17": "htBleed",
+    "sensor_18": "Nf_dmd",
+    "sensor_19": "PCNfR_dmd",
+    "sensor_20": "W31",
+    "sensor_21": "W32",
+}
+
 
 def load_ai4i(filepath: str | Path) -> pd.DataFrame:
     """
@@ -110,6 +138,12 @@ def load_cmapss(filepath: str | Path, subset: str = "FD001") -> pd.DataFrame:
     Load the C-MAPSS dataset (turbofan engine degradation) and map to automotive fields.
     Adds a Remaining Useful Life (RUL) column for regression tasks.
 
+    Sensor columns are renamed to their physical symbols (see SENSOR_NAMES):
+    T2/T24/T30/T50 fan-to-LPT gas temperatures, P2/P15/P30/Ps30 pressures,
+    Nf/Nc physical and NRf/NRc corrected speeds, epr pressure ratio, phi
+    fuel-flow ratio, BPR bypass ratio, farB fuel-air ratio, htBleed bleed
+    enthalpy, Nf_dmd/PCNfR_dmd demanded speeds, W31/W32 coolant bleeds.
+
     Args:
         filepath: Path to the directory containing C-MAPSS text files or the file itself.
         subset: The subset to load, e.g. "FD001" (default). If "all", loads all FD001-FD004.
@@ -160,12 +194,8 @@ def load_cmapss(filepath: str | Path, subset: str = "FD001") -> pd.DataFrame:
     mapping = {
         "unit_number": "vehicle_id",
         "time_in_cycles": "timestamp",
-        "sensor_2": "coolant_temp_c",
-        "sensor_3": "intake_air_temp_c",
-        "sensor_4": "battery_voltage",
-        "sensor_11": "engine_rpm",
-        "sensor_15": "vibration",
     }
+    mapping.update(SENSOR_NAMES)
 
     rename_dict = {k: v for k, v in mapping.items() if k in df.columns}
     df = df.rename(columns=rename_dict)
