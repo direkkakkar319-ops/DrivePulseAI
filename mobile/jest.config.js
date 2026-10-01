@@ -2,6 +2,9 @@
 module.exports = {
   preset: 'jest-expo/android',
   testMatch: ['<rootDir>/tests/**/*.test.ts?(x)'],
-  moduleNameMapper: { '^@/(.*)$': '<rootDir>/src/$1' },
+  moduleNameMapper: {
+    '^@/assets/(.*)$': '<rootDir>/assets/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
   clearMocks: true,
 };

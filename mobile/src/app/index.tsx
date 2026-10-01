@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore';
 
 export default function Index() {
   const { user } = useAuthStore();
-  if (!user) return <Redirect href="/(auth)/login" />;
+  if (!user) return <Redirect href="/(auth)/welcome" />;
   if (!user.emailVerified) return <Redirect href="/verify-email" />;
   return <Redirect href="/(main)/dashboard" />;
 }

@@ -1,30 +1,99 @@
-import { View, Text, StyleSheet, Button } from 'react-native';
+// Vehicle overview, sensor list and history use the route's explicit vehicle context.
+import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-
-export default function VehicleDetailScreen() {
-  const { id } = useLocalSearchParams();
+import { useRouteVehicle } from '@/hooks/use-route-vehicle';
+import { Page, State, Chips, Button, Copy } from '@/components/vehicle-health/ui';
+import { VehicleCard, Freshness, HealthCard, SensorCards } from '@/components/vehicle-health/cards';
+import { DataGate, AssessmentUnavailable } from '@/components/vehicle-health/data-state';
+import { SensorChart } from '@/components/vehicle-health/sensor-chart';
+export default function VehicleDetail() {
+  const { id, tab: initialTab } = useLocalSearchParams<{ id: string; tab?: string }>();
   const router = useRouter();
-
+  const { vehicle, pending } = useRouteVehicle(id);
+  const [tab, setTab] = useState(initialTab === 'sensors' ? 'sensors' : 'overview');
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Digital Twin: {id}</Text>
-
-      {/* Placeholder for Health Gauge and Chart */}
-      <View style={styles.placeholderBox}>
-        <Text style={styles.boxText}>Live Telemetry Stream</Text>
-      </View>
-
-      <Button
-        title="View Maintenance Report"
-        onPress={() => router.push(`/(main)/report/${id}`)}
-      />
-    </View>
+    <Page title="Vehicle details" back={() => router.back()}>
+      {pending ? (
+        <State title="Loading vehicle" loading />
+      ) : !vehicle ? (
+        <State
+          title="Vehicle not found"
+          message="Session-only vehicles disappear when the demo session ends."
+        />
+      ) : (
+        <>
+          <VehicleCard vehicle={vehicle} />
+          <Button
+            secondary
+            title="Manage vehicle"
+            onPress={() =>
+              router.push({ pathname: '/(main)/vehicle/edit/[id]', params: { id: vehicle.id } })
+            }
+          />
+          <Chips
+            values={[
+              { id: 'overview', label: 'Overview' },
+              { id: 'sensors', label: 'Sensors' },
+              { id: 'history', label: 'History' },
+            ]}
+            selected={tab}
+            onSelect={setTab}
+          />
+          <DataGate>
+            {(data) => (
+              <>
+                <Freshness data={data} />
+                {tab === 'overview' ? (
+                  <>
+                    {data.assessment ? (
+                      <HealthCard assessment={data.assessment} />
+                    ) : (
+                      <AssessmentUnavailable data={data} />
+                    )}
+                    <Copy muted>{data.insights.length} flagged demo observations</Copy>
+                    <Button
+                      secondary
+                      title="View insights"
+                      onPress={() => router.push('/(main)/(tabs)/insights')}
+                    />
+                    <Button
+                      title="View report preview"
+                      onPress={() =>
+                        router.push({ pathname: '/(main)/report/[id]', params: { id: vehicle.id } })
+                      }
+                    />
+                  </>
+                ) : tab === 'sensors' ? (
+                  <SensorCards
+                    data={data}
+                    onSelect={(key) =>
+                      router.push({
+                        pathname: '/(main)/sensor/[key]',
+                        params: { key, vehicleId: vehicle.id },
+                      })
+                    }
+                  />
+                ) : (
+                  <>
+                    <Copy>Battery voltage · available demo history</Copy>
+                    <SensorChart history={data.history} sensor="battery_voltage" unit="V" />
+                    <Button
+                      secondary
+                      title="Explore battery history"
+                      onPress={() =>
+                        router.push({
+                          pathname: '/(main)/sensor/[key]',
+                          params: { key: 'battery_voltage', vehicleId: vehicle.id },
+                        })
+                      }
+                    />
+                  </>
+                )}
+              </>
+            )}
+          </DataGate>
+        </>
+      )}
+    </Page>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  placeholderBox: { height: 200, backgroundColor: '#222', justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginBottom: 20 },
-  boxText: { color: '#666' }
-});
