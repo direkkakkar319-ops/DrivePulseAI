@@ -110,7 +110,7 @@ class FailureClassifier:
         return XGBClassifier(
             eval_metric="logloss",
             random_state=random_state,
-            **{**{"scale_pos_weight": 28.0}, **best_params, **params},
+            **{"scale_pos_weight": 28.0, **best_params, **params},
         )
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> FailureClassifier:
