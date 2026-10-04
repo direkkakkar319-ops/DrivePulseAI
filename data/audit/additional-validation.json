@@ -1,0 +1,1513 @@
+{
+  "csv_numeric_and_time_format": [
+    {
+      "path": "data/benchmarks/ai4i/raw/predictive_maintenance.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_failure/scania_aps/raw/aps_failure_training_set.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_failure/scania_aps/raw/aps_failure_test_set.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live11.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live28.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe6.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive3.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live32.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live5.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive8.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle29.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe4.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live31.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live29.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe2.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive1.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live19.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle18.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe10.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live33.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live36.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe7.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle22.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long1.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle25.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live38.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe8.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live17.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live23.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live26.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long10.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle15.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle24.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle35.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long7.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live12.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live25.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long2.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe11.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle30.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive11.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle21.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long11.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle36.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long4.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle47.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle40.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe15.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle19.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle1.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe13.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long3.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle8.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle42.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle16.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle43.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long9.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live4.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle4.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle39.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live20.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live37.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle5.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle2.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle27.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive4.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live14.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe3.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle3.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live2.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe16.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive13.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle33.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle23.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live18.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle7.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle34.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive10.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive9.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle17.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe5.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe9.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle46.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle45.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live13.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle20.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe1.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive2.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe17.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle37.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle32.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live34.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live27.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle12.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live7.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe12.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live9.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long5.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive5.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live30.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live8.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live35.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle9.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live10.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle26.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long12.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle13.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live39.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle44.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle14.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live15.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle6.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle38.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long8.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/long6.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live21.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe18.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live1.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive12.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live24.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle11.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live22.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live16.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle31.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle41.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive7.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live6.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/ufpe14.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle28.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/drive6.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/live3.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/carobd/raw/idle10.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-23_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-01_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-26_Seat_Leon_S_RT_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-04-23_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-11_Seat_Leon_S_RT_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-26_Seat_Leon_RT_RT_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-26_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-18_Seat_Leon_RT_KA_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-07_Seat_Leon_RT_KA_Frei_Vollbremsung.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-03_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-27_Seat_Leon_KA_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-08_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-13_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-07_Seat_Leon_KA_RT_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-01_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-19_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-05_Seat_Leon_S_CW_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-14_Seat_Leon_KA_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-19_Seat_Leon_RT_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-06_Seat_Leon_KA_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-27_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-29_Seat_Leon_KA_RT_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-21_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-20_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-14_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-07_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-11_Seat_Leon_KA_KA_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-23_Seat_Leon_S_RT_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-22_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-26_Seat_Leon_RT_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_RT_RT_Frei_Beschleunigung.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-28_Seat_Leon_KA_RT_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-27_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-21_Seat_Leon_BB_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-24_Seat_Leon_RT_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-26_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-04-23_Seat_Leon_RT_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-26_Seat_Leon_S_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-28_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-01_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-26_Seat_Leon_RT_S_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-17_Seat_Leon_RT_BB_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-27_Seat_Leon_KA_KA_2_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-28_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-12_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-06_Seat_Leon_KA_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-06_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-22_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-07_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-10_Seat_Leon_KA_KA_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-07_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-14_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-05_Seat_Leon_RT_S_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-04_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-02_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-22_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-09_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-14_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-08_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-10_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-31_Seat_Leon_KA_KA_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-10_Seat_Leon_S_RT_Frei.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-20_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-05_Seat_Leon_S_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-17_Seat_Leon_BB_RT_Normal_Glatteis.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-02_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-13_Seat_Leon_RT_KA_Stau_Messfehler.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-21_Seat_Leon_KA_BB_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-01_Seat_Leon_KA_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-07_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-11_Seat_Leon_KA_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-09_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-21_Seat_Leon_KA_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-28_Seat_Leon_KA_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_S_S_Stau.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-16_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-12_Seat_Leon_RT_S_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-08_Seat_Leon_S_RT_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    },
+    {
+      "path": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-31_Seat_Leon_RT_KA_Normal.csv",
+      "unexpected_nonnumeric_cells": 0,
+      "nonfinite_numeric_cells": 0,
+      "bad_kit_time_format": 0,
+      "nonempty_extra_fields": 0
+    }
+  ],
+  "cmapss_label_alignment": [
+    {
+      "subset": "FD001",
+      "contiguous_test_ids_match_nonnegative_integer_label_count": true
+    },
+    {
+      "subset": "FD002",
+      "contiguous_test_ids_match_nonnegative_integer_label_count": true
+    },
+    {
+      "subset": "FD003",
+      "contiguous_test_ids_match_nonnegative_integer_label_count": true
+    },
+    {
+      "subset": "FD004",
+      "contiguous_test_ids_match_nonnegative_integer_label_count": true
+    }
+  ]
+}

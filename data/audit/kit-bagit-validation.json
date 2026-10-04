@@ -1,0 +1,32 @@
+[
+  {
+    "file": "data/readme.txt",
+    "md5": "ea9e1ec73d290b2ad3953f34206a1d3c",
+    "passed": true
+  },
+  {
+    "file": "data/technical-md/dataset.tech_md.xml",
+    "md5": "f807c8413cadf85d1d0a9673b4a92781",
+    "passed": true
+  },
+  {
+    "file": "data/descriptive-md/dataset.desc_md.xml",
+    "md5": "4d18a7ad4777856c48f804c77ddb93a2",
+    "passed": true
+  },
+  {
+    "file": "data/dataset/OBD-II-Dataset.zip",
+    "md5": "4aece6c7b16f59a69be4fafec7ad54d9",
+    "passed": true
+  },
+  {
+    "file": "bagit.txt",
+    "md5": "9e5ad981e0d29adc278f6a294b8c2aca",
+    "passed": true
+  },
+  {
+    "file": "manifest-md5.txt",
+    "md5": "d997f920b1513f5450ed0f42d3228a84",
+    "passed": true
+  }
+]

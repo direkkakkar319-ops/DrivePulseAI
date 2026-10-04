@@ -1,0 +1,1464 @@
+[
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live11.csv",
+    "to": "data/automotive_obd/carobd/raw/live11.csv",
+    "sha256": "7133265ecafc64ec5012b135c9dd7a6e9e80efbfe61976bf387417593bb10337"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live28.csv",
+    "to": "data/automotive_obd/carobd/raw/live28.csv",
+    "sha256": "0c592c8debbec8df036e27684827f5d94c8203d821153daf0d0df1f16cfbdd78"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe6.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe6.csv",
+    "sha256": "7708eadd80a0b5fcf5f083e147194a4da84a174cb1d8bccc715ffe15ae53b488"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive3.csv",
+    "to": "data/automotive_obd/carobd/raw/drive3.csv",
+    "sha256": "95669f7a288799877b007d5993b183a49de686ab96b10ca62203ee823370c182"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live32.csv",
+    "to": "data/automotive_obd/carobd/raw/live32.csv",
+    "sha256": "cf62fc4c26200a9e9ccc39bdf20b5806e2cdc7d5b7a1d0b7cde48b70c209a4ed"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live5.csv",
+    "to": "data/automotive_obd/carobd/raw/live5.csv",
+    "sha256": "34b8502b88f3cf825ccbcea7260d86606c3f300163a437736b82b841c77bea10"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive8.csv",
+    "to": "data/automotive_obd/carobd/raw/drive8.csv",
+    "sha256": "50eb0cff81bfefea36d5e82f9458ad93954753138e0cc7e9c4899a2f48174b13"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle29.csv",
+    "to": "data/automotive_obd/carobd/raw/idle29.csv",
+    "sha256": "4d560acca39b9101293ca948f9bbb6f548d7da8cb3ba65a97fe8f9fc5467076c"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe4.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe4.csv",
+    "sha256": "c82e92f0ac75c3850c0dd89fc0daaba5757428386b639b30882eaf16762594a5"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live31.csv",
+    "to": "data/automotive_obd/carobd/raw/live31.csv",
+    "sha256": "f7a515ba810983096a2141ebdbbcb6af5e0b5eead7e0132c59e31565aedbd912"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live29.csv",
+    "to": "data/automotive_obd/carobd/raw/live29.csv",
+    "sha256": "001040b21d0cb0c9450e2d8b8d8f7467eab089e3eb75324c69b0a0d8fbfc06eb"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe2.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe2.csv",
+    "sha256": "2bf16736283d72421cf50848ac13a86638e2f7340d6f504cf37d09a677cab618"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive1.csv",
+    "to": "data/automotive_obd/carobd/raw/drive1.csv",
+    "sha256": "592fbeebe332ee5ffb0d3388004fdfb3a0e4e68ba235c64636e6f6779c0177d0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live19.csv",
+    "to": "data/automotive_obd/carobd/raw/live19.csv",
+    "sha256": "54582e38542129a1bdc3a4bbbcca97c252cc6e6cf1d92612923327e4820ff1c0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle18.csv",
+    "to": "data/automotive_obd/carobd/raw/idle18.csv",
+    "sha256": "598659dbf60a1928c03be136d7f53adc4f48337e136250219056b79df5c7a239"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe10.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe10.csv",
+    "sha256": "fc097263f218a9df86fe73f768fe364bf68936a6ca4c38b9a3b88ff7e4b72a3c"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live33.csv",
+    "to": "data/automotive_obd/carobd/raw/live33.csv",
+    "sha256": "ed94d3c0df49618dfd5259fa8215f14949c1ee2aa7c1c6c9264bbb2423ba8387"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live36.csv",
+    "to": "data/automotive_obd/carobd/raw/live36.csv",
+    "sha256": "8d6aafdb58bfdd3618f7b8327bc6983fe6fc513e57484d4cc6820eb65115f210"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe7.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe7.csv",
+    "sha256": "a6dd7e0ac5842d12d030c8d27b790319ea4f1c553f60a2940d8b33824bf4af50"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle22.csv",
+    "to": "data/automotive_obd/carobd/raw/idle22.csv",
+    "sha256": "6c6479eab43ea60c8684f5de3039ea80fa89932d43ab276b9485880b1a4567e0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long1.csv",
+    "to": "data/automotive_obd/carobd/raw/long1.csv",
+    "sha256": "e040f11e25916cd0cf72a66fe2e2e87b77930f91212ef72c3d07e003fc09f8b6"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle25.csv",
+    "to": "data/automotive_obd/carobd/raw/idle25.csv",
+    "sha256": "d4c0cda822631266e1022d3427cc0e947c77f473bb207d392a9ca5cd6e77ea19"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live38.csv",
+    "to": "data/automotive_obd/carobd/raw/live38.csv",
+    "sha256": "6f5772a3aedaab54ee213726c27d418edffa127c9f0f7fd46b5b5f01ec82ec2d"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe8.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe8.csv",
+    "sha256": "577986b7f31fee9915282334480a07eb0bb0fd9725b751a66348e2c5a12c8f66"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live17.csv",
+    "to": "data/automotive_obd/carobd/raw/live17.csv",
+    "sha256": "06fa440e82264bd8ef64197163a888bd99bd286f7c2e9bbe06a2fd4b28fe078a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live23.csv",
+    "to": "data/automotive_obd/carobd/raw/live23.csv",
+    "sha256": "9f51416988382ee4c02b3e8c056583b7644183e9ffcb02b0c8720864b6571539"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live26.csv",
+    "to": "data/automotive_obd/carobd/raw/live26.csv",
+    "sha256": "d208d20a3003d335eadd832212affc992dfb0e2e95c4d725c5792bd19bcdd9b7"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long10.csv",
+    "to": "data/automotive_obd/carobd/raw/long10.csv",
+    "sha256": "15fe9d116506f6b5f5bd2159d08175c1223e9400490e11309e23291ec6c9855c"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle15.csv",
+    "to": "data/automotive_obd/carobd/raw/idle15.csv",
+    "sha256": "b451101a0dc7808cb80e3060756c718d574e8d6a23c5bde379e1982d91ea0567"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle24.csv",
+    "to": "data/automotive_obd/carobd/raw/idle24.csv",
+    "sha256": "fd5f71038796ebab9aef934834529bf7827ecb596bcb2e6a19d95e39d4f26e26"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle35.csv",
+    "to": "data/automotive_obd/carobd/raw/idle35.csv",
+    "sha256": "4216ab882e140123bc71ace61e4fc462ea5889514dcab8ee00893a7613d11709"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long7.csv",
+    "to": "data/automotive_obd/carobd/raw/long7.csv",
+    "sha256": "34930dd1fcb8533d2ba36cd5944edf21229050b9005449b4fffa842a835c96f9"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live12.csv",
+    "to": "data/automotive_obd/carobd/raw/live12.csv",
+    "sha256": "4182bf4558bcef744679f9363bd78620a7d4a9714f238b1810c10afae17bc98a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live25.csv",
+    "to": "data/automotive_obd/carobd/raw/live25.csv",
+    "sha256": "a46610651aefcd4994afad3a813c8c17fb3085a0816d6c65bdb8fef219484017"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long2.csv",
+    "to": "data/automotive_obd/carobd/raw/long2.csv",
+    "sha256": "64033a9ffed2b89e1b792948e294fdac4e11b343d997d5ad76254029e7eb1fc1"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe11.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe11.csv",
+    "sha256": "4ac10e715ac29499a00b1768e7cab892d7bedb0f2875e036c2fc911bbe0565d5"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle30.csv",
+    "to": "data/automotive_obd/carobd/raw/idle30.csv",
+    "sha256": "f2fb65b2a37543062aa2126a1cf342d272b03e7bff4372da85f3fe31da85ec28"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive11.csv",
+    "to": "data/automotive_obd/carobd/raw/drive11.csv",
+    "sha256": "5aff808ac1b2a83bd65029a482e5c2264c98481109c8de9445aba4e273389d78"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle21.csv",
+    "to": "data/automotive_obd/carobd/raw/idle21.csv",
+    "sha256": "f5041384de6b1b0f59e4caa1d71ea974d31b8730706fc498d8c03727ae95c4d3"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long11.csv",
+    "to": "data/automotive_obd/carobd/raw/long11.csv",
+    "sha256": "ca2821dd321c10ac62b2c9c7285abde6df7267b9ea314d13c44cd45cbc97aaa8"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle36.csv",
+    "to": "data/automotive_obd/carobd/raw/idle36.csv",
+    "sha256": "6a6ef141a57dc1b5ae881735d97a48390b88c0d4c652a92502a6193c905a773a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long4.csv",
+    "to": "data/automotive_obd/carobd/raw/long4.csv",
+    "sha256": "610190e8843a44f4a0eb47fc43a8ec38baf43ed947f00dd4ef4acc24e69b661a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle47.csv",
+    "to": "data/automotive_obd/carobd/raw/idle47.csv",
+    "sha256": "5ddd53e9ef571d96d50999970d6d8e2b388467b613cec0aabdc6d76338dec0fd"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle40.csv",
+    "to": "data/automotive_obd/carobd/raw/idle40.csv",
+    "sha256": "d55bf07ee0d76a371285e8fcd78f8e50d04fb1a2403e87398096467a5cc147f2"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe15.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe15.csv",
+    "sha256": "c96c4631713958a2b07af11cc2d29f8ef99fa97311323a9ea9fdd8ed69a02b99"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle19.csv",
+    "to": "data/automotive_obd/carobd/raw/idle19.csv",
+    "sha256": "4abb0d6864d3e8644059bdc64f4465a7aa57dbf5173d88e4cff8ae4b64f51b23"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle1.csv",
+    "to": "data/automotive_obd/carobd/raw/idle1.csv",
+    "sha256": "eb924bb6316e0ac289dc108f171fc606b8e9eefef19cb7d8346306fe5ec827c4"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe13.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe13.csv",
+    "sha256": "6792f3bd587bbb092aea0a61eba5469199eaa7d7cfb0865e35744fc34f681cb5"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long3.csv",
+    "to": "data/automotive_obd/carobd/raw/long3.csv",
+    "sha256": "d736fba8162f2e660b45bc53fc7895f0787a02d33fef7fdbd2a5f6ffb4c83cb6"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle8.csv",
+    "to": "data/automotive_obd/carobd/raw/idle8.csv",
+    "sha256": "b5ed060e43400919843d4663191f6d26941d617cc2d6484b85e5aa0c1843ee40"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle42.csv",
+    "to": "data/automotive_obd/carobd/raw/idle42.csv",
+    "sha256": "b92fe5d56bdf0061dd0c6aaeec15fde462a88267d0095659d1d00405d4f0d9ae"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle16.csv",
+    "to": "data/automotive_obd/carobd/raw/idle16.csv",
+    "sha256": "c9286264fc0e71e09ffcfe2ebb987c21f7c2baf1bd4956c1a0250dd0c667bf55"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle43.csv",
+    "to": "data/automotive_obd/carobd/raw/idle43.csv",
+    "sha256": "a7f2a8fa16f25a03bb04a03d1a670dfa5ab005d3395d6b70c889dbf32ddac02e"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long9.csv",
+    "to": "data/automotive_obd/carobd/raw/long9.csv",
+    "sha256": "3e34fbe87c7d01afeca9d46c32f29d13dda6644ead2759964f9c1ecfb4047b97"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live4.csv",
+    "to": "data/automotive_obd/carobd/raw/live4.csv",
+    "sha256": "84c6db763b66bfc54df4e7752982cbd9ec2e2d3905cfe857381bee06a3232c0a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle4.csv",
+    "to": "data/automotive_obd/carobd/raw/idle4.csv",
+    "sha256": "8b94185d6e7682291d74cbad21f2a18253b80711b0cf8678c72226105dc8f2df"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle39.csv",
+    "to": "data/automotive_obd/carobd/raw/idle39.csv",
+    "sha256": "157ab49ec72762e1b0a5b77795c4f495c0c92136bb576425520a423963ef8018"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live20.csv",
+    "to": "data/automotive_obd/carobd/raw/live20.csv",
+    "sha256": "5871d498ddda09610b0a15296ff54690ceff59a4f57cb71f0f98d05e7a6c7ca0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live37.csv",
+    "to": "data/automotive_obd/carobd/raw/live37.csv",
+    "sha256": "564d6288dc6862a999678d055cbb1d7f96d6671bc9fa90ae42411a0681928692"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle5.csv",
+    "to": "data/automotive_obd/carobd/raw/idle5.csv",
+    "sha256": "f470abde5bd12de32585a29ea48ee7781b395e1256b7d6a3ab454631563a4381"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle2.csv",
+    "to": "data/automotive_obd/carobd/raw/idle2.csv",
+    "sha256": "a00d28094dd6b68cce818928882f23ae7ac02097ed3be3e2d3d6d8efeaa961d6"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle27.csv",
+    "to": "data/automotive_obd/carobd/raw/idle27.csv",
+    "sha256": "2bf002b0c7a4bf2a48cb2083047a598aaf14c54ff81bd314b1460871766ef2ea"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive4.csv",
+    "to": "data/automotive_obd/carobd/raw/drive4.csv",
+    "sha256": "8736d472c6aaee70f6f46a008134c8f1d64c212c4da1a64504f395702a43ac17"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live14.csv",
+    "to": "data/automotive_obd/carobd/raw/live14.csv",
+    "sha256": "a3b34f4e6e58eae523e39b904a6d1b25b064348a175f944c4259a950fa4d64f7"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe3.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe3.csv",
+    "sha256": "668445825ac20f238e5d206e3d1b27418e2d86d5a8ce4bc46c9bbadc5a97e6d4"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle3.csv",
+    "to": "data/automotive_obd/carobd/raw/idle3.csv",
+    "sha256": "e8ba234c849bd160b018fadcc11a3c3ed1adc512338348e21436004fdb00b4c7"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live2.csv",
+    "to": "data/automotive_obd/carobd/raw/live2.csv",
+    "sha256": "bf81577d25a907c3295ecc2749a12aad5c384ba227975d9f3fefff0c7e2647d0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe16.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe16.csv",
+    "sha256": "4f2e710e447a396dd571caeea9a9ac3834e6c43e8c827251992dd3d999b76455"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive13.csv",
+    "to": "data/automotive_obd/carobd/raw/drive13.csv",
+    "sha256": "f7f96d758f322926f6806a9ab4c97d74e4bb0f6e4d37b182f97d0f4c95b6225f"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle33.csv",
+    "to": "data/automotive_obd/carobd/raw/idle33.csv",
+    "sha256": "64fe0a27218e9a45c303646159490122c3011c491c14a6548d486a07f13f5d12"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle23.csv",
+    "to": "data/automotive_obd/carobd/raw/idle23.csv",
+    "sha256": "ad228ffbf22d48c000f124d0cf7bb74a5685b53207c2ddb7d426024823a9d57e"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live18.csv",
+    "to": "data/automotive_obd/carobd/raw/live18.csv",
+    "sha256": "a6030a5017a2d04a91988119072361f6a5d8feb164655754e9d109768f38d8e0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle7.csv",
+    "to": "data/automotive_obd/carobd/raw/idle7.csv",
+    "sha256": "102ff140675bef7a95d02b3904d85398bf1e68e5f7da383eba45ef830670462d"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle34.csv",
+    "to": "data/automotive_obd/carobd/raw/idle34.csv",
+    "sha256": "8bf848bb638a76621f518ed3760aabb726d2a1a60c11a53efcda3b05bee025ab"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive10.csv",
+    "to": "data/automotive_obd/carobd/raw/drive10.csv",
+    "sha256": "a854faaa6add52002afae2f8a21394ec92d5935af78dac40043df1adff2291ba"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive9.csv",
+    "to": "data/automotive_obd/carobd/raw/drive9.csv",
+    "sha256": "c374c050db061174209f4bf18031e462c4bf9aa7ba9a2311458cf77bf7b8c814"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle17.csv",
+    "to": "data/automotive_obd/carobd/raw/idle17.csv",
+    "sha256": "6d72e9e50a25372b0127e1cbd27eb1600cb0e73ca1767f5a668a8e4deb4e10ae"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe5.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe5.csv",
+    "sha256": "59d1128d7021ab0754a08f33a5e053bd5d8a85b621ac5044234d0baf070c5c4a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe9.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe9.csv",
+    "sha256": "350cef41cf8c53d20b49f8a75a8f84f03e39dc5fd0d7d0f40ac3f494a6a55c72"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle46.csv",
+    "to": "data/automotive_obd/carobd/raw/idle46.csv",
+    "sha256": "d74f058680626a7909a77c880d17193cb95cd9380b299663c41824a2ee35b1e2"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle45.csv",
+    "to": "data/automotive_obd/carobd/raw/idle45.csv",
+    "sha256": "9f0bc3173762fac69c696891692ae337c732685c4a7927af4d105038a838c6cf"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live13.csv",
+    "to": "data/automotive_obd/carobd/raw/live13.csv",
+    "sha256": "1d75f0fe2a0f731b5e3efa9e737735e5427fdc2f65a0870b922d567392050406"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle20.csv",
+    "to": "data/automotive_obd/carobd/raw/idle20.csv",
+    "sha256": "8fafb180c7ab634f6691de8e64f199f9eac2590511d0d34e17cbcafe01b0702a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe1.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe1.csv",
+    "sha256": "b506412f19ab0c0712465ee46cccc2b8d7cecf8cd8e0d188f0575b90a06cbbfe"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive2.csv",
+    "to": "data/automotive_obd/carobd/raw/drive2.csv",
+    "sha256": "f5bed60f0ad3b994435af1d730c8d7439375d68dd7b5a99dfa8349415860f049"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe17.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe17.csv",
+    "sha256": "243f5ece521b83382eb3878db1fbd7b25a7cabdaf7331f77edcd98a4a390f2e0"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle37.csv",
+    "to": "data/automotive_obd/carobd/raw/idle37.csv",
+    "sha256": "c52229447c6b98240ae551ae1f0192eda08223b7b288f9e305663a3c55dbf3c8"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle32.csv",
+    "to": "data/automotive_obd/carobd/raw/idle32.csv",
+    "sha256": "94d82f01176834c3c8a360028669b9cd228b95733b815444432ddf013859e1b7"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live34.csv",
+    "to": "data/automotive_obd/carobd/raw/live34.csv",
+    "sha256": "228d54b3b74c04b1253d4125244ea8fe6751d9b32ad07a14b6151084e9dcc411"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live27.csv",
+    "to": "data/automotive_obd/carobd/raw/live27.csv",
+    "sha256": "958881f4bc6b6d653f4e26c58ef608a82aace4f500b06ce8ec7713fdcebcfca8"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle12.csv",
+    "to": "data/automotive_obd/carobd/raw/idle12.csv",
+    "sha256": "a7520a7b6e1ade91628ecdaf115e1a342f7c950c6afab10c5fa57951e9b077b4"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live7.csv",
+    "to": "data/automotive_obd/carobd/raw/live7.csv",
+    "sha256": "dd30d28414ac58b41a9ef42037029ceec992febfbd31484742b5e1a2a5fdad76"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe12.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe12.csv",
+    "sha256": "1bf4d72b58b9a2fe2aba15f75c54baee561ad5329374ea8cc0217b0991bf7140"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live9.csv",
+    "to": "data/automotive_obd/carobd/raw/live9.csv",
+    "sha256": "c29e4640ee0b544d2254fa38f310cead03c0a248c6e73e5f7337580090b1118c"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long5.csv",
+    "to": "data/automotive_obd/carobd/raw/long5.csv",
+    "sha256": "b74a32163e6bc7bd35241f5c18ea54f8f8805fdeff9a9e70819866508357dd91"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive5.csv",
+    "to": "data/automotive_obd/carobd/raw/drive5.csv",
+    "sha256": "bacd907dba4be8c47bc8051309c7886220edbc0324e4783358bce306fec1f182"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live30.csv",
+    "to": "data/automotive_obd/carobd/raw/live30.csv",
+    "sha256": "6a24f6b0c9ffa3a6c8a5440324f22f1f55c28df5d2617c4081966617e0ec4cdc"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live8.csv",
+    "to": "data/automotive_obd/carobd/raw/live8.csv",
+    "sha256": "2e387b163e4e14033c49d0f52865e43803d5546fa1bbe44b0e9e156feec3cf03"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live35.csv",
+    "to": "data/automotive_obd/carobd/raw/live35.csv",
+    "sha256": "8d1680e2581e873e566a02e422ef8ed62a049a1126fc23a4b15d8bb1599e12ed"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle9.csv",
+    "to": "data/automotive_obd/carobd/raw/idle9.csv",
+    "sha256": "4231e0b6c6fa56ffe1b1b9b598257d35371c88b4e39bb27f0e5bd7d445b87c46"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live10.csv",
+    "to": "data/automotive_obd/carobd/raw/live10.csv",
+    "sha256": "a50adc30cf04d0c0c6170ff9fc209f3e64f172e67164effe5b0ebf5674ece547"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle26.csv",
+    "to": "data/automotive_obd/carobd/raw/idle26.csv",
+    "sha256": "9c98bf704b10967c211639a5d4be0fa4c244ce79102d521f9dd542c8d08b1689"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long12.csv",
+    "to": "data/automotive_obd/carobd/raw/long12.csv",
+    "sha256": "fa960c3ef0ff31fb2dc2268cf1731a3ef7a26bbd490f04f53c8e14b1db3254b7"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle13.csv",
+    "to": "data/automotive_obd/carobd/raw/idle13.csv",
+    "sha256": "ffa683047f0f1973a35632f781374e2bb2bc40c1372c5e543927ceb4d5ef2db8"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live39.csv",
+    "to": "data/automotive_obd/carobd/raw/live39.csv",
+    "sha256": "8ecb3a284ff29a3f106eda46f7e592d3fcc4d11104a35958102e7dcc7e4748e9"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle44.csv",
+    "to": "data/automotive_obd/carobd/raw/idle44.csv",
+    "sha256": "6e38b2fa1ab2cea126b53d2181288de65d453f25b29963ad4e6896e1330c9505"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle14.csv",
+    "to": "data/automotive_obd/carobd/raw/idle14.csv",
+    "sha256": "461cc7fd2f037e191c7e751cc273276b6b16e87b8e9cafabd2b19eec1ce5c9fe"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live15.csv",
+    "to": "data/automotive_obd/carobd/raw/live15.csv",
+    "sha256": "7de75ef90679e3d6b644c93dde4532aa986ba2911b3d6f7dee6ce01bec05df34"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle6.csv",
+    "to": "data/automotive_obd/carobd/raw/idle6.csv",
+    "sha256": "c25c56b75c32a1a6ce053570f52d7e8222a85b2b72cb94136d29e396e8355620"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle38.csv",
+    "to": "data/automotive_obd/carobd/raw/idle38.csv",
+    "sha256": "c9fdfcb5f6517bed3e8f565a0b2b73326678c387a0f7f69e4c422807106f227d"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long8.csv",
+    "to": "data/automotive_obd/carobd/raw/long8.csv",
+    "sha256": "5f60c29c93b116e50f66648a8b8b80ade89d423efb816fad76047b0910aef6ad"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/long6.csv",
+    "to": "data/automotive_obd/carobd/raw/long6.csv",
+    "sha256": "45cab2492e980fb919e71b09860a771d26d14f996cb890d8e6fd1ea44dfa1e4d"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live21.csv",
+    "to": "data/automotive_obd/carobd/raw/live21.csv",
+    "sha256": "3cdefb1451773ad524cc712d77108aa7ab1f48a6f55e897a4523364fe05e32ec"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe18.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe18.csv",
+    "sha256": "f9bfcb82f668b40e5abf0c7c46eccdf1e046a037520b351b3f666c23dfbbba50"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live1.csv",
+    "to": "data/automotive_obd/carobd/raw/live1.csv",
+    "sha256": "7df8f70ca69cfc0ad9c462cd1fa3f60ad6742d6b9a91fba0066be692eeb57691"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive12.csv",
+    "to": "data/automotive_obd/carobd/raw/drive12.csv",
+    "sha256": "b5b6011ddae13a846b528b6c615030bdc0938627408643d14bd2eacde584240a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live24.csv",
+    "to": "data/automotive_obd/carobd/raw/live24.csv",
+    "sha256": "5ba301a3dbb1c36bdbb0307ddc916e111e775119fc238050bdf521799e314ab9"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle11.csv",
+    "to": "data/automotive_obd/carobd/raw/idle11.csv",
+    "sha256": "253c5106ccf25b711fe391a11f859721a1bbc102836183a1bd288a7c4cac74e3"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live22.csv",
+    "to": "data/automotive_obd/carobd/raw/live22.csv",
+    "sha256": "2e960037a498866226b34de353a07899af96b4a3443fbe53394ee2ecb9b5cc63"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live16.csv",
+    "to": "data/automotive_obd/carobd/raw/live16.csv",
+    "sha256": "fc28d3713d1b337ba8ef8c50eca1cd004e9f53976bfa28ea004ce680e2f0480f"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle31.csv",
+    "to": "data/automotive_obd/carobd/raw/idle31.csv",
+    "sha256": "37fe318d493f72f7c2f8de457d19adad8f77d1ad8f06141af2b8930ceb64571a"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle41.csv",
+    "to": "data/automotive_obd/carobd/raw/idle41.csv",
+    "sha256": "586a2e97070c044e05f4c813d0882f11b893817a0abec52181a954266c6f7a0f"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive7.csv",
+    "to": "data/automotive_obd/carobd/raw/drive7.csv",
+    "sha256": "c5e76010501520a337fdf107c1b0a7038744fe181a45e08a87251b3300bafe13"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live6.csv",
+    "to": "data/automotive_obd/carobd/raw/live6.csv",
+    "sha256": "09ff357a25104193c7384048a1e83c8c1091eb1804165bcb7f7da40217d68949"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/ufpe14.csv",
+    "to": "data/automotive_obd/carobd/raw/ufpe14.csv",
+    "sha256": "621c32323e1eae98e89ee8632cd6134c32500252bda9c2aa6f682eff868723d6"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle28.csv",
+    "to": "data/automotive_obd/carobd/raw/idle28.csv",
+    "sha256": "c55f77ec770d4e950fb8ef5ab276c88d1ef19924c55b94bba7d173b1d14014fa"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/.DS_Store",
+    "to": "data/audit/preserved_misc/.DS_Store",
+    "sha256": "1caf60d8a14d6dfe8ede31f93ca7deb9d102707d0620c44b2e652ca218b686a6"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/drive6.csv",
+    "to": "data/automotive_obd/carobd/raw/drive6.csv",
+    "sha256": "d1c43f4894f393c469c0d74b62c72451192e3ba7e7063be3fe5f98ffd53da773"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/live3.csv",
+    "to": "data/automotive_obd/carobd/raw/live3.csv",
+    "sha256": "1b5ac13edfbabcbcba583a5c12541d2cb9b0161bce8f49e3545a5d3312bc50d2"
+  },
+  {
+    "action": "move",
+    "from": "data/anomly_detection/raw/idle10.csv",
+    "to": "data/automotive_obd/carobd/raw/idle10.csv",
+    "sha256": "e924cecf7f11c6ef6a42bc119e3cf1b7a130778333388d95b356f913082d1b62"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/test_FD001.txt",
+    "to": "data/benchmarks/cmapss/raw/test_FD001.txt",
+    "sha256": "818b11b2b35d9be951a290ae0d816f91e0084f71d37172c0d18b7f8be137490c"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/RUL_FD002.txt",
+    "to": "data/benchmarks/cmapss/raw/RUL_FD002.txt",
+    "sha256": "ebdc950de148a64540b81ea48586216f9689e2c04cb26b4d03eb0ef1e43f66c9"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/train_FD004.txt",
+    "to": "data/benchmarks/cmapss/raw/train_FD004.txt",
+    "sha256": "e81c9e26213623a7f0173d6632028cbe665e67cb8ea757fbba2b9154479fc118"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/test_FD004.txt",
+    "to": "data/benchmarks/cmapss/raw/test_FD004.txt",
+    "sha256": "e5babedfd7fe17562287eeb68f0a8fc622108a2a1bc3ff764283784afae32775"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/readme.txt",
+    "to": "data/benchmarks/cmapss/raw/readme.txt",
+    "sha256": "015ab9375c46dc8ed60b92c83dc4b0806f630938c324bbf41c41faab53deaf2f"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/Damage Propagation Modeling.pdf",
+    "to": "data/benchmarks/cmapss/raw/Damage Propagation Modeling.pdf",
+    "sha256": "e7aaef80c177333f400a4c1099fe76e67d244569b9397c937ec4cd3ed5b44a27"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/RUL_FD003.txt",
+    "to": "data/benchmarks/cmapss/raw/RUL_FD003.txt",
+    "sha256": "8195a4a89cba1e19d5756783418cc675ea0096279ed019acc30b8ff33d84f2a8"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/train_FD003.txt",
+    "to": "data/benchmarks/cmapss/raw/train_FD003.txt",
+    "sha256": "ddc59b42c919f8a36883ff01c40555e841d66cf7a705e70d1db5d1e11e57688a"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/train_FD002.txt",
+    "to": "data/benchmarks/cmapss/raw/train_FD002.txt",
+    "sha256": "454ea17e10450f43a92b03f570e290fd5d68bc9d34dbaf1af697fcfc8a375632"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/RUL_FD001.txt",
+    "to": "data/benchmarks/cmapss/raw/RUL_FD001.txt",
+    "sha256": "ac81721ae8df4627c06b5f83e8ac02bf94a602713340bdf5cf02275054259733"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/test_FD002.txt",
+    "to": "data/benchmarks/cmapss/raw/test_FD002.txt",
+    "sha256": "9bd0ed47395feed3ea88b50b49d09ef630da2ee4e6ecd05f486ccb2d2e6bf705"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/RUL_FD004.txt",
+    "to": "data/benchmarks/cmapss/raw/RUL_FD004.txt",
+    "sha256": "022b993ebf38bd6ac91c2a610af94eea9e69a6d91c8fea2e5fe11707b5e0c7b3"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/train_FD001.txt",
+    "to": "data/benchmarks/cmapss/raw/train_FD001.txt",
+    "sha256": "6d4b04c7a84f7f6d6c9c0153340f634f2ee4e4466fff337603ea7d74bcfcdbe1"
+  },
+  {
+    "action": "move",
+    "from": "data/RUL_score/raw/test_FD003.txt",
+    "to": "data/benchmarks/cmapss/raw/test_FD003.txt",
+    "sha256": "0f706b9e02f1ce6f225368ef9fca14000a93130ad7bd978f6a8939a6bcaa7d72"
+  },
+  {
+    "action": "move",
+    "from": "data/failure_classification/raw/predictive_maintenance.csv",
+    "to": "data/benchmarks/ai4i/raw/predictive_maintenance.csv",
+    "sha256": "9b01f38d2d2b860f0ad699bac001875eafbfb6b7159ccd2d746808c73c43e77d"
+  },
+  {
+    "action": "move",
+    "from": "data/MASTER_TEST_X.xlsx",
+    "to": "data/automotive_obd/dieselobd/raw/MASTER_TEST_X.xlsx",
+    "sha256": "9f4047f5964a450e03fa96de4b4927c09171998713e4222e5285cae3a0c1b1d4"
+  },
+  {
+    "action": "move",
+    "from": "data/MASTER_TRAIN_X.xlsx",
+    "to": "data/automotive_obd/dieselobd/raw/MASTER_TRAIN_X.xlsx",
+    "sha256": "4af148292731d3e16429a71fc4edd4de060930e9a0e2476f9389214c8bb9af32"
+  },
+  {
+    "action": "move",
+    "from": "data/VED_Static_Data_ICE&HEV.xlsx",
+    "to": "data/automotive_obd/ved/raw/VED_Static_Data_ICE&HEV.xlsx",
+    "sha256": "addb23d937ef7d943620755f478cc5a24316a7d61dee232ffbfd9b6e50986dae"
+  },
+  {
+    "action": "move",
+    "from": "data/2024-34-3.bibtex",
+    "to": "data/automotive_prognostics/scania_component_x/documentation/2024-34-3.bibtex",
+    "sha256": "02caa90faa81e92ece5901dcf5f5e4ee9912417e0b84b1e281d156ccfc6a26ae"
+  },
+  {
+    "action": "extract",
+    "from": "data/aps+failure+at+scania+trucks.zip::aps_failure_test_set.csv",
+    "to": "data/automotive_failure/scania_aps/raw/aps_failure_test_set.csv",
+    "sha256": "2cdf6f7661c7b4c63333c93cdec36a3a82350176b604a2312cf82799fb2712f3"
+  },
+  {
+    "action": "extract",
+    "from": "data/aps+failure+at+scania+trucks.zip::aps_failure_training_set.csv",
+    "to": "data/automotive_failure/scania_aps/raw/aps_failure_training_set.csv",
+    "sha256": "bb484302e3a3a1c8ef5e1f0129c4dc7cbd58f350867f95b575461ca21ab6b9da"
+  },
+  {
+    "action": "extract",
+    "from": "data/aps+failure+at+scania+trucks.zip::aps_failure_description.txt",
+    "to": "data/automotive_failure/scania_aps/raw/aps_failure_description.txt",
+    "sha256": "57b1eb3c551a678ffc1c8112e5b34c566dd16457642563f58aeb3ca65beeb820"
+  },
+  {
+    "action": "remove_verified_extracted_archive",
+    "from": "data/aps+failure+at+scania+trucks.zip",
+    "sha256": "5504d0402f54faaf97ac0ca085a621645763f5cfea2eb29c592b057d43d4db89"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/data/readme.txt",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/readme.txt",
+    "sha256": "a3a63108e9355a6988bcef27e584740f234e56fc5c2c6a17b0da1617664077c0"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/data/descriptive-md/dataset.desc_md.xml",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/descriptive-md/dataset.desc_md.xml",
+    "sha256": "134c215e055fd087f3c02660b8184fdc781e91ee681e8a4c678eeb23ac1f0b05"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/data/technical-md/dataset.tech_md.xml",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/technical-md/dataset.tech_md.xml",
+    "sha256": "688eaa55f8f48aaa6b835634eba6f5db58e500750f75c24529649498fd3c74f0"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/data/dataset/OBD-II-Dataset.zip",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip",
+    "sha256": "d000daf9f61c3d632f40ead6b0481ee72026ef6dc4ee1033c103f186987b9ac9"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/bagit.txt",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/bagit.txt",
+    "sha256": "e91f941be5973ff71f1dccbdd1a32d598881893a7f21be516aca743da38b1689"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/manifest-md5.txt",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/manifest-md5.txt",
+    "sha256": "77a273c7de6f5ab0057718835426cf49a4e29c89506ce3587c929daf7607cf4b"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/bag-info.txt",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/bag-info.txt",
+    "sha256": "e7ac05d95d179828faf617a20c4b6559d2cf81ef441a59519dcfdc5bb2121ed6"
+  },
+  {
+    "action": "extract",
+    "from": "data/failure_classification/raw/10.35097-1130.tar::10.35097-1130/tagmanifest-md5.txt",
+    "to": "data/automotive_obd/kit_obd/raw/10.35097-1130/tagmanifest-md5.txt",
+    "sha256": "b578a50f4a683654c534ab8a7eab90388521ad01fba96203cb45162b6667832c"
+  },
+  {
+    "action": "remove_verified_extracted_archive",
+    "from": "data/failure_classification/raw/10.35097-1130.tar",
+    "sha256": "898dc4ea4ee2074d37273d8ddc0e3ede04dfb70bea0608d3485d193c20357ea2"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-05_Seat_Leon_RT_S_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-05_Seat_Leon_RT_S_Stau.csv",
+    "sha256": "250e9ff68162cdc2dc22e0037fed3886bcee82f89d0899a778fdcaf74853db33"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-05_Seat_Leon_S_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-05_Seat_Leon_S_KA_Normal.csv",
+    "sha256": "05c0bf00c667372a63092eb76b616870d6c1f7fdc13e9b11ff28981d9be915fe"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-06_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-06_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "cd17fb8cc8b811ad9404e5e6838ab041b675645662a76c116e2b8c757f97d9ca"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-06_Seat_Leon_KA_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-06_Seat_Leon_KA_RT_Normal.csv",
+    "sha256": "b5576f78fe97b19651510b8e23c75454da01da09a6101dd167762b48fbb3a95a"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-07_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-07_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "68d8cb01bb89f385cc279f09ecaeb642d5916655c2d588d56ad57f625bf8cf8d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-07_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-07_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "8ed3d94a9a0fb3e639162a628f3357f27beb18ed2714c7fb1ffb69dc3079c151"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-10_Seat_Leon_KA_KA_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-10_Seat_Leon_KA_KA_Stau.csv",
+    "sha256": "1b8b3e2253008e6a48f32342625476321006ecbd9f7d3d370156846a4292f42d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-11_Seat_Leon_KA_KA_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-11_Seat_Leon_KA_KA_Stau.csv",
+    "sha256": "7231d4e988a4866096071270cdb91d287b97c00ffad679a14d7e54b5650fc778"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-11_Seat_Leon_KA_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-11_Seat_Leon_KA_S_Normal.csv",
+    "sha256": "a55456c3a7e474789c4882a204f76cb42010935fad77268f73dca11af9e45a08"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-11_Seat_Leon_S_RT_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-11_Seat_Leon_S_RT_Frei.csv",
+    "sha256": "baa25202b16d2712398531a004dfbdf9bcc9b82503627cb410599730942c6eeb"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-12_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-12_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "5a69e2d5717ab6de5f8f15fbcc54df64bb927d904b29f99c68da2062e9d5733d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-12_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-12_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "1ce416298e154a8588bbe1fe55bbb3c143ed48d53272b41e6e40ba976c31b060"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-13_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-13_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "ed0337f4fcc9f5e18878b02aef92c0901ce36b545528bfd10307a3f0bc8825ed"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-13_Seat_Leon_RT_KA_Stau_Messfehler.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-13_Seat_Leon_RT_KA_Stau_Messfehler.csv",
+    "sha256": "3906221629251246da963f1df7883d9c89281deb6099246900c5e1e9d2cc72ac"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-14_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-14_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "a5430dbfad877991546d2a23322386a123100a883fc21e5fb5c30953525c3020"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-14_Seat_Leon_KA_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-14_Seat_Leon_KA_RT_Normal.csv",
+    "sha256": "0b32ac66ac749e76ed4739b4241c036b6ac8d346bf4e8ab010cb038d6cba1f74"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-24_Seat_Leon_RT_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-24_Seat_Leon_RT_KA_Normal.csv",
+    "sha256": "b3899b9507f512df9b7e2b7437b0f48a7c39e2d417040d4d0ef53a12906e757e"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-26_Seat_Leon_RT_S_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-26_Seat_Leon_RT_S_Stau.csv",
+    "sha256": "13116c2435977ea6beb1a8940650c9058a75198c81d97e2101f208375e11114c"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-26_Seat_Leon_S_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-26_Seat_Leon_S_KA_Normal.csv",
+    "sha256": "dd7c3add13da18e0232d4663a50ace98a3e0f1d7df6808a468c9ddeb6dbdd498"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-27_Seat_Leon_KA_KA_2_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-27_Seat_Leon_KA_KA_2_Normal.csv",
+    "sha256": "1bc325937e4421ab88f057a56272589aae1fb4859525b2f872a8e5386953f349"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-27_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-27_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "302e031a1cee3e0bd1849b901aa344ebc89bc28409183f20dbd2173c927d8471"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-28_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-28_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "ce2f2932347fc82c4ce09d50bb0f21f1f25901169f2ef8de87b0e53bc10c90d1"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-28_Seat_Leon_KA_RT_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-28_Seat_Leon_KA_RT_Stau.csv",
+    "sha256": "3ccff44c1aeb3c36b5f9ded44046eb83339f8e24d55d2850a0d865186a9e3dc4"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-31_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-31_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "2955417aba813463656f9326aaa40aa88f5f6120a4a70094bd73191f0bc8d810"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-07-31_Seat_Leon_RT_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-07-31_Seat_Leon_RT_KA_Normal.csv",
+    "sha256": "ab2d4a6ea4f5255dd8a01a0691b4d5b3b9f0ec9f46459f824f5f565bb14f6282"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-01_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-01_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "fcd86f5e4538de004ab3dbf42cdc234c388cb47ea52b1054ef157ed9cdb0c34f"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-01_Seat_Leon_KA_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-01_Seat_Leon_KA_RT_Normal.csv",
+    "sha256": "c18a10b6c04a3e510a84a1bed51cdacf073fe85c9284f9868231ece2dd4b2552"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-02_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-02_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "b5550761c52cb8c12332bd5aa70ae8ee758e6363cb27df0fec8af5bbce158612"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-03_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-03_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "765591222c7ddf80a23fe29b1a851ab191d4b42dbb2e7a086cad406d65bf84e7"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-04_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-04_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "52e6f032506d2fb18d530c1c3b4cba31668dfaf0c0096d1572e31bd154b9b35f"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-05_Seat_Leon_S_CW_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-05_Seat_Leon_S_CW_Normal.csv",
+    "sha256": "9f1aa9be9e10ea82f3b14ba324f5b3f116c3cf5bca4f86eed164845c4956e3d5"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-07_Seat_Leon_KA_RT_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-07_Seat_Leon_KA_RT_Frei.csv",
+    "sha256": "ee95a63585f334a71de5dcac5001feec805feb62d6323a7c725ea5fc6eb2014e"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-07_Seat_Leon_RT_KA_Frei_Vollbremsung.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-07_Seat_Leon_RT_KA_Frei_Vollbremsung.csv",
+    "sha256": "543646e2b7c4b44177298199afdac9f0126e0102ff0f46e1ae48fde89f93e46a"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-08_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-08_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "9d2bb021b0d0f154aa2ca0c23112170990a85f3df0c3aeac4b7418f3ffbd12fb"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-08_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-08_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "c4080386992d4b2fc9df7e370f2ae6fec0909b7398432ae484a7737827c6c8ee"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-09_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-09_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "188da85a2c78fc7a0a66f433116fdbac8ff2c23a8756bf198c846ee46504f722"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-09_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-09_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "194ca1b73c3bfec9191e86211501334ed141be5a217675b82f9ba96facde2731"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-10_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-10_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "6f38affd6981f3bc19ac4743cf32419325bcad0de3833520c0005751158a1b7d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2017-08-10_Seat_Leon_S_RT_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2017-08-10_Seat_Leon_S_RT_Frei.csv",
+    "sha256": "c4ad9cbdb406c275904c4e09828c67913ec6bf68d59f873c98a006c1869680f6"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-14_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-14_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "6555daabbccd27554a8c73dd237ecac20d47a7926395fb0b6a9844404d8b9b2f"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-14_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-14_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "0bedc934d68ac455479dac7d6b3a4271e5792d328942fc582bf70fef2d202449"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-16_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-16_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "1b672b6ef7b6a4a8ea257e614151ae9717fffcdf50836548105a99e51a671a2d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-17_Seat_Leon_BB_RT_Normal_Glatteis.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-17_Seat_Leon_BB_RT_Normal_Glatteis.csv",
+    "sha256": "074867b4c00880c831f7ac5b81f85cdc16f789ddfc1dea3ea64ee3f07783208d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-17_Seat_Leon_RT_BB_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-17_Seat_Leon_RT_BB_Frei.csv",
+    "sha256": "6e8f231fda54c02ca98c39d6bc45893d65382391f241e28b7dd8786e8d23f31f"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-18_Seat_Leon_RT_KA_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-18_Seat_Leon_RT_KA_Stau.csv",
+    "sha256": "5e7d56740efe97eba450b35524c0ea1c274f0c68b3a701c0d0bab108a5bbae66"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-20_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-20_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "9c7a6c43be05a4bd25b1d11f1a30daf7671bbb287b9cd4e42501d3865fdb9606"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-21_Seat_Leon_BB_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-21_Seat_Leon_BB_RT_Normal.csv",
+    "sha256": "a22270c3e5b37e2e5df542856d05736a22c0cc9472ab4a4f450e89b7314ddf62"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-21_Seat_Leon_KA_BB_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-21_Seat_Leon_KA_BB_Normal.csv",
+    "sha256": "f07213c31cf3bfbf05ae26c63c83d864a7d9e69de36540c2efb5167b5dacf9d5"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-21_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-21_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "49d4587c73eb5d7ac53c7c34e9550c64e02ba6ddc361162b2bc5696bc253fe4c"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-22_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-22_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "c943e0b291dab8ad853a454dc009f9f482e1606a75867aa2dfbc97c27714041b"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-23_Seat_Leon_RT_RT_Frei_Beschleunigung.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_RT_RT_Frei_Beschleunigung.csv",
+    "sha256": "a3967da1cd5d681de87fabfb4d560f5dd9c29748bfbe959e583dbe58fea27b66"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-23_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "488474f56e302b918ba51f6fb09fcaa683111c420da81e939385e83382b4d2f8"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-23_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "203b4d365d31b71bfab2e9087297173f64a8a1cd5a050c93d9bd26366fd90e26"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-23_Seat_Leon_S_S_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-23_Seat_Leon_S_S_Stau.csv",
+    "sha256": "bd173d3dcd487d95891b57580c259137348c7081848f9b3dcb330e0b5c9b5c89"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-26_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-26_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "779bafddce7f5e8716cbb8d6118cba49bf0bd90c6a4b3a76dc4d8993210c7c6c"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-26_Seat_Leon_RT_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-26_Seat_Leon_RT_KA_Normal.csv",
+    "sha256": "9ecba432a00a380208d31515738a5293ef9ed68fcf2d52c310d5d1ee9d7ace40"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-26_Seat_Leon_RT_RT_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-26_Seat_Leon_RT_RT_Frei.csv",
+    "sha256": "6c119871743267ad714754e1bdef9d9dae41dedf5ee3650c3ae992c7af4e2179"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-27_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-27_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "d88e7985cf63f803afa9c8440da4abc9b65b7e254e0d983be73dbedb8e6802c4"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-27_Seat_Leon_KA_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-27_Seat_Leon_KA_RT_Normal.csv",
+    "sha256": "f658818c7dc5de53e14d818cf5a9745534bd84aa46d0573a983e848356568de8"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-28_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-28_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "427c67c14192d3fc77d29e3e8a6f77115b4b2b1fcbb7ec533e79fdff7617037d"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-02-28_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-02-28_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "5b5597b6ce7d0f8e4dad14afc0677894016f2cee42c5dabbefec0eb1d02b76b6"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-01_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-01_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "82c2795aca31e047642ee3d616dff5d5d29871cabbf4a7e4aa4195a64fd3f8f6"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-01_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-01_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "a67d04bd0d2dec2edc7c6a1d26f699b01c1bedec98f9dcbb845df106d2b409e4"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-02_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-02_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "137c24f38acb8bfc3800e9187535a821973d26698f98e11c3c3663e0cd0fa0f5"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-06_Seat_Leon_KA_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-06_Seat_Leon_KA_RT_Normal.csv",
+    "sha256": "ae06c91e1213e7e596d48ad066e78f41c3726c3efa2abfe3dcf6c7a1847b04fd"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-07_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-07_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "ed0d73a8906f7020238a428a3c4f7fd09d293645b9c1210612bd193e3c063193"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-07_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-07_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "d4ccbf20175a235e5d1167ff7fbf98168cdc402ff6e9ebd927e0b520525104b9"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-08_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-08_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "4d672f4a8cb7284169fb11388a15118d23d856982b3806ced7e934e7dd96831c"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-19_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-19_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "3b863afe3a432503afaf149be43e9a181a939673cbf24cd15f50ac605ee82c9e"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-19_Seat_Leon_RT_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-19_Seat_Leon_RT_KA_Normal.csv",
+    "sha256": "8c21ca9047c6297d6874f6d4455f83d53e57cf36f24095b8bd5640e361f16d92"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-20_Seat_Leon_KA_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-20_Seat_Leon_KA_KA_Normal.csv",
+    "sha256": "9a3c7c8285cb4dc6d4dc49443d27406070dc3d6ca756630a2d0f60c3d9da9774"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-21_Seat_Leon_KA_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-21_Seat_Leon_KA_RT_Normal.csv",
+    "sha256": "72bb4a10a8e4a6d5987c6db5a807996b02c38f78577935793ce75641574a4b8c"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-22_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-22_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "d7b923ed10af76b6cf1205cb74972068543db8479f50a6e1da7384a8ef56b0b8"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-22_Seat_Leon_S_RT_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-22_Seat_Leon_S_RT_Normal.csv",
+    "sha256": "b6aac4167accb9b4f890e21baaca8677d998f5c4622f2c35a2f221f071e05140"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-23_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-23_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "dbfeffec5b4ff719a98818126bcba20e0c1412133a6e0a12765e970e570403e0"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-23_Seat_Leon_S_RT_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-23_Seat_Leon_S_RT_Stau.csv",
+    "sha256": "551da35dceb3cabcb936c15deffd096e6187c2655043fc37ec134253ef6eb5a8"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-26_Seat_Leon_RT_S_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-26_Seat_Leon_RT_S_Normal.csv",
+    "sha256": "5bd8fa3d6047cdf53987ac2b2fba68e90988abb1dc490eccf370be667308aaab"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-26_Seat_Leon_S_RT_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-26_Seat_Leon_S_RT_Stau.csv",
+    "sha256": "a0c7d8e8fc79d10fa61f941cdff607529bd6af9f86425971b8a0edf1b68b2533"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-03-29_Seat_Leon_KA_RT_Stau.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-03-29_Seat_Leon_KA_RT_Stau.csv",
+    "sha256": "296a43ea5b9dea2e010298a8362fce4dcdbfda3c826c1338596af536f791fcc9"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-04-23_Seat_Leon_KA_KA_Frei.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-04-23_Seat_Leon_KA_KA_Frei.csv",
+    "sha256": "e94fe8a06da8ceb0da1ba814236bf90a2ff18105a489ce3bd9087db41c7f51b7"
+  },
+  {
+    "action": "extract",
+    "from": "data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip::OBD-II-Dataset/2018-04-23_Seat_Leon_RT_KA_Normal.csv",
+    "to": "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset/2018-04-23_Seat_Leon_RT_KA_Normal.csv",
+    "sha256": "21d93aab881b015ecd14b83e412c77280389594f73cfde22b607ecaf6400b1eb"
+  },
+  {
+    "action": "move",
+    "from": "data/failure_classification/raw/RADAR_DATASET_DESCRIPTIVE_METADATA",
+    "to": "data/automotive_obd/kit_obd/raw/RADAR_DATASET_DESCRIPTIVE_METADATA",
+    "sha256": "727fe004268f17948ce56db8c6d34fbaa5627f651a2be9ee1adc7e6817ce5e90"
+  }
+]

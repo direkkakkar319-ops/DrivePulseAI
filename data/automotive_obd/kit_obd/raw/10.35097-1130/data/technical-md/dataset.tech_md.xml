@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dataset xmlns="http://radar-service.eu/schemas/dataset-technical-metadata/v09">
+    <retentionPeriod>0</retentionPeriod>
+    <archiveDate>2023-06-21T10:18:02.472</archiveDate>
+    <archiveCreator>kitopen</archiveCreator>
+    <responsibleEmail>Marc.Weber@vector.com</responsibleEmail>
+    <numberOfPendingNotificationMailsSent>0</numberOfPendingNotificationMailsSent>
+    <size>11538523</size>
+    <access>public</access>
+    <blocked>false</blocked>
+    <schema>
+        <key>RDDM</key>
+        <version>9.1</version>
+    </schema>
+</dataset>
