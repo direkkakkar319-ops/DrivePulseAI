@@ -1,0 +1,72 @@
+{
+  "seed": 42,
+  "source_sha256": {
+    "aps_failure_training_set.csv": "bb484302e3a3a1c8ef5e1f0129c4dc7cbd58f350867f95b575461ca21ab6b9da",
+    "aps_failure_test_set.csv": "2cdf6f7661c7b4c63333c93cdec36a3a82350176b604a2312cf82799fb2712f3"
+  },
+  "versions": {
+    "pandas": "2.3.3",
+    "numpy": "2.5.1",
+    "sklearn": "1.9.0"
+  },
+  "partitions": {
+    "supplied_training": {
+      "rows": 60000,
+      "labels": {
+        "neg": 59000,
+        "pos": 1000
+      },
+      "missing_cells": 850015
+    },
+    "train": {
+      "rows": 48000,
+      "labels": {
+        "neg": 47200,
+        "pos": 800
+      },
+      "missing_cells": 680133
+    },
+    "validation": {
+      "rows": 12000,
+      "labels": {
+        "neg": 11800,
+        "pos": 200
+      },
+      "missing_cells": 169882
+    },
+    "test": {
+      "rows": 16000,
+      "labels": {
+        "neg": 15625,
+        "pos": 375
+      },
+      "missing_cells": 228680
+    }
+  },
+  "leakage": {
+    "training_full_row_duplicates": 0,
+    "test_full_row_duplicates": 0,
+    "training_predictor_duplicate_rows": 0,
+    "test_predictor_duplicate_rows": 0,
+    "cross_split_distinct_predictor_hashes": 0,
+    "cross_split_three_significant_digit_candidates": 2362,
+    "training_conflicting_label_groups": 0
+  },
+  "excluded_constant_features": [
+    "cd_000"
+  ],
+  "baseline": {
+    "validation": {
+      "average_precision": 0.8693589736108308,
+      "precision": 0.3464991023339318,
+      "recall": 0.965,
+      "tn": 11436,
+      "fp": 364,
+      "fn": 7,
+      "tp": 193,
+      "challenge_cost": 7140
+    },
+    "threshold": 0.059513986532193586,
+    "test_evaluation_blocked": true
+  }
+}
