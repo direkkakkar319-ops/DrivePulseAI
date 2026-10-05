@@ -35,8 +35,8 @@ for candidate in (ML_DIR, REPO_ROOT / "ml"):
             sys.path.insert(0, str(candidate))
         break
 
-from src.data.loaders import load_aps  # noqa: E402
-from src.data.preprocessing import PreProcessing  # noqa: E402
+from src.data.loaders import load_aps
+from src.data.preprocessing import PreProcessing
 
 DEFAULT_DATA_DIR = REPO_ROOT / "data" / "automotive_failure" / "scania_aps" / "raw"
 FIG_DIR = REPO_ROOT / "ml" / "reports" / "figures" / "aps"
