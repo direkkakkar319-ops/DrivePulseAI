@@ -16,12 +16,12 @@ Documents the local dataset inventory, immutable raw locations, validation findi
 | --- | --- | --- |
 | carOBD candidate | INCOMPLETE; provenance UNVERIFIED | `automotive_obd/carobd/raw/`: 129 CSV recordings, 304,299 rows; malformed/short records described below |
 | DieselOBD candidate | UNVERIFIED | `automotive_obd/dieselobd/raw/`: two OBD/DTC Excel workbooks; no source documentation |
-| VED | INCOMPLETE; distribution/version UNVERIFIED | `automotive_obd/ved/raw/`: ICE/HEV static metadata workbook only |
+| VED | REMOVED 2026-10-06: static metadata only, no telemetry; unused by any loader | `automotive_obd/ved/raw/` (deleted) |
 | KIT Automotive OBD-II | COMPLETE | `automotive_obd/kit_obd/raw/`: 81 actual CSV recordings plus original RADAR metadata/BagIt payload |
 | Scania APS Failure | COMPLETE | `automotive_failure/scania_aps/raw/`: official-named training/test CSVs and description |
-| SCANIA Component X | MISSING data; version UNVERIFIED | `automotive_prognostics/scania_component_x/documentation/`: citation only; no raw directory pretending to contain data |
-| AI4I derivative | UNVERIFIED provenance/completeness against original | `benchmarks/ai4i/raw/`: valid 10,000-row, 12-column local copy |
-| NASA C-MAPSS | COMPLETE structurally; documentation discrepancy | `benchmarks/cmapss/raw/`: all four train/test/RUL subsets, README and paper |
+| SCANIA Component X | REMOVED 2026-10-06: citation only, data never downloaded; RUL blocked until the official release arrives | `automotive_prognostics/scania_component_x/` (deleted) |
+| AI4I derivative | REMOVED 2026-10-06: industrial benchmark, superseded by Scania APS; loaders deleted | `benchmarks/ai4i/raw/` (deleted) |
+| NASA C-MAPSS | REMOVED 2026-10-06: aircraft benchmark, superseded by Scania APS; loaders deleted | `benchmarks/cmapss/raw/` (deleted) |
 
 No additional NASA battery dataset was found. No exact duplicate standalone raw files were found after extraction. Dataset-like files outside `data/` were webpack cache archives, not dataset copies; their inventory is in `audit/repository-data-candidates.json`. Dependency/VCS environments were excluded from that search. Existing AI4I EDA figures in `ml/reports/` were left untouched. No confidently identified invalid generated dataset was found to remove.
 
