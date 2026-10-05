@@ -1,0 +1,63 @@
+{
+  "samples": 230,
+  "sensor_rows": 4800,
+  "split_label_sample_counts": {
+    "training/healthy": 92,
+    "training/airleak_nox": 92,
+    "testing/healthy": 23,
+    "testing/airleak_nox": 23
+  },
+  "missing_or_nonfinite_sensor_cells": 0,
+  "exact_cross_split_sensor_patterns": 0,
+  "exact_cross_split_whole_sample_patterns": 0,
+  "github_original_csvs": [
+    {
+      "path": "source/n53_airleak_MAF_NOx.csv",
+      "rows": 2400,
+      "labels": {
+        "airleak_nox": 2400
+      },
+      "sha256": "da3efd66acbe0e644db2d442bc6fa376763a9118cc3300a3d16ee0dd3cc429c8"
+    },
+    {
+      "path": "source/n53_healthy_MAF_NOx.csv",
+      "rows": 2400,
+      "labels": {
+        "healthy": 2400
+      },
+      "sha256": "fba858890927c8b6b1e5461d11a72b2623674b564af535af2cd1f9aa9b935eae"
+    }
+  ],
+  "public_patterns_absent_from_github_csvs": 0,
+  "source_sha256": {
+    "source/training_page_14.html": "1c4767dc06a7a820204d0b02655c58953be7761cbf240d532bb63cf67a7265df",
+    "source/training_page_5.html": "6c8741d5e81283c3f777825e20f0da21516acec6b6737e8f4d2a5dd71300a646",
+    "source/training_page_13.html": "f312c291d36ffd976b78607581041cff5120dab54bb3ba6f427540f967501195",
+    "source/training_page_7.html": "f54842b5903fe0fbee5ddf8e5a93d4e0ec7cafda960a1060daa48290b851ce24",
+    "source/testing_page_4.html": "04bd748758f09e5f79c9f0b334d8eae7eb3bb751681eb67d1b4216eeaba8aeab",
+    "source/training_page_6.html": "3ab945159e17c0538affa7002b54f01be9ba30fcf51ab12b6f40a6da6b097aef",
+    "source/testing_page_2.html": "060d81e8519133d966555a6963ce8056e1aca27ae635b295e53310113c4de346",
+    "source/training_page_4.html": "444289bbc2fa81c8d6a3841536a3f04c8694c2584e5a9fdc171e6ebb2b0f0b06",
+    "source/n53_airleak_MAF_NOx.csv": "da3efd66acbe0e644db2d442bc6fa376763a9118cc3300a3d16ee0dd3cc429c8",
+    "source/training_page_11.html": "34ce00b916202605daa19b668212078c107c1283fb66cdf5a9479a4022d0e563",
+    "source/training_page_10.html": "42076fabfa9de176b9478ce9b652790870afd8140f0f688570b4158b0812c891",
+    "source/training_page_16.html": "f089dedfe2ea4b760a2d94bdb177ddc48b9a3231cc86ddabdc546d1f58dcfda6",
+    "source/testing_page_1.html": "2f04dd72e2efa8dcc194e00e35a9288ea1cb20604965b928afe0e419d7a71e08",
+    "source/collection_LICENSE": "5efac04bfd0c1630065763c5007b3385c749de46f03869fea6d871729fe52913",
+    "source/training_page_3.html": "783bca606adcd8a419296d45994e988ca943573cd8aad417bb8d19abfaa16dfb",
+    "source/training_page_2.html": "7351ce343515ff2c4aa842586ec70d5f9203b6b7ea66f871893834eaee63aae1",
+    "source/training_page_9.html": "bf9f64d71f8a9781f50fa3d79a15959504ba649300110d8f80069ce4b4c4f4db",
+    "source/testing_page_3.html": "5e23ed253c8cf01375feb266edb4a29ef48bb5280818059d9cf7f7375d93517d",
+    "source/training_page_1.html": "1cd3ae98878197904c7c86911210958dc918f32adcc5765927dd88f70dfe2c7c",
+    "source/training_page_15.html": "8ae18fcda0cdaa49324a09b566e12a885b9e7a534f0b6cf83a5dd0b9e9d9b5cf",
+    "source/collection_README.md": "ae965b4d8f1f6283e1f852a2bfa8b8064f78ee2662a3dbffcb957fba0182f805",
+    "source/training_page_8.html": "692ff8e7aa29872640ec9130afc18c5461bf52b8d43013718aa8bc2be15a5296",
+    "source/training_page_12.html": "71d9215298ed51378a6dd80ddbffe2594ac146ad74ecb784be9a51194227ecff",
+    "source/n53_healthy_MAF_NOx.csv": "fba858890927c8b6b1e5461d11a72b2623674b564af535af2cd1f9aa9b935eae"
+  },
+  "limitations": [
+    "Only healthy vs induced intake-related condition; no general mechanical-health certification.",
+    "Split samples come from condition-specific source recordings; supplied split is not independent-car evaluation.",
+    "No RUL target. Public availability is not a separate dataset licensing statement; collection repository includes BSD-3-Clause license."
+  ]
+}
