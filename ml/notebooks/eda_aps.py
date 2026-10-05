@@ -215,7 +215,7 @@ def plot_separation(tr: pd.DataFrame) -> None:
     log("\n--- standardized mean difference |pos-neg|/sd (top 15) ---")
     log(smd.head(15).to_string())
 
-    fig, ax = plt.subplots(figsize=(9, 6))
+    _, ax = plt.subplots(figsize=(9, 6))
     smd.head(20).sort_values().plot(kind="barh", ax=ax)
     ax.set_title("Top-20 class separators (std. mean difference)")
     ax.set_xlabel("|mean_pos - mean_neg| / pooled sd")
@@ -316,7 +316,7 @@ def prototype_features(tr: pd.DataFrame, top: list[str]) -> list[str]:
                              include_lowest=True, duplicates="drop")
     log(feats.groupby("miss_q", observed=True)["failure"].mean().to_string())
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    _, ax = plt.subplots(figsize=(8, 4))
     feats.groupby("miss_q", observed=True)["failure"].mean().plot(kind="bar", ax=ax)
     ax.set_title("Failure rate by missing-cell quartile")
     ax.set_ylabel("APS failure rate")

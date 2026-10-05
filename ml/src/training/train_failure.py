@@ -212,7 +212,7 @@ def track_model_run(func):
         start = time.perf_counter()
         try:
             result = func(*args, **kwargs)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - isolate per-model failures
             elapsed = time.perf_counter() - start
             log(f"[FAILED] {name} raised {type(e).__name__}: {e}")
             log(f"  time elapsed: {elapsed:.2f}s")

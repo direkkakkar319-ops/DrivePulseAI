@@ -58,7 +58,7 @@ def test_load_aps_missing_path(tmp_path: Path):
 
 def test_load_kit_single_file(tmp_path: Path):
     rec = tmp_path / "trip.csv"
-    open(rec, "w").write(
+    rec.write_text(
         "Time,ECT,MAP,RPM,VSS,IAT,MAF,THR,AMB,PD,PE\n"
         "08:00:00.000,90,40,1500,50,30,10.0,20,25,10,12\n"
         "08:00:01.000,91,41,1600,55,31,11.0,21,25,11,12\n"
@@ -87,7 +87,7 @@ def test_load_kit_missing_path(tmp_path: Path):
 def test_load_carobd_trailing_field(tmp_path: Path):
     header = ",".join(f"C{i}" for i in range(27))
     rec = tmp_path / "drive1.csv"
-    open(rec, "w").write(header + "\n" + ",".join(["1"] * 28) + "\n")
+    rec.write_text(header + "\n" + ",".join(["1"] * 28) + "\n")
 
     df = load_carobd(rec)
     assert len(df) == 1
@@ -98,7 +98,7 @@ def test_load_carobd_trailing_field(tmp_path: Path):
 
 def test_load_carobd_bad_header(tmp_path: Path):
     rec = tmp_path / "bad.csv"
-    open(rec, "w").write("A,B,C\n1,2,3\n")
+    rec.write_text("A,B,C\n1,2,3\n")
     with pytest.raises(ValueError, match="expected 27 header columns"):
         load_carobd(rec)
 
