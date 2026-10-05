@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:radarDataset xmlns="http://radar-service.eu/schemas/descriptive/radar/v09/radar-elements" xmlns:ns2="http://radar-service.eu/schemas/descriptive/radar/v09/radar-dataset">
+    <identifier identifierType="DOI">10.35097/1130</identifier>
+    <alternateIdentifiers>
+        <alternateIdentifier alternateIdentifierType="KITopen-DOI">10.5445/IR/1000085073</alternateIdentifier>
+    </alternateIdentifiers>
+    <creators>
+        <creator>
+            <creatorName>Weber, Marc</creatorName>
+            <givenName>Marc</givenName>
+            <familyName>Weber</familyName>
+        </creator>
+    </creators>
+    <title>Automotive OBD-II Dataset</title>
+    <descriptions>
+        <description descriptionType="TechnicalRemarks">CSV data containing ten vehicle signals logged via the OBD-II interface: Engine coolant temperature, intake manifold absolute pressure, engine RPM, vehicle speed sensor, intake air temperature, air flow rate from mass flow sensor, absolute throttle position, ambient air temperature as well as the accelerator pedal positions D and E.&#xD;
+&#xD;
+The data was recorded with the OBD-II dongle KIWI 3 from PLX Devices in combination with the smartphone application OBD Auto Doctor from Creosys on an iOS device.&#xD;
+&#xD;
+The file name is assembled according to the following scheme: &lt;yyyy-mm-dd&gt;_&lt;brand&gt;_&lt;model&gt;_&lt;from&gt;_&lt;to&gt;_&lt;condition&gt;_&lt;extension&gt;.csv&#xD;
+- &lt;from&gt; and &lt;to&gt; represent start and end position of the log according to the German number plates, i.e. KA = Karlsruhe etc.&#xD;
+- &lt;condition&gt; is a label indicating the principle road conditions (e.g. normal, frei/free, Stau/busy)&#xD;
+- &lt;extension&gt; is optional and marks special situations occurring in the vehicle speed data</description>
+    </descriptions>
+    <publishers>
+        <publisher nameIdentifierScheme="ROR" schemeURI="https://ror.org/" nameIdentifier="https://ror.org/04t3en479">Karlsruhe Institute of Technology</publisher>
+    </publishers>
+    <productionYear>2018</productionYear>
+    <publicationYear>2023</publicationYear>
+    <subjectAreas>
+        <subjectArea>
+            <controlledSubjectAreaName>Engineering</controlledSubjectAreaName>
+        </subjectArea>
+    </subjectAreas>
+    <resource resourceType="Dataset"></resource>
+    <rights>
+        <controlledRights>CC BY 4.0 Attribution</controlledRights>
+    </rights>
+    <rightsHolders>
+        <rightsHolder nameIdentifierScheme="Other">Weber, Marc</rightsHolder>
+    </rightsHolders>
+</ns2:radarDataset>

@@ -2,177 +2,166 @@ from pathlib import Path
 
 import pandas as pd
 
+# File starts with a ~20-line GPL copyright preamble; the header row begins
+# with "class,". Verified against the canonical train file (header at line 20).
+APS_PREAMBLE_LINES = 20
 
-def load_ai4i(filepath: str | Path) -> pd.DataFrame:
+
+def load_aps(filepath: str | Path, split: str = "train") -> pd.DataFrame:
     """
-    Load the AI4I Predictive Maintenance dataset and map to automotive fields.
+    Load the Scania APS failure dataset (heavy-truck air pressure system).
+
+    Failure semantics: failure=1 means the specified APS component failed.
+    failure=0 means failure in some OTHER component, not a healthy vehicle.
+    The 170 features are anonymized counters/histogram bins with no physical
+    units. vehicle_id is a row identity (APS-<split>-<row>), not a vehicle:
+    the files carry no vehicle, trip, or time axis.
 
     Args:
-        filepath: Path to the predictive_maintenance.csv file.
+        filepath: Directory holding the official CSVs, or a single CSV file.
+        split: "train" or "test" when filepath is a directory. The official
+            split is preserved as-is; never remix it for evaluation.
 
     Returns:
-        pd.DataFrame: Dataframe with standard automotive column names and source label.
-    """
-    df = pd.read_csv(filepath)
-
-    mapping = {
-        "UDI": "vehicle_id",
-        "Rotational speed [rpm]": "engine_rpm",
-        "Torque [Nm]": "engine_load_pct",
-        "Process temperature [K]": "coolant_temp_c",
-        "Air temperature [K]": "intake_air_temp_c",
-        "Tool wear [min]": "vibration",
-        "Machine failure": "failure",
-    }
-
-    rename_dict = {k: v for k, v in mapping.items() if k in df.columns}
-    df = df.rename(columns=rename_dict)
-
-    # Kelvin to Celsius
-    if "coolant_temp_c" in df.columns:
-        df["coolant_temp_c"] = df["coolant_temp_c"] - 273.15
-    if "intake_air_temp_c" in df.columns:
-        df["intake_air_temp_c"] = df["intake_air_temp_c"] - 273.15
-
-    # Scale engine_load_pct to 0 to 100 (assuming torque max is around 80 Nm in AI4I)
-    if "engine_load_pct" in df.columns:
-        df["engine_load_pct"] = (
-            df["engine_load_pct"] / df["engine_load_pct"].max()
-        ) * 100
-
-    # Add standard fields
-    df["source"] = "ai4i"
-    if "vehicle_id" not in df.columns:
-        df["vehicle_id"] = "AI4I-" + df.index.astype(str)
-    else:
-        df["vehicle_id"] = "AI4I-" + df["vehicle_id"].astype(str)
-
-    return df
-
-
-def load_simulated(
-    filepath: str | Path,
-    pattern: str = "*.csv",
-) -> pd.DataFrame:
-    """
-    Load simulated telemetry data (CSV or JSONL), either from a single file or a directory.
-
-    Args:
-        filepath: Path to the simulated data file or directory containing files.
-        pattern: Glob pattern when loading from a directory (default: "*.csv").
-
-    Returns:
-        pd.DataFrame: Dataframe containing the simulated telemetry with unified column names and source label.
+        pd.DataFrame: Features plus failure label, vehicle_id, and source label.
     """
     filepath = Path(filepath)
-
-    def _load_single(f: Path) -> pd.DataFrame:
-        if f.suffix == ".jsonl":
-            sub_df = pd.read_json(f, lines=True)
-        else:
-            sub_df = pd.read_csv(f)
-        if "vehicle_id" not in sub_df.columns:
-            sub_df["vehicle_id"] = f"SIM-{f.stem}"
-        return sub_df
-
+    if split not in ("train", "test"):
+        raise ValueError(f"split must be 'train' or 'test', got {split!r}")
     if filepath.is_dir():
-        files = sorted(filepath.glob(pattern))
-        if not files and pattern == "*.csv":
-            files = sorted(filepath.glob("*.jsonl"))
-        if not files:
-            raise FileNotFoundError(f"No matching files found in directory: {filepath}")
-        dfs = [_load_single(f) for f in files]
-        df = pd.concat(dfs, ignore_index=True)
-    elif filepath.is_file():
-        df = _load_single(filepath)
-    else:
+        name = "training" if split == "train" else "test"
+        filepath = filepath / f"aps_failure_{name}_set.csv"
+    elif not filepath.is_file():
         raise FileNotFoundError(f"File or directory not found: {filepath}")
 
-    mapping = {
-        "ENGINE_RUN_TINE ()": "timestamp",
-        "ENGINE_RPM ()": "engine_rpm",
-        "VEHICLE_SPEED ()": "speed_kmph",
-        "ENGINE_LOAD ()": "engine_load_pct",
-        "COOLANT_TEMPERATURE ()": "coolant_temp_c",
-        "INTAKE_AIR_TEMP ()": "intake_air_temp_c",
-        "CONTROL_MODULE_VOLTAGE ()": "battery_voltage",
-        "THROTTLE ()": "throttle_pct",
-    }
-    rename_dict = {k: v for k, v in mapping.items() if k in df.columns}
-    df = df.rename(columns=rename_dict)
-
-    df["source"] = "simulated"
+    df = pd.read_csv(filepath, skiprows=APS_PREAMBLE_LINES, na_values=["na"])
+    if "class" not in df.columns:
+        raise ValueError(f"No 'class' column in {filepath}: not an APS file")
+    df["failure"] = (df["class"] == "pos").astype(int)
+    df["vehicle_id"] = f"APS-{split}-" + df.index.astype(str)
+    df["source"] = "scania_aps"
     return df
 
 
-def load_cmapss(filepath: str | Path, subset: str = "FD001") -> pd.DataFrame:
+# KIT recordings carry 11 columns (time + 10 signals) with units in the
+# headers. Renamed positionally so header mojibake variants can't misalign
+# signals; a file with != 11 columns fails loudly instead of shifting data.
+KIT_COLUMNS = [
+    "timestamp_raw",
+    "coolant_temp_c",
+    "map_kpa",
+    "engine_rpm",
+    "speed_kmph",
+    "intake_air_temp_c",
+    "maf_gs",
+    "throttle_pct",
+    "ambient_air_temp_c",
+    "pedal_d_pct",
+    "pedal_e_pct",
+]
+
+
+def load_kit_obd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
     """
-    Load the C-MAPSS dataset (turbofan engine degradation) and map to automotive fields.
-    Adds a Remaining Useful Life (RUL) column for regression tasks.
+    Load KIT Automotive OBD-II recordings (real Seat Leon trips).
+
+    timestamp is seconds since midnight parsed from the time-of-day column;
+    the date context lives in vehicle_id (KIT-<filename stem>), which is a
+    recording/trip identity, not a proven independent vehicle. Small backward
+    timestamp jumps and blank cells documented in the data audit are retained
+    as-is for preprocessing to handle. No failure labels exist: anomaly
+    detection only.
 
     Args:
-        filepath: Path to the directory containing C-MAPSS text files or the file itself.
-        subset: The subset to load, e.g. "FD001" (default). If "all", loads all FD001-FD004.
+        filepath: A single recording CSV or a directory of recordings.
+        pattern: Glob pattern when loading from a directory.
 
     Returns:
-        pd.DataFrame: Dataframe with standard automotive column names, RUL, and source label.
+        pd.DataFrame: Telemetry with vehicle_id, timestamp, and source label.
     """
     filepath = Path(filepath)
-    columns = ["unit_number", "time_in_cycles", "setting_1", "setting_2", "setting_3"]
-    columns += [f"sensor_{i}" for i in range(1, 22)]
-
-    def _load_single_file(file_path: Path, subset_name: str) -> pd.DataFrame:
-        df_sub = pd.read_csv(file_path, sep=r"\s+", header=None, names=columns)
-        df_sub["subset"] = subset_name
-        # Unit numbers are per subset, so make them globally unique
-        df_sub["unit_number"] = subset_name + "_" + df_sub["unit_number"].astype(str)
-        return df_sub
+    files = (
+        sorted(filepath.glob(pattern))
+        if filepath.is_dir()
+        else [filepath]
+        if filepath.is_file()
+        else None
+    )
+    if not files:
+        raise FileNotFoundError(f"No KIT recordings found at {filepath}")
 
     dfs = []
-    if filepath.is_dir():
-        if subset == "all":
-            for i in range(1, 5):
-                sub_name = f"FD00{i}"
-                file_path = filepath / f"train_{sub_name}.txt"
-                if file_path.exists():
-                    dfs.append(_load_single_file(file_path, sub_name))
-        else:
-            file_path = filepath / f"train_{subset}.txt"
-            if file_path.exists():
-                dfs.append(_load_single_file(file_path, subset))
-    else:
-        dfs.append(_load_single_file(filepath, subset))
+    for f in files:
+        df = pd.read_csv(f)
+        if len(df.columns) != len(KIT_COLUMNS):
+            raise ValueError(
+                f"{f.name}: expected {len(KIT_COLUMNS)} columns, "
+                f"got {len(df.columns)}"
+            )
+        df.columns = KIT_COLUMNS
+        df["timestamp"] = pd.to_timedelta(
+            df["timestamp_raw"], errors="coerce"
+        ).dt.total_seconds()
+        df["vehicle_id"] = f"KIT-{f.stem}"
+        df["source"] = "kit_obd"
+        dfs = dfs + [df]
+    return pd.concat(dfs, ignore_index=True)
 
-    if not dfs:
-        raise FileNotFoundError(
-            f"No C-MAPSS files found at {filepath} for subset {subset}"
-        )
 
-    df = pd.concat(dfs, ignore_index=True)
+def load_carobd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
+    """
+    Load carOBD candidate recordings (provenance UNVERIFIED, see data audit).
 
-    # Calculate RUL (Remaining Useful Life)
-    rul = pd.DataFrame(df.groupby("unit_number")["time_in_cycles"].max()).reset_index()
-    rul.columns = ["unit_number", "max_cycles"]
-    df = df.merge(rul, on="unit_number", how="left")
-    df["rul"] = df["max_cycles"] - df["time_in_cycles"]
-    df.drop("max_cycles", axis=1, inplace=True)
+    timestamp is engine runtime (ENGINE_RUN_TINE, spelling preserved
+    upstream), not wall-clock time. vehicle_id is the recording filename
+    stem (trip identity), not a verified vehicle. Short/truncated rows are
+    kept with NaN, never dropped or realigned. No failure labels: anomaly
+    detection exploration only, after provenance validation.
 
-    mapping = {
-        "unit_number": "vehicle_id",
-        "time_in_cycles": "timestamp",
-        "sensor_2": "coolant_temp_c",
-        "sensor_3": "intake_air_temp_c",
-        "sensor_4": "battery_voltage",
-        "sensor_11": "engine_rpm",
-        "sensor_15": "vibration",
-    }
+    Args:
+        filepath: A single recording CSV or a directory of recordings.
+        pattern: Glob pattern when loading from a directory.
 
-    rename_dict = {k: v for k, v in mapping.items() if k in df.columns}
-    df = df.rename(columns=rename_dict)
+    Returns:
+        pd.DataFrame: Telemetry with vehicle_id, timestamp, and source label.
+    """
+    filepath = Path(filepath)
+    files = (
+        sorted(filepath.glob(pattern))
+        if filepath.is_dir()
+        else [filepath]
+        if filepath.is_file()
+        else None
+    )
+    if not files:
+        raise FileNotFoundError(f"No carOBD recordings found at {filepath}")
 
-    df["source"] = "cmapss"
-
-    if "vehicle_id" in df.columns:
-        df["vehicle_id"] = "CMAPSS-" + df["vehicle_id"].astype(str)
-
-    return df
+    dfs = []
+    for f in files:
+        header = pd.read_csv(f, nrows=0).columns.tolist()
+        if len(header) != 27:
+            raise ValueError(
+                f"{f.name}: expected 27 header columns, got {len(header)}"
+            )
+        # usecols pins the read to the 27 named positions so the trailing
+        # empty 28th field present in most rows can never shift signals.
+        df = pd.read_csv(f, usecols=list(range(27)))
+        df.columns = header
+        rename = {
+            "ENGINE_RUN_TINE ()": "timestamp",
+            "ENGINE_RPM ()": "engine_rpm",
+            "VEHICLE_SPEED ()": "speed_kmph",
+            "THROTTLE ()": "throttle_pct",
+            "ENGINE_LOAD ()": "engine_load_pct",
+            "COOLANT_TEMPERATURE ()": "coolant_temp_c",
+            "LONG_TERM_FUEL_TRIM_BANK_1 ()": "long_term_fuel_trim_bank_1",
+            "SHORT_TERM_FUEL_TRIM_BANK_1 ()": "short_term_fuel_trim_bank_1",
+        }
+        df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+        for c in df.columns:
+            if c not in ("vehicle_id", "source"):
+                df[c] = pd.to_numeric(df[c], errors="coerce")
+        df["vehicle_id"] = f"carOBD-{f.stem}"
+        df["source"] = "carobd"
+        dfs = dfs + [df]
+    return pd.concat(dfs, ignore_index=True)

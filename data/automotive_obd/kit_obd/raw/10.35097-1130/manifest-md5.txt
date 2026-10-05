@@ -1,0 +1,4 @@
+ea9e1ec73d290b2ad3953f34206a1d3c  data/readme.txt
+f807c8413cadf85d1d0a9673b4a92781  data/technical-md/dataset.tech_md.xml
+4d18a7ad4777856c48f804c77ddb93a2  data/descriptive-md/dataset.desc_md.xml
+4aece6c7b16f59a69be4fafec7ad54d9  data/dataset/OBD-II-Dataset.zip
