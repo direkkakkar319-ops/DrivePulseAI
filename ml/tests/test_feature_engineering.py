@@ -1,67 +1,53 @@
 import pandas as pd
 
-from src.data.feature_engineering import AI4I_LEAKAGE_COLS, FeatureEngineering
+from src.data.feature_engineering import FeatureEngineering
+from src.data.preprocessing import PreProcessing
 
 
 def _sample() -> pd.DataFrame:
     return pd.DataFrame(
         {
-            "Rotational speed": [1500, 1400],
-            "Torque": [40.0, 50.0],
-            "Process temperature": [310.0, 312.0],
-            "Air temperature": [300.0, 300.0],
-            "Tool wear": [100, 210],
-            "Type": ["L", "M"],
-            "Machine failure": [0, 1],
-            "TWF": [0, 1],
-            "HDF": [0, 0],
-            "PWF": [0, 0],
-            "OSF": [0, 0],
-            "RNF": [0, 0],
+            "ag_000": [1.0, None, 3.0, 4.0],
+            "ag_001": [2.0, 2.0, None, 4.0],
+            "aa_000": [5.0, 6.0, 7.0, 8.0],
+            "failure": [0, 1, 0, 1],
+            "vehicle_id": ["a", "b", "c", "d"],
+            "source": ["scania_aps"] * 4,
         }
     )
 
 
-def test_derived_math():
-    out = FeatureEngineering.add_ai4i_features(_sample())
-    assert out["temp_diff"].tolist() == [10.0, 12.0]
-    assert out["power_proxy"].tolist() == [60000.0, 70000.0]
-    assert out["wear_critical"].tolist() == [0, 1]
+def test_add_aps_features_missing_count():
+    out = FeatureEngineering.add_aps_features(_sample())
+    assert out["n_missing"].tolist() == [0, 1, 1, 0]
 
 
-def test_leakage_dropped_by_default():
-    out = FeatureEngineering.add_ai4i_features(_sample())
-    for col in AI4I_LEAKAGE_COLS:
-        assert col not in out.columns
-    assert "Machine failure" in out.columns
+def test_add_aps_features_group_aggs():
+    out = FeatureEngineering.add_aps_features(_sample())
+    assert out["ag_sum"].tolist() == [3.0, 2.0, 3.0, 8.0]
+    assert out["ag_mean"].tolist() == [1.5, 2.0, 3.0, 4.0]
+    assert out["ag_max"].tolist() == [2.0, 2.0, 3.0, 4.0]
+    assert "aa_000_sum" not in out.columns  # singleton prefix: no aggs
 
 
-def test_leakage_kept_when_off():
-    out = FeatureEngineering.add_ai4i_features(_sample(), drop_leakage=False)
-    assert "TWF" in out.columns
+def test_add_aps_features_all_nan_group_stays_nan():
+    df = _sample()
+    df.loc[0, ["ag_000", "ag_001"]] = None
+    out = FeatureEngineering.add_aps_features(df)
+    assert pd.isna(out.loc[0, "ag_sum"])
+    cleaned = PreProcessing.clean(out)
+    assert not cleaned[["ag_sum", "ag_mean", "ag_max"]].isna().any().any()
 
 
-def test_type_one_hot():
-    out = FeatureEngineering.add_ai4i_features(_sample())
-    assert "Type" not in out.columns
-    assert out["type_L"].tolist() == [1, 0]
-    assert out["type_M"].tolist() == [0, 1]
-
-
-def test_input_not_mutated():
+def test_add_aps_features_no_input_mutation():
     df = _sample()
     before = df.copy(deep=True)
-    FeatureEngineering.add_ai4i_features(df)
+    FeatureEngineering.add_aps_features(df)
     pd.testing.assert_frame_equal(df, before)
 
 
-def test_model_columns_excludes_targets_and_meta():
-    df = FeatureEngineering.add_ai4i_features(_sample())
-    df["vehicle_id"] = ["A", "B"]
-    df["source"] = ["ai4i", "ai4i"]
-    cols = FeatureEngineering.ai4i_model_columns(df)
-    assert "temp_diff" in cols and "power_proxy" in cols
-    assert "Machine failure" not in cols
-    assert "vehicle_id" not in cols and "source" not in cols
-    for col in AI4I_LEAKAGE_COLS:
-        assert col not in cols
+def test_aps_model_columns():
+    out = FeatureEngineering.add_aps_features(_sample())
+    cols = FeatureEngineering.aps_model_columns(out)
+    assert "failure" not in cols and "vehicle_id" not in cols
+    assert "n_missing" in cols and "ag_sum" in cols

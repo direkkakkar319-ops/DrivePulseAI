@@ -1,72 +1,108 @@
-import json
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from src.data.loaders import load_simulated
+from src.data.loaders import load_aps, load_carobd, load_kit_obd
+
+APS_DIR = (
+    Path(__file__).parents[2]
+    / "data"
+    / "automotive_failure"
+    / "scania_aps"
+    / "raw"
+)
+KIT_DIR = (
+    Path(__file__).parents[2]
+    / "data"
+    / "automotive_obd"
+    / "kit_obd"
+    / "raw"
+    / "recordings"
+    / "OBD-II-Dataset"
+)
+CAROBD_DIR = (
+    Path(__file__).parents[2] / "data" / "automotive_obd" / "carobd" / "raw"
+)
+
+needs_data = pytest.mark.skipif(
+    not APS_DIR.exists(), reason="APS data not checked out"
+)
 
 
-def test_load_simulated_single_csv(tmp_path: Path):
-    csv_file = tmp_path / "trip_01.csv"
-    df_raw = pd.DataFrame(
-        {
-            "ENGINE_RUN_TINE ()": [1, 2],
-            "ENGINE_RPM ()": [1500, 1600],
-            "VEHICLE_SPEED ()": [45, 50],
-            "CONTROL_MODULE_VOLTAGE ()": [13.8, 14.1],
-        }
+@needs_data
+def test_load_aps_train():
+    df = load_aps(APS_DIR, split="train")
+    assert len(df) == 60000
+    assert df["failure"].sum() == 1000
+    assert df["source"].unique().tolist() == ["scania_aps"]
+
+
+@needs_data
+def test_load_aps_test():
+    df = load_aps(APS_DIR, split="test")
+    assert len(df) == 16000
+    assert df["failure"].sum() == 375
+
+
+@needs_data
+def test_load_aps_bad_split():
+    with pytest.raises(ValueError, match="split must be"):
+        load_aps(APS_DIR, split="valid")
+
+
+def test_load_aps_missing_path(tmp_path: Path):
+    with pytest.raises(FileNotFoundError, match="not found"):
+        load_aps(tmp_path / "nope")
+
+
+def test_load_kit_single_file(tmp_path: Path):
+    rec = tmp_path / "trip.csv"
+    open(rec, "w").write(
+        "Time,ECT,MAP,RPM,VSS,IAT,MAF,THR,AMB,PD,PE\n"
+        "08:00:00.000,90,40,1500,50,30,10.0,20,25,10,12\n"
+        "08:00:01.000,91,41,1600,55,31,11.0,21,25,11,12\n"
     )
-    df_raw.to_csv(csv_file, index=False)
 
-    df = load_simulated(csv_file)
+    df = load_kit_obd(rec)
     assert len(df) == 2
-    assert "timestamp" in df.columns
-    assert "engine_rpm" in df.columns
-    assert "speed_kmph" in df.columns
-    assert "battery_voltage" in df.columns
-    assert df["source"].iloc[0] == "simulated"
-    assert df["vehicle_id"].iloc[0] == "SIM-trip_01"
+    assert df["timestamp"].tolist() == [28800.0, 28801.0]
+    assert df["engine_rpm"].tolist() == [1500, 1600]
+    assert df["source"].unique().tolist() == ["kit_obd"]
+    assert df["vehicle_id"].iloc[0] == "KIT-trip"
 
 
-def test_load_simulated_single_jsonl(tmp_path: Path):
-    jsonl_file = tmp_path / "trip_json.jsonl"
-    records = [
-        {"ENGINE_RPM ()": 2000, "VEHICLE_SPEED ()": 60},
-        {"ENGINE_RPM ()": 2100, "VEHICLE_SPEED ()": 65},
-    ]
-    with open(jsonl_file, "w", encoding="utf-8") as f:
-        f.writelines(json.dumps(r) + "\n" for r in records)
-
-    df = load_simulated(jsonl_file)
-    assert len(df) == 2
-    assert "engine_rpm" in df.columns
-    assert "speed_kmph" in df.columns
-    assert df["source"].iloc[0] == "simulated"
-    assert df["vehicle_id"].iloc[0] == "SIM-trip_json"
+def test_load_kit_wrong_columns(tmp_path: Path):
+    rec = tmp_path / "bad.csv"
+    pd.DataFrame([[1, 2, 3]]).to_csv(rec, index=False)
+    with pytest.raises(ValueError, match="expected 11 columns"):
+        load_kit_obd(rec)
 
 
-def test_load_simulated_directory(tmp_path: Path):
-    file1 = tmp_path / "vehicle_101.csv"
-    file2 = tmp_path / "vehicle_102.csv"
-    pd.DataFrame({"ENGINE_RPM ()": [1000]}).to_csv(file1, index=False)
-    pd.DataFrame({"ENGINE_RPM ()": [2000]}).to_csv(file2, index=False)
-
-    df = load_simulated(tmp_path, pattern="*.csv")
-    assert len(df) == 2
-    assert set(df["vehicle_id"]) == {"SIM-vehicle_101", "SIM-vehicle_102"}
-    assert df["source"].unique().tolist() == ["simulated"]
-    assert "engine_rpm" in df.columns
+def test_load_kit_missing_path(tmp_path: Path):
+    with pytest.raises(FileNotFoundError, match="No KIT recordings"):
+        load_kit_obd(tmp_path / "nope")
 
 
-def test_load_simulated_directory_empty_raises(tmp_path: Path):
-    empty_dir = tmp_path / "empty_dir"
-    empty_dir.mkdir()
-    with pytest.raises(FileNotFoundError, match="No matching files found"):
-        load_simulated(empty_dir)
+def test_load_carobd_trailing_field(tmp_path: Path):
+    header = ",".join(f"C{i}" for i in range(27))
+    rec = tmp_path / "drive1.csv"
+    open(rec, "w").write(header + "\n" + ",".join(["1"] * 28) + "\n")
+
+    df = load_carobd(rec)
+    assert len(df) == 1
+    assert len(df.columns) == 27 + 2  # signals + vehicle_id/source
+    assert df["source"].iloc[0] == "carobd"
+    assert df["vehicle_id"].iloc[0] == "carOBD-drive1"
 
 
-def test_load_simulated_missing_path_raises(tmp_path: Path):
-    non_existent = tmp_path / "does_not_exist.csv"
-    with pytest.raises(FileNotFoundError, match="File or directory not found"):
-        load_simulated(non_existent)
+def test_load_carobd_bad_header(tmp_path: Path):
+    rec = tmp_path / "bad.csv"
+    open(rec, "w").write("A,B,C\n1,2,3\n")
+    with pytest.raises(ValueError, match="expected 27 header columns"):
+        load_carobd(rec)
+
+
+def test_load_carobd_missing_path(tmp_path: Path):
+    with pytest.raises(FileNotFoundError, match="No carOBD recordings"):
+        load_carobd(tmp_path / "nope")
