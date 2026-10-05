@@ -1,0 +1,111 @@
+{
+  "source": "https://github.com/AbouAbdallah-Lounis/OBD-Dataset",
+  "files": {
+    "TRAIN": {
+      "rows": 118477,
+      "columns": [
+        "LOAD_PCT",
+        "ECT",
+        "MAP",
+        "RPM",
+        "VSS",
+        "IAT",
+        "MAF",
+        "FRP",
+        "BARO",
+        "VPWR",
+        "AAT",
+        "P0000",
+        "P0562",
+        "P0113",
+        "P0102",
+        "P0403",
+        "P0404",
+        "P2562",
+        "P0234",
+        "P2015",
+        "P2009",
+        "P0107",
+        "P0069",
+        "P0089",
+        "P0406",
+        "Mode"
+      ],
+      "sha256": "4af148292731d3e16429a71fc4edd4de060930e9a0e2476f9389214c8bb9af32",
+      "git_blob_sha1": "ca5fcf99ae8d2edc7c04b5636a1b18839df7dd52",
+      "matches_author_github_blob": true,
+      "repeated_full_rows": 90657,
+      "repeated_predictor_rows": 90657,
+      "p0000_counts": {
+        "0.0": 88803,
+        "1.0": 29674
+      },
+      "rows_with_any_fault_code": 84412,
+      "p0000_and_fault_code_both_positive": 0,
+      "neither_p0000_nor_fault_code_positive": 4391,
+      "mode_counts": {
+        "0.0": 32384,
+        "2.0": 37171,
+        "1.0": 48922
+      },
+      "missing_named_cells": 0
+    },
+    "TEST": {
+      "rows": 33838,
+      "columns": [
+        "LOAD_PCT",
+        "ECT",
+        "MAP",
+        "RPM",
+        "VSS",
+        "IAT",
+        "MAF",
+        "FRP",
+        "BARO",
+        "VPWR",
+        "AAT",
+        "P0000",
+        "P0562",
+        "P0113",
+        "P0102",
+        "P0403",
+        "P0404",
+        "P2562",
+        "P0234",
+        "P2015",
+        "P2009",
+        "P0107",
+        "P0069",
+        "P0089",
+        "P0406",
+        "Mode"
+      ],
+      "sha256": "9f4047f5964a450e03fa96de4b4927c09171998713e4222e5285cae3a0c1b1d4",
+      "git_blob_sha1": "f76b794fac48ee3f2ad74214757272e7ab2cd9e6",
+      "matches_author_github_blob": true,
+      "repeated_full_rows": 26280,
+      "repeated_predictor_rows": 26280,
+      "p0000_counts": {
+        "0.0": 21898,
+        "1.0": 11940
+      },
+      "rows_with_any_fault_code": 20802,
+      "p0000_and_fault_code_both_positive": 0,
+      "neither_p0000_nor_fault_code_positive": 1096,
+      "mode_counts": {
+        "0.0": 12308,
+        "2.0": 9295,
+        "1.0": 12235
+      },
+      "missing_named_cells": 0
+    }
+  },
+  "distinct_full_patterns_shared_across_splits": 173,
+  "distinct_predictor_patterns_shared_across_splits": 173,
+  "source_snapshot_sha256": {
+    "README.md": "3ee22525a547950d479a5494a837cbdb501baa2a54d817766ebdbeddb61643e7",
+    "feature_derivation_train.py": "7ec4804b990194364d91eb0b420595f9fdb4495e5128b55f59df0a3429f94c48",
+    "MODEL.py": "28f29acea165e4a6eb21217ef019a1c8fa9dd378a2f4774587144c37c6951022",
+    "drive_freature_train.py": "34cb3faae15ff38c88a8f4ea7bd30c765ec2fa9a518f2e19ef25286659c0087e"
+  }
+}

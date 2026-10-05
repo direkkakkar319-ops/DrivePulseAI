@@ -8,21 +8,21 @@ from src.data.loaders import load_aps, load_carobd, load_kit_obd
 APS_DIR = (
     Path(__file__).parents[2]
     / "data"
-    / "automotive_failure"
+    / "deferred"
     / "scania_aps"
     / "raw"
 )
 KIT_DIR = (
     Path(__file__).parents[2]
     / "data"
-    / "automotive_obd"
+    / "passenger_cars"
     / "kit_obd"
     / "raw"
     / "recordings"
     / "OBD-II-Dataset"
 )
 CAROBD_DIR = (
-    Path(__file__).parents[2] / "data" / "automotive_obd" / "carobd" / "raw"
+    Path(__file__).parents[2] / "data" / "deferred" / "carobd" / "raw"
 )
 
 needs_data = pytest.mark.skipif(

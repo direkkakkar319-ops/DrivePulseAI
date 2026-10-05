@@ -51,7 +51,7 @@ from src.data.feature_engineering import FeatureEngineering
 from src.data.loaders import load_aps
 from src.data.preprocessing import PreProcessing
 
-DEFAULT_DATA_DIR = REPO_ROOT / "data" / "automotive_failure" / "scania_aps" / "raw"
+DEFAULT_DATA_DIR = REPO_ROOT / "data" / "deferred" / "scania_aps" / "raw"
 MODEL_DIR = REPO_ROOT / "ml" / "src" / "models" / "failure_classification"
 OUT_DIR = REPO_ROOT / "ml" / "reports" / "figures" / "aps"
 

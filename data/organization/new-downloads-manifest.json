@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-06",
+  "files": [
+    {
+      "path": "passenger_cars/edge_impulse_airleak/source/collect_obd_data.py",
+      "url": "https://raw.githubusercontent.com/edgeimpulse/obd-automotive-data/4880b0fb7274e89e31313bc0f9f8d30475844cb1/collect_obd_data.py",
+      "sha256": "bd506f96b4d2373b9e4ab9d86e8584de266424f3c2aaeaed6cea1970f9fe8ea3"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_README.md",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/master/README.md",
+      "sha256": "d64d41710ec7e5b6aa1a6c1dc013d40a018c17e4bd5f428afc26620f52ab9f42"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_inventory.json",
+      "url": "https://api.github.com/repos/eron93br/carOBD/contents/obdiidata?ref=bf09e1c00f8443212fdbf4b09e8b2a468badd775",
+      "sha256": "017d35936f88baa7ac1de68cdee9d1deea9ae905006bdec256183939033b80af"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/idle1.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/idle1.csv",
+      "sha256": "8d728b7356e9a6ece6b89b1eaa4fe05a20372358673a68e6dfb799d0dd656550"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/idle2.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/idle2.csv",
+      "sha256": "7a4b7a6fe5172d2109bc3bf411193907b458269512ba4434791896a0f4801eb4"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/live16.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/live16.csv",
+      "sha256": "22cd91f83de1f43ca20fe0fb6e41aad8c4a8b748d055f2228003dea588f1fc42"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/live17.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/live17.csv",
+      "sha256": "69c42c7e52f8ffa67b4735d59ae07e0c649033fb7f026dbe306bc7a22873d230"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/live18.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/live18.csv",
+      "sha256": "26fdcba57d5524541fe2c40995e10656515c796e126e16f3a29fc154adb261a4"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/live6.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/live6.csv",
+      "sha256": "c5e48eafc28544ff91f19cd8784b231926d78a5bedfc04ad75998bd42758c0f1"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/ufpe18.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/ufpe18.csv",
+      "sha256": "fc607d2c7b7b2323d7000a8ed38b311ec72d2391a6e0d1c597e45421a34c855c"
+    },
+    {
+      "path": "deferred/carobd/source_verification/upstream_raw/ufpe4.csv",
+      "url": "https://raw.githubusercontent.com/eron93br/carOBD/bf09e1c00f8443212fdbf4b09e8b2a468badd775/obdiidata/ufpe4.csv",
+      "sha256": "22eac75b78be51658b169b86c942bfb53266fa90ea87919c1dda42414e3c2955"
+    }
+  ]
+}
