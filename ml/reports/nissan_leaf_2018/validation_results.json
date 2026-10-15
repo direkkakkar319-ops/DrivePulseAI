@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "version": "processed",
+      "rows": 1918299,
+      "columns": 32,
+      "malformed_records": 0,
+      "source_hash_matches": true,
+      "report_accounting_matches": true
+    },
+    {
+      "version": "raw",
+      "rows": 2322105,
+      "columns": 92,
+      "malformed_records": 0,
+      "source_hash_matches": true,
+      "report_accounting_matches": true
+    }
+  ],
+  "all_passed": true
+}

@@ -49,3 +49,8 @@ Thumbs.db
 **/*firebase-adminsdk*.json
 backend/service-account*.json
 backend/.secrets/
+
+# Nissan Leaf source telemetry: preserve locally, do not commit large downloads
+/data/nissan_leaf_2018/raw/*
+/data/nissan_leaf_2018/processed/*
+/data/nissan_leaf_2018/**/*.part

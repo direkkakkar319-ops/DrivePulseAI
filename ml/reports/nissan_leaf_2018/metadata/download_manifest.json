@@ -1,0 +1,73 @@
+{
+  "files": [
+    {
+      "path": "processed/Dataset_Preprocessed.csv",
+      "repository_path": "data/nissan_leaf_2018/processed/Dataset_Preprocessed.csv",
+      "url": "https://ubilab.mpu.edu.mo/Dataset_Preprocessed.csv",
+      "filename": "Dataset_Preprocessed.csv",
+      "bytes": 443747562,
+      "sha256": "609efebf1004f5694a1c5af9e3bc56ee11eed2f5b47b07aa736bc701c3918e81",
+      "compression": "none",
+      "download_status": "complete",
+      "verified_at_utc": "2026-10-15T14:12:53.599474+00:00",
+      "http_status": [
+        "200"
+      ],
+      "last_modified": [
+        "Sun, 02 Apr 2023 08:56:58 GMT"
+      ],
+      "etag": [
+        "\"rshcuy7c71t6\""
+      ]
+    },
+    {
+      "path": "raw/Dataset_NissanLeaf-2021_2022.csv",
+      "repository_path": "data/nissan_leaf_2018/raw/Dataset_NissanLeaf-2021_2022.csv",
+      "url": "https://ubilab.mpu.edu.mo/Dataset_NissanLeaf-2021_2022.csv",
+      "filename": "Dataset_NissanLeaf-2021_2022.csv",
+      "bytes": 1538549900,
+      "sha256": "7fe9682e6132ac564eec4928ece989c82d8c9369290abfc00401b7a1c4cdb84c",
+      "compression": "none",
+      "download_status": "complete",
+      "verified_at_utc": "2026-10-15T14:12:54.630617+00:00",
+      "http_status": [
+        "200"
+      ],
+      "last_modified": [
+        "Sun, 02 Apr 2023 09:10:50 GMT"
+      ],
+      "etag": [
+        "\"rshdi2pg0gp8\""
+      ]
+    },
+    {
+      "path": "metadata/Nissan_Leaf_Model2018_Data_Description.xlsx",
+      "repository_path": "ml/reports/nissan_leaf_2018/metadata/Nissan_Leaf_Model2018_Data_Description.xlsx",
+      "url": "https://ubilab.mpu.edu.mo/Nissan_Leaf_Model2018_Data_Description.xlsx",
+      "filename": "Nissan_Leaf_Model2018_Data_Description.xlsx",
+      "bytes": 28139,
+      "sha256": "3e2d4d44fbb055108e05d742111cc4ba369a9d0d53742d512214b8cda1429802",
+      "compression": "none (CSV); XLSX is a ZIP container",
+      "download_status": "complete",
+      "verified_at_utc": "2026-10-15T14:12:54.631994+00:00",
+      "uncompressed_member_bytes": 192845,
+      "http_status": [
+        "200"
+      ],
+      "last_modified": [
+        "Sun, 02 Apr 2023 08:55:18 GMT"
+      ],
+      "etag": [
+        "\"rshcs6lpn\""
+      ]
+    },
+    {
+      "path": "metadata/source_page.html",
+      "url": "https://ubilab.mpu.edu.mo/data.html",
+      "bytes": 16520,
+      "sha256": "69eba6c312c2c7470be1a02f1391bc5a920dcf663d39f96d7722d58e1a45fc44",
+      "download_status": "complete"
+    }
+  ],
+  "license": "No explicit dataset license found on source page or workbook; source requests research citation. Public access is not a grant of unrestricted reuse."
+}

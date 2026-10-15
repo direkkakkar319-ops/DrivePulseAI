@@ -1,0 +1,13 @@
+column,group,rows,missing,min,median,max
+Speed,retained_index,1886696,0,-1.0,35.1,145.0
+Speed,not_in_processed,435409,0,-1.0,-1.0,129.0
+SOC,retained_index,1886696,0,-1.0,78.6721,99.1054
+SOC,not_in_processed,435409,0,-1.0,85.4431,99.269
+SOH,retained_index,1886696,2201,92.63,93.91,96.46
+SOH,not_in_processed,435409,46,0.0,92.98,96.46
+HV_Bat_Voltage,retained_index,1886696,0,-1.0,374.49,655.35
+HV_Bat_Voltage,not_in_processed,435409,0,-1.0,385.13,403.97
+HV_Bat_Current_2,retained_index,1886696,0,-378.867,-5.6318359375,954.61
+HV_Bat_Current_2,not_in_processed,435409,0,-375.675,-4.32,960.7666015625
+Charge_Mode,retained_index,1886696,0,-1.0,0.0,0.0
+Charge_Mode,not_in_processed,435409,0,-1.0,0.0,0.0

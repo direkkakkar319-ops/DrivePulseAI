@@ -1,0 +1,32 @@
+{
+  "exact_full_rows": 0,
+  "duplicate_timestamp_rows": 0,
+  "duplicate_trip_timestamp_rows": 0,
+  "duplicate_measurement_rows_excluding_ids_times_derived": 35953,
+  "measurement_columns": [
+    "Speed",
+    "Odometer",
+    "RPM",
+    "SOC",
+    "SOH",
+    "Torque",
+    "Motor_Temp",
+    "TP_FR",
+    "TP_FL",
+    "TP_RR",
+    "TP_RL",
+    "Aux_Pwr_100W",
+    "AC_Pwr_250W",
+    "EstPwr_AC_50W",
+    "HV_Bat_Voltage",
+    "Brake",
+    "Acc_Pedal",
+    "ECO",
+    "ePedal",
+    "HV_Bat_Current_2",
+    "Ambient_C_Temp",
+    "Pack_1_C_Temp",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp"
+  ]
+}
