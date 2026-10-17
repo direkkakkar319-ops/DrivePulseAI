@@ -1,0 +1,107 @@
+{
+  "source_files_verified": [
+    {
+      "path": "data/nissan_leaf_2018/processed/Dataset_Preprocessed.csv",
+      "sha256": "609efebf1004f5694a1c5af9e3bc56ee11eed2f5b47b07aa736bc701c3918e81",
+      "bytes": 443747562
+    },
+    {
+      "path": "data/nissan_leaf_2018/raw/Dataset_NissanLeaf-2021_2022.csv",
+      "sha256": "7fe9682e6132ac564eec4928ece989c82d8c9369290abfc00401b7a1c4cdb84c",
+      "bytes": 1538549900
+    },
+    {
+      "path": "ml/reports/nissan_leaf_2018/metadata/Nissan_Leaf_Model2018_Data_Description.xlsx",
+      "sha256": "3e2d4d44fbb055108e05d742111cc4ba369a9d0d53742d512214b8cda1429802",
+      "bytes": 28139
+    },
+    {
+      "path": "ml/reports/nissan_leaf_2018/metadata/source_page.html",
+      "sha256": "69eba6c312c2c7470be1a02f1391bc5a920dcf663d39f96d7722d58e1a45fc44",
+      "bytes": 16520
+    }
+  ],
+  "analysis_scope": "All rows, selected columns; complete schemas and inventories from hash-verified EDA. No training or cleaning.",
+  "versions": {
+    "pandas": "2.3.3",
+    "numpy": "2.5.1",
+    "matplotlib": "3.11.1"
+  },
+  "scripts": {
+    "ml/notebooks/nissan_leaf_2018/scripts/readiness_report.py": "3bce0e71fcc17cf87f75919990e09c6f54789b9a8b23ab09f36b80f2e65759d6",
+    "ml/notebooks/nissan_leaf_2018/scripts/readiness.py": "469b0979317e63d02bce555e54fa9b5f02d1a6b5f71ea08bc638619359edca64"
+  },
+  "reused_eda_table_hashes": {
+    "ml/reports/nissan_leaf_2018/tables/processed/column_dictionary.csv": "2fbb2ef3091e88c049b697948435fdd5634c20f2e4381228ae38c3abeb0ecf44",
+    "ml/reports/nissan_leaf_2018/tables/processed/correlation_pearson.csv": "37e72c69921d864479ea638bb3cf201b0093eafe257461db91833eb7a9fe0a40",
+    "ml/reports/nissan_leaf_2018/tables/processed/current_sign_context.csv": "a0e329749610b88d9561b12dbdbd687b71ece819561b1af05641c357f07312cf",
+    "ml/reports/nissan_leaf_2018/tables/processed/data_quality_findings.csv": "6a4eea0d9e4aee7c36e68ef844fa403e5768e8a782e36e0da67844ef4eca18e3",
+    "ml/reports/nissan_leaf_2018/tables/processed/derived_relationship_checks.csv": "31d6f9e2ac6c0e7f8627f0251e1496155dfdfc2a8cf9e9473de27df73412f129",
+    "ml/reports/nissan_leaf_2018/tables/processed/duplicate_analysis.csv": "b044f378734be78ab40b34a1f286aa6d71b329401ae8bf6d0384e4f2e6eaafd5",
+    "ml/reports/nissan_leaf_2018/tables/processed/duplicate_analysis.json": "4855b7dfaffc7c94a570c3ff2a3353ed2cc1aec25fa1bd0ff75441729888c46b",
+    "ml/reports/nissan_leaf_2018/tables/processed/integrity_checks.csv": "105af16a2b1125188d6a4f2e765d22466729e1ef64199ef55b8a301f84b4ac58",
+    "ml/reports/nissan_leaf_2018/tables/processed/measurement_updates.csv": "bf31f102173b260f91a67fa2f26cf7d1b1b8f0fd765fe5b996a744300946dd65",
+    "ml/reports/nissan_leaf_2018/tables/processed/missing_patterns.csv": "b540e12e7b51e55d77efb2675ca8a59cf139976fe1a59db7c8d5771a395b847c",
+    "ml/reports/nissan_leaf_2018/tables/processed/missing_runs.csv": "515c3ae8b70dc239a2cfaabbdfc1879d11878579209efb763d48c130deec1549",
+    "ml/reports/nissan_leaf_2018/tables/processed/missing_values.csv": "ccab4e86ad1fac29484a8d15827cf11f77130759a53415a4f3c2faabcd3219c8",
+    "ml/reports/nissan_leaf_2018/tables/processed/odometer_discontinuities.csv": "ae89965a7176d8efb9404e0fbba987db64c7d0ce796252b65a36467162f5c4be",
+    "ml/reports/nissan_leaf_2018/tables/processed/overlapping_sessions.csv": "ffef70dccef5323c5ab5c9aa0fbd830424be7f5688005f1158078457cfab9c03",
+    "ml/reports/nissan_leaf_2018/tables/processed/overview.json": "5f87c84fd1bff1d2b1a7c8aa8440b315afead8d6a37d5ad9749a98ab27c6faa4",
+    "ml/reports/nissan_leaf_2018/tables/processed/possible_duplicate_sessions.csv": "c9f513408902c62f98263c5666e1e1e71b70d024ed3482add1606073d8c01cb6",
+    "ml/reports/nissan_leaf_2018/tables/processed/sessions.csv": "97016c02352397d0131d198968a55c568e2b04adfdad18a24d4fa815402d6ed5",
+    "ml/reports/nissan_leaf_2018/tables/processed/strong_correlations.csv": "087aeebda5d22807be73581e208b4e0f6c7009d69758891b34c636a2cda4af7a",
+    "ml/reports/nissan_leaf_2018/tables/processed/summary_statistics.csv": "7c7fff3fd5cf35dd1ae59e434b212a2ca4cd71ff5e9bd26525520338838b9b6d",
+    "ml/reports/nissan_leaf_2018/tables/processed/time_summary.json": "62e94dcfb6a9f48a4bf675c4e214f85ef3ea43d40cef827a5285def62966a472",
+    "ml/reports/nissan_leaf_2018/tables/processed/timestamp_boundaries.csv": "18f4fee747057030deb07e85ef61a24afb186f5cecb4f2cbb1fa223800650b10",
+    "ml/reports/nissan_leaf_2018/tables/processed/top_value_frequencies.csv": "547d5d6ce452d9690a7352db3da0fee89930d83cb05300acb376c788c891bbeb",
+    "ml/reports/nissan_leaf_2018/tables/processed/voltage_review_rows.csv": "20aad60d30df038f5296bfb422d404bc7a2866e10c1783c3b351fc097a84844f",
+    "ml/reports/nissan_leaf_2018/tables/raw/charging_modes.csv": "f3644c9cd8f919101a451807283f2864ce1e14e68898b39e6ff0600583bd5838",
+    "ml/reports/nissan_leaf_2018/tables/raw/column_dictionary.csv": "cf40f0fc10b4a8f52f6fb5eac62ef74a385ce8ed624aaf30a70ec9173c95e641",
+    "ml/reports/nissan_leaf_2018/tables/raw/correlation_pearson.csv": "ae8a8380e21ff5fd2d56cedbb463d5d1321c24f8f97213826f659adb620ac533",
+    "ml/reports/nissan_leaf_2018/tables/raw/current_sign_context.csv": "b724ded79e764ab4e02cf7af904e59ca904eed1f71ea91ba8c78197e5c2ac59a",
+    "ml/reports/nissan_leaf_2018/tables/raw/data_quality_findings.csv": "9f211b4a9b51c4023f70e741df52040ce0b4fead11d7d32e34fe157ae3bd7dd3",
+    "ml/reports/nissan_leaf_2018/tables/raw/derived_relationship_checks.csv": "92d08599f2ad54610fe4a86d7607ce0aaee77add42e9c18406faa35ab860fbe5",
+    "ml/reports/nissan_leaf_2018/tables/raw/duplicate_analysis.csv": "5457eacd9753745a3e81cc53aa066928c3bf3f266f0cf266745c113a3d621551",
+    "ml/reports/nissan_leaf_2018/tables/raw/duplicate_analysis.json": "9ece533feb3c11cd93f6d0c7ead8c2eeab4943ab4058e9275a1203c5064d0931",
+    "ml/reports/nissan_leaf_2018/tables/raw/integrity_checks.csv": "436d5c21f14116a23a7e2290e05ee324a7484ade833fcd5e0bcf7938f5a896b1",
+    "ml/reports/nissan_leaf_2018/tables/raw/measurement_updates.csv": "61016fe75a12565b5358daa51070562273f61be7a202c66f2c473c17a73543aa",
+    "ml/reports/nissan_leaf_2018/tables/raw/missing_patterns.csv": "2f29f3c5951486684d9d712f0eeb1b4c04449fb255fd25881c29d02ae179ac33",
+    "ml/reports/nissan_leaf_2018/tables/raw/missing_runs.csv": "3068092ba9af92c4b574ad0a26a4da91c24b866d4b5682ecfba95bba16689103",
+    "ml/reports/nissan_leaf_2018/tables/raw/missing_values.csv": "6cd873c6360119bb55b050e088091a05094711da0dee46fc52154f1abd90ea83",
+    "ml/reports/nissan_leaf_2018/tables/raw/odometer_discontinuities.csv": "fc87cb8e34f165e076c7a7bb32624d322d8d9cea3e221ca0116b682ab5ae67a2",
+    "ml/reports/nissan_leaf_2018/tables/raw/overlapping_sessions.csv": "ffef70dccef5323c5ab5c9aa0fbd830424be7f5688005f1158078457cfab9c03",
+    "ml/reports/nissan_leaf_2018/tables/raw/overview.json": "95d49dbd60785532a24bbcf387766de61628d685475b05a4c10c9649aab4cda9",
+    "ml/reports/nissan_leaf_2018/tables/raw/possible_duplicate_sessions.csv": "c9f513408902c62f98263c5666e1e1e71b70d024ed3482add1606073d8c01cb6",
+    "ml/reports/nissan_leaf_2018/tables/raw/sessions.csv": "2ca090f8300928f47e95f9557dc17332d138a8be369e519dd4c3fba29fae3bef",
+    "ml/reports/nissan_leaf_2018/tables/raw/strong_correlations.csv": "530932e62bed4feffb9801fa6baa25c4b6c02536c3da25309697263bb9b75a3a",
+    "ml/reports/nissan_leaf_2018/tables/raw/summary_statistics.csv": "8660b666a8f248da72c515e8d7a70b4b7cee842c6389259e59cd7f343a18956d",
+    "ml/reports/nissan_leaf_2018/tables/raw/time_summary.json": "d39cc22244ca6e68dc391b247f641cee6567c59fe3e24bc4b837457d51777055",
+    "ml/reports/nissan_leaf_2018/tables/raw/timestamp_boundaries.csv": "67b9b148a05b6327452cfa00ff143a8ea0683adfc62924882d5e8ec8f2f545a9",
+    "ml/reports/nissan_leaf_2018/tables/raw/top_value_frequencies.csv": "94a91872fa9d596b79b8019ededc3baa640975d7ef9d077d34bc8c43ce692d0c",
+    "ml/reports/nissan_leaf_2018/tables/raw/voltage_review_rows.csv": "dbca0f201f2171341e8f11f85fe46b300a6799f7f2b932977eff8d05c8bd422f",
+    "ml/reports/nissan_leaf_2018/tables/raw_processed_comparison.json": "88d4dd190c8326410e401be99d96da91f3c6b70e63d92878f3eb1cb7bcaaf0e6",
+    "ml/reports/nissan_leaf_2018/tables/raw_processed_distributions.csv": "b0435158c6f334f694d6af379cf91f198a9890e08898fc4d66b656a092840519",
+    "ml/reports/nissan_leaf_2018/tables/raw_processed_matched_values.csv": "c39c5b19463aa446e6018d320e9c6b058225a43f803a3ef011c34b3cd6b79a96",
+    "ml/reports/nissan_leaf_2018/tables/raw_processed_timestamp_alignment.json": "fbb38e27e6a54c15d07a2b80286f17411f05457d422f82901c0b64dd7c6e6ee9",
+    "ml/reports/nissan_leaf_2018/tables/retained_vs_removed_raw_rows.csv": "c9a274b4f0af1cf9d9c8d30828eb98237016137d4620424f18716156edd8ccc9"
+  },
+  "outputs": {
+    "ml/reports/nissan_leaf_2018/ML_READINESS_REPORT.md": "a8aa47941abcb924ef96dae65abd58512e6d3e91882356ad6e5ae45aaf4004fe",
+    "ml/reports/nissan_leaf_2018/figures/readiness/processed_soh_shortcuts.png": "2e324f54dcc6d817e63f4dfeee4f3aea8ea2ef90627402dd722b57df7cdcdeab",
+    "ml/reports/nissan_leaf_2018/figures/readiness/raw_soh_shortcuts.png": "67728cc64250f5468f7a1d58a793c2cf6bd411b5d6ca91dab65e094cda93340a",
+    "ml/reports/nissan_leaf_2018/tables/readiness/adjacent_similarity.csv": "1db13e2455e2a0bcde3b7c2c42959bc3a694d889f43d2536bff4b0bdd52a7515",
+    "ml/reports/nissan_leaf_2018/tables/readiness/feature_inventory.csv": "e134fc9ebf6f3d11b5f860d00f0f57c6abce7f12c7f4acfe0c280442c4e33164",
+    "ml/reports/nissan_leaf_2018/tables/readiness/processed_daily_soh.csv": "977bcec5ebe3b416aac7682c0b53453a12a7b4d5dff88158e45c1b4536e4c1af",
+    "ml/reports/nissan_leaf_2018/tables/readiness/processed_soh_changes.csv": "34e0d14cbe7711b3820079df804f13ccc6750867d7fcdcf1c0f7f560416dd005",
+    "ml/reports/nissan_leaf_2018/tables/readiness/processed_soh_values.csv": "57c4d343b45308b4336f0aaf13fe40388d313f12705a493ad18fe1d0eb7effbf",
+    "ml/reports/nissan_leaf_2018/tables/readiness/processed_trip_soh.csv": "74a9acedb250fe56ddd986c879398ff48183163953d3138cdd4cf2f7333da501",
+    "ml/reports/nissan_leaf_2018/tables/readiness/raw_daily_soh.csv": "28fd2534987414d6f41dbc57955c4afa992892f74d16c93f17692142abaf392a",
+    "ml/reports/nissan_leaf_2018/tables/readiness/raw_soh_changes.csv": "2470fdf94c18d178335fe7aa18d7d989a8af1d990cce60e5475e0e59400bc757",
+    "ml/reports/nissan_leaf_2018/tables/readiness/raw_soh_values.csv": "f81567df184fa7d9f6343c60205f9f622d63c17b34f9a1a8f59d7107a1c53221",
+    "ml/reports/nissan_leaf_2018/tables/readiness/raw_trip_soh.csv": "027405338438081c6f5ff0e57aa68efd9ea6eb6fbe35a50d700c4e6abdab9df0",
+    "ml/reports/nissan_leaf_2018/tables/readiness/readiness_metrics.json": "92f768f5cc64e4baf574bbff33b0e640466d4979d8645080bde9959b76972f43",
+    "ml/reports/nissan_leaf_2018/tables/readiness/selected_missing_checks.csv": "dad9d63a0e5c866f4dfae87896ba893aa35927631af4d5164a88d6c98c5dedf1",
+    "ml/reports/nissan_leaf_2018/tables/readiness/soh_associations.csv": "c97889a5aa9c7f1591626677c48925726e87878e4df0644acfbfcc8347589dd4",
+    "ml/reports/nissan_leaf_2018/tables/readiness/task_readiness.csv": "b277ed99f13a4619356a3e29e0f197b24a4060882206efbc4a36bc25b30d5ee8"
+  }
+}
