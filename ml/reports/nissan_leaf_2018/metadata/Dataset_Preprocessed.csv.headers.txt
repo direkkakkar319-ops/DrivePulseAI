@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Content-Length: 443747562
+Content-Type: text/csv; charset=utf-8
+Etag: "rshcuy7c71t6"
+Last-Modified: Sun, 02 Apr 2023 08:56:58 GMT
+Server: Caddy
+Date: Thu, 15 Oct 2026 09:42:28 GMT
+

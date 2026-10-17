@@ -1,0 +1,26 @@
+{
+  "report": "EDA_REPORT.md",
+  "report_sha256": "15f5e6091673999b2f15d38afa81c7d6e7ff8797c66fd11a4270dfa7ba0a192e",
+  "builder_sha256": "f0aeb887e6e895e48e9165ad8a99c9f307c18aa89528c61f0e6d80172a0f4fd8",
+  "validated_inputs": {
+    "checks": [
+      {
+        "version": "processed",
+        "rows": 1918299,
+        "columns": 32,
+        "malformed_records": 0,
+        "source_hash_matches": true,
+        "report_accounting_matches": true
+      },
+      {
+        "version": "raw",
+        "rows": 2322105,
+        "columns": 92,
+        "malformed_records": 0,
+        "source_hash_matches": true,
+        "report_accounting_matches": true
+      }
+    ],
+    "all_passed": true
+  }
+}

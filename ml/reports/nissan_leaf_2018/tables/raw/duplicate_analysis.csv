@@ -1,0 +1,5 @@
+check,count
+exact_full_rows,0
+duplicate_timestamp_rows,0
+duplicate_trip_timestamp_rows,0
+duplicate_measurement_rows_excluding_ids_times_derived,13733

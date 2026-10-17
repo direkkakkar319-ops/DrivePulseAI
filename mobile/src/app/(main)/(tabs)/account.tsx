@@ -1,16 +1,15 @@
-// Real Firebase account and profile-sync status alongside explicitly labelled demo controls.
+// Preserve Firebase account operations in the recorded-data account presentation.
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useAuthStore } from '@/store/authStore';
 import { useProfileSync } from '@/hooks/use-profile-sync';
 import { authService } from '@/api/auth';
 import { authErrorMessage } from '@/api/auth-errors';
 import { UsernameSaveNotice } from '@/components/username-save-notice';
-import { AuthMessage, AuthButton } from '@/components/auth-form';
-import { Avatar, Badge, Card, Copy, Page, styles } from '@/components/vehicle-health/ui';
-import { DemoControls } from '@/components/vehicle-health/data-state';
+import { Button, Copy, Page, Panel, SectionHeader, StatusPill } from '@/components/recorded/ui';
+import { colors, spacing, type } from '@/components/recorded/theme';
 export function AccountDetails() {
-  const { user } = useAuthStore();
+  const { user, usernameSavePending } = useAuthStore();
   const sync = useProfileSync();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -27,36 +26,32 @@ export function AccountDetails() {
   }
   return (
     <>
-      <Card>
-        <View style={styles.row}>
-          <Avatar name={user?.displayName || 'Driver'} />
-          <View style={{ flex: 1 }}>
-            <Copy style={{ fontSize: 19, fontWeight: '600' }}>
-              {user?.displayName || 'Your account'}
-            </Copy>
-            <Copy muted>{user?.email ?? 'Email unavailable'}</Copy>
-          </View>
+      <Panel>
+        <View style={{ gap: spacing.xxs }}>
+          <Copy muted style={type.caption}>SIGNED IN AS</Copy>
+          <Copy style={{ fontSize: 22, lineHeight: 29, fontWeight: '600' }}>{user?.displayName || 'Your account'}</Copy>
+          <Copy muted>{user?.email ?? 'Email unavailable'}</Copy>
         </View>
-        <Badge label={user?.emailVerified ? 'EMAIL VERIFIED' : 'VERIFICATION PENDING'} />
+        <StatusPill label={user?.emailVerified ? 'Email verified' : 'Verification pending'} unusual={!user?.emailVerified} />
         <Copy muted>Account information from Firebase</Copy>
-      </Card>
-      <UsernameSaveNotice />
-      <Card>
-        <Copy style={{ fontWeight: '600' }}>Account synchronization</Copy>
-        <AuthMessage message={sync.message} error={sync.failed} />
-        {sync.failed && <AuthButton title="Retry account sync" secondary onPress={sync.retry} />}
-      </Card>
-      <AuthMessage message={error} error />
-      <AuthButton title="Log out" onPress={logout} loading={busy} />
+      </Panel>
+      {usernameSavePending && <View style={{ backgroundColor: colors.surface, padding: spacing.md, borderRadius: 10 }}><UsernameSaveNotice /></View>}
+      <Panel>
+        <SectionHeader title="Account synchronization" />
+        <Copy muted>{sync.message}</Copy>
+        {sync.failed && <Button title="Retry account sync" secondary onPress={sync.retry} />}
+      </Panel>
+      {!!error && <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ color: colors.danger, ...type.body }}>{error}</Text>}
+      <Button title={busy ? 'Logging out…' : 'Log out'} onPress={logout} disabled={busy} />
     </>
   );
 }
 export default function Account() {
   return (
-    <Page title="Account">
+    <Page title="Account" back accountAction={false}>
+      <Copy muted>Manage the Firebase account used to access this recorded telemetry prototype.</Copy>
       <AccountDetails />
-      <DemoControls />
-      <Copy muted>DrivePulse AI · Vehicle-health prototype</Copy>
+      <Copy muted style={type.caption}>DrivePulse AI · Recorded battery telemetry prototype</Copy>
     </Page>
   );
 }

@@ -1,0 +1,23 @@
+{
+  "outputs": {
+    "ml/reports/nissan_leaf_2018/NEGATIVE_SPEED_REVIEW.md": "44b3458c924359f2d573ca230102b64d540c8e47014801354107391261df410e",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/gear_context.csv": "d603fe653dda1fe81ea8812567c5771aaa522b0415c714bbe37d201dce6c6bad",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/negative_trips.csv": "54e92a55e81ade5e76561f4f8a7ee26edabfb61d908421c525824d6ea90d6867",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/negative_values.csv": "a394bed7d1d6ecc154fa2a9156bcd6f52c574f3f16fa20905e724e1013e9b6b1",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/other_channels.csv": "6ac8c091a45deb7edb75b6e78506a08a91e7c33d4b58331b0a3ed5e685344610",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/policy_comparison.csv": "df800563f31ce9039d242f27c8301d4b0219c2a6c1c05be11db65c71afa8fdb9",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/policy_trip_counts.csv": "5940ffdbc0e36bd1a7a0062d9a68922a419aba4145ed42db0a247e76ad9212c4",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/processed_comparison.json": "33281da7d7f68e7a6bb7b6b00d653e72bc932e24ae401080e45a389b17876c82",
+    "ml/reports/nissan_leaf_2018/tables/negative_speed/training_transformers_comparison.json": "681568bedd7b05f1a16000318f8dc2a4999698c11f92baced602f9b41f519a54"
+  },
+  "script_sha256": "aab22239cad6d54b2ccc2f7afb6047abf350e5349841aa9670ee86c85ea9604d",
+  "source_hashes": {
+    "data/nissan_leaf_2018/processed/Dataset_Preprocessed.csv": "609efebf1004f5694a1c5af9e3bc56ee11eed2f5b47b07aa736bc701c3918e81",
+    "data/nissan_leaf_2018/raw/Dataset_NissanLeaf-2021_2022.csv": "7fe9682e6132ac564eec4928ece989c82d8c9369290abfc00401b7a1c4cdb84c",
+    "ml/reports/nissan_leaf_2018/metadata/Nissan_Leaf_Model2018_Data_Description.xlsx": "3e2d4d44fbb055108e05d742111cc4ba369a9d0d53742d512214b8cda1429802",
+    "ml/reports/nissan_leaf_2018/metadata/source_page.html": "69eba6c312c2c7470be1a02f1391bc5a920dcf663d39f96d7722d58e1a45fc44"
+  },
+  "source_ledger_sha256": "95d87905208b5d3dd2c23bb9fc582a6689955f965778935621ae8770bf7b2bbc",
+  "source_preparation_run": "d7e9e32e1ff2981a",
+  "source_preparation_summary_sha256": "9a61285afe5e6caf596fbab278dd7c5194c81f3f542c88894657bc7dcd6bf6a8"
+}

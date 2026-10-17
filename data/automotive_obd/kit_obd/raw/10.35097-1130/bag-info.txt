@@ -1,4 +1,0 @@
-Bagging-Date: 2023-06-21
-Bag-Size: 11.5 MB
-Payload-Oxum: 11543411.4
-External-Identifier: bCtGxdTklQlfQcAq

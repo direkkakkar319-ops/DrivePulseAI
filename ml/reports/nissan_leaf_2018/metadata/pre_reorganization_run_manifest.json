@@ -1,0 +1,18 @@
+{
+  "python": "3.12.13",
+  "pandas": "2.3.3",
+  "numpy": "2.5.1",
+  "matplotlib": "3.11.1",
+  "versions_analyzed": [
+    "processed",
+    "raw"
+  ],
+  "source_manifest_sha256": "89913d0bcbfdf0f52a423745f10f097e1820532654e27c49e5fe0ec8310630ab",
+  "scripts_sha256": {
+    "acquire.py": "70588db7268c3e4b8feb90b3557c4cfea7acfa2dc46261543e5e6325b08603cb",
+    "dictionary.py": "9b5e3ce889b62e5b2182a611e28c933e711d2ad5006c78a2fe2d93f72b2c40f5",
+    "run_eda.py": "ae5cd897294615af6f52d6e0925cc475910512629248cfa111e51be8eba81224",
+    "validate.py": "92eb3eb1a24b5de913d9264226160f799320df49c3357fc575aecddd94f8a6b7"
+  },
+  "method": "All rows for numerical statistics, missingness, correlations and checks. Boxplots/time plots explicitly subsampled; no imputation/removal. Numeric arrays are temporary disk-backed float64; read CSV in 75,000-row chunks."
+}

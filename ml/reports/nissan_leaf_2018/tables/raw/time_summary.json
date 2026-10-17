@@ -1,0 +1,33 @@
+{
+  "earliest_utc_interpretation": "2020-11-12 13:01:08.257560+00:00",
+  "latest_utc_interpretation": "2022-08-03 17:19:57.501000+00:00",
+  "span_days": 629.1797366138888,
+  "invalid_epoch_timestamps": 0,
+  "timestamp_unit": "Unix microseconds inferred from magnitude and checked against raw date columns",
+  "global_reversals": 0,
+  "within_trip_reversals": 0,
+  "within_trip_zero_deltas": 0,
+  "within_trip_gaps_over_1s": 15825,
+  "global_gaps_over_1s": 16050,
+  "within_trip_positive_interval_quantiles_seconds": {
+    "0": 2e-06,
+    "0.01": 0.242803,
+    "0.5": 0.25,
+    "0.95": 0.5,
+    "0.99": 0.75,
+    "1": 3635.500706
+  },
+  "within_trip_observed_contiguous_seconds_max_gap_1s": 625596.681776,
+  "other_timestamp_columns": {
+    "DateTime": {
+      "invalid_or_missing": 0,
+      "unique_parsed_instants": 2322105,
+      "max_abs_difference_from_epoch_seconds": 9e-06
+    },
+    "Timestamp_Object": {
+      "invalid_or_missing": 0,
+      "unique_parsed_instants": 641664,
+      "max_abs_difference_from_epoch_seconds": 0.999767
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "battery_only_conditional": {
+    "center": {
+      "HV_Bat_Voltage": 379.59,
+      "Pack_1_C_Temp": 24.3,
+      "SOC": 81.7796
+    },
+    "features": [
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "fit_rows": 1623891,
+    "fit_split": "train",
+    "median": {
+      "HV_Bat_Voltage": 379.59,
+      "Pack_1_C_Temp": 24.3,
+      "SOC": 81.7796
+    },
+    "missing_policy": "exclude",
+    "output_features": [
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "scale": {
+      "HV_Bat_Voltage": 33.670000000000016,
+      "Pack_1_C_Temp": 14.86,
+      "SOC": 26.39555
+    },
+    "scaling": "robust",
+    "zero_scale_features": []
+  },
+  "existing_six_features": {
+    "center": {
+      "HV_Bat_Voltage": 378.6,
+      "Motor_Temp": 39.0,
+      "Pack_1_C_Temp": 25.2,
+      "SOC": 81.2896,
+      "Speed": 27.9,
+      "Torque": 2.25
+    },
+    "features": [
+      "Speed",
+      "Torque",
+      "Motor_Temp",
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "fit_rows": 1540563,
+    "fit_split": "train",
+    "median": {
+      "HV_Bat_Voltage": 378.6,
+      "Motor_Temp": 39.0,
+      "Pack_1_C_Temp": 25.2,
+      "SOC": 81.2896,
+      "Speed": 27.9,
+      "Torque": 2.25
+    },
+    "missing_policy": "exclude",
+    "output_features": [
+      "Speed",
+      "Torque",
+      "Motor_Temp",
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "scale": {
+      "HV_Bat_Voltage": 35.02000000000004,
+      "Motor_Temp": 21.0,
+      "Pack_1_C_Temp": 13.91,
+      "SOC": 28.066649999999996,
+      "Speed": 70.8,
+      "Torque": 25.75
+    },
+    "scaling": "robust",
+    "zero_scale_features": []
+  },
+  "omit_speed_only_diagnostic": {
+    "center": {
+      "HV_Bat_Voltage": 379.59,
+      "Motor_Temp": 38.0,
+      "Pack_1_C_Temp": 24.3,
+      "SOC": 81.7796,
+      "Torque": 0.0
+    },
+    "features": [
+      "Torque",
+      "Motor_Temp",
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "fit_rows": 1623891,
+    "fit_split": "train",
+    "median": {
+      "HV_Bat_Voltage": 379.59,
+      "Motor_Temp": 38.0,
+      "Pack_1_C_Temp": 24.3,
+      "SOC": 81.7796,
+      "Torque": 0.0
+    },
+    "missing_policy": "exclude",
+    "output_features": [
+      "Torque",
+      "Motor_Temp",
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "scale": {
+      "HV_Bat_Voltage": 33.670000000000016,
+      "Motor_Temp": 22.0,
+      "Pack_1_C_Temp": 14.86,
+      "SOC": 26.39555,
+      "Torque": 24.75
+    },
+    "scaling": "robust",
+    "zero_scale_features": []
+  }
+}
