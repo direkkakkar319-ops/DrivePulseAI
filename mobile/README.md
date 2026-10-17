@@ -14,10 +14,11 @@ React Native + Expo frontend with Firebase email/password and Android Google aut
 - Native Firebase session persistence and logout on this device.
 - Protected routes: signed-out users see login; unverified users see verification;
   only verified users enter the account area.
-- Four signed-in tabs: Home, Vehicles, Insights, Account.
-- Session-only demo vehicles, deterministic sensor histories, labelled illustrative
-  assessments, observation details and report previews. No real telemetry or
-  production predictions are generated.
+- Three signed-in tabs: Overview, Telemetry and Insights; header access to Account.
+- Recorded Nissan Leaf replay with 416 real observations and saved Isolation Forest scores.
+  See [recorded replay architecture and API contract](RECORDED_REPLAY.md).
+- Older session-only simulated vehicle routes remain available through their existing URLs,
+  outside the primary recorded-data navigation.
 - Account uses real Firebase information; profile synchronization runs on entry
   to the signed-in area and supports retry from Account.
 
@@ -35,7 +36,7 @@ permission checks.
 
 FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
 Live use requires server credentials and a reachable API. Cloud deployment remains
-a subsequent step. Mobile vehicle/report screens now use an isolated demo provider. Backend
+a subsequent step. Primary battery screens use a local recorded-data provider; legacy vehicle/report routes use the isolated simulator provider. Backend
 vehicle/report routes remain placeholders.
 iOS and web authentication have not been configured; they display a setup message.
 The Firebase Auth config plugin only adds iOS setup in the installed version, so
@@ -166,30 +167,13 @@ email delivery, native compilation, or Android back-stack/deep-link behavior.
 - [React Native Firebase setup](https://rnfirebase.io/)
 - [Firebase Android setup](https://firebase.google.com/docs/android/setup)
 
-## Demo frontend and integration boundary
+## Recorded frontend and integration boundary
 
-The navy/cyan mobile UI follows the approved reference. Every simulated view is
-labelled. Account → Prototype controls selects deterministic scenarios, including
-missing readings, waiting, collecting, loading, failure, stale and disconnected
-states. Loading/failure fixtures remain in that state until another scenario is
-selected. Demo playback is a fixed, dated snapshot, not a live network connection.
+The primary MVP uses a light, restrained battery telemetry interface with genuine saved
+Nissan Leaf measurements and experimental anomaly scores. See [RECORDED_REPLAY.md](RECORDED_REPLAY.md)
+for navigation, provenance, playback semantics, data contracts and Step 3 requirements.
 
-Vehicle edits are in memory and reset after logout or app restart. New vehicles
-start without readings; make/model never generate telemetry. No external vehicle
-API, vehicle-size categories, confidence, failure probability or RUL are invented.
-
-The only numeric health assessment is an explicitly illustrative 86/100 fixture,
-with an explanation that it is authored rather than model-calculated. Report
-previews reuse the displayed telemetry and observations. No PDF/export is offered.
-
-Data flows through `src/api/vehicle-data-provider.ts` and
-`src/store/vehicleDataStore.tsx`; fixtures are centralized in `src/demo/`.
-Nullable frontend view models are in `src/types/vehicle-health.ts`. These do not
-redefine the provisional backend prediction contract.
-
-`react-native-svg` and `expo-linear-gradient` support charts, the gauge and visual
-styling. Rebuild the Android development app after installing these native modules.
-The existing iOS command does not configure iOS Firebase authentication.
-
-See [future mobile integration](../docs/future-mobile-integration.md) for the
-Implemented / Demo / Planned / Requires Validation roadmap and manual UI checks.
+The local replay is functional without PostgreSQL. Existing profile synchronization and
+account retry remain separate. No FastAPI replay endpoints or live inference were added.
+Legacy simulated vehicle, sensor and report routes remain labelled and are not mixed
+into recorded screens. Physical Android verification is still required after this change.

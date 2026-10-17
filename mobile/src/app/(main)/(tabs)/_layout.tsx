@@ -1,56 +1,23 @@
-// Four primary tabs; vehicle, history, insight and report details stay in the parent stack.
-import { Tabs, TabList, TabTrigger, TabSlot } from 'expo-router/ui';
-import { Pressable, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// Three recorded-data tabs; legacy vehicle/account URLs remain reachable but hidden.
+import { Tabs } from 'expo-router';
 import { Icon } from '@/components/vehicle-health/ui';
-import { colors as c } from '@/theme/colors';
-import type { TabTriggerSlotProps } from 'expo-router/ui';
-function TabButton({
-  children,
-  isFocused,
-  icon,
-  ...props
-}: TabTriggerSlotProps & { icon: string }) {
-  return (
-    <Pressable
-      {...props}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: isFocused }}
-      style={{ flex: 1, minHeight: 58, alignItems: 'center', justifyContent: 'center', gap: 5 }}
-    >
-      <Icon name={icon} color={isFocused ? c.primary : c.textMuted} />
-      <Text style={{ fontSize: 11, color: isFocused ? c.primary : c.textMuted }}>{children}</Text>
-    </Pressable>
-  );
-}
+import { palette } from '@/components/recorded/ui';
+import { minimumTouchTarget, spacing, type } from '@/components/recorded/theme';
 export default function ProductTabs() {
-  const insets = useSafeAreaInsets();
-  return (
-    <Tabs style={{ flex: 1, backgroundColor: c.background }}>
-      <View style={{ flex: 1 }}>
-        <TabSlot />
-      </View>
-      <TabList
-        style={{
-          borderTopWidth: 1,
-          borderColor: c.border,
-          backgroundColor: c.card,
-          paddingBottom: insets.bottom,
-        }}
-      >
-        <TabTrigger name="home" href="/(main)/(tabs)/home" asChild>
-          <TabButton icon="home">Home</TabButton>
-        </TabTrigger>
-        <TabTrigger name="vehicles" href="/(main)/(tabs)/vehicles" asChild>
-          <TabButton icon="car">Vehicles</TabButton>
-        </TabTrigger>
-        <TabTrigger name="insights" href="/(main)/(tabs)/insights" asChild>
-          <TabButton icon="pulse">Insights</TabButton>
-        </TabTrigger>
-        <TabTrigger name="account" href="/(main)/(tabs)/account" asChild>
-          <TabButton icon="account">Account</TabButton>
-        </TabTrigger>
-      </TabList>
-    </Tabs>
-  );
+  return <Tabs initialRouteName="home" screenOptions={{
+    headerShown: false,
+    tabBarHideOnKeyboard: true,
+    tabBarActiveTintColor: palette.accent,
+    tabBarInactiveTintColor: palette.muted,
+    tabBarLabelStyle: { ...type.caption, fontWeight: '600', marginTop: spacing.xxs },
+    tabBarItemStyle: { minHeight: minimumTouchTarget, paddingTop: spacing.xs },
+    tabBarStyle: { backgroundColor: palette.surface, borderTopColor: palette.line, borderTopWidth: 1 },
+    sceneStyle: { backgroundColor: palette.background },
+  }}>
+    <Tabs.Screen name="home" options={{ title: 'Overview', tabBarIcon: ({ color }) => <Icon name="home" color={String(color)} /> }} />
+    <Tabs.Screen name="telemetry" options={{ title: 'Telemetry', tabBarIcon: ({ color }) => <Icon name="gauge" color={String(color)} /> }} />
+    <Tabs.Screen name="insights" options={{ title: 'Insights', tabBarIcon: ({ color }) => <Icon name="pulse" color={String(color)} /> }} />
+    <Tabs.Screen name="vehicles" options={{ href: null }} />
+    <Tabs.Screen name="account" options={{ href: null }} />
+  </Tabs>;
 }

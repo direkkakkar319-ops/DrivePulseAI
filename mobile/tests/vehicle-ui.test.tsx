@@ -3,10 +3,9 @@ import * as Native from 'react-native';
 import { makeSnapshot } from '../src/demo/fixtures';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { VehicleDataProvider, useVehicles } from '../src/store/vehicleDataStore';
-import { DataGate, DemoControls } from '../src/components/vehicle-health/data-state';
+import { DataGate, DemoControls, AssessmentUnavailable } from '../src/components/vehicle-health/data-state';
 import { Freshness, HealthCard, SensorCards } from '../src/components/vehicle-health/cards';
 import { Copy, Button } from '../src/components/vehicle-health/ui';
-import Home from '../src/app/(main)/(tabs)/home';
 import { VehicleForm } from '../src/components/vehicle-health/vehicle-form';
 const mockPush = jest.fn(),
   mockReplace = jest.fn();
@@ -26,7 +25,7 @@ function Harness() {
         {(data) => (
           <>
             <Freshness data={data} />
-            {data.assessment && <HealthCard assessment={data.assessment} />}
+            {data.assessment ? <HealthCard assessment={data.assessment} /> : <AssessmentUnavailable data={data} />}
             <SensorCards data={data} onSelect={jest.fn()} />
           </>
         )}
@@ -73,24 +72,6 @@ it('changes the active vehicle without retaining the prior vehicle assessment', 
   await act(async () => {});
   expect(screen.queryByText('86')).toBeNull();
 });
-it('uses real account identity and routes cards with explicit vehicle context', async () => {
-  await render(
-    <VehicleDataProvider>
-      <Home />
-    </VehicleDataProvider>,
-  );
-  expect(await screen.findByText('Hello, Actual user')).toBeTruthy();
-  await fireEvent.press(await screen.findByText('Battery voltage deviation'));
-  expect(mockPush).toHaveBeenCalledWith({
-    pathname: '/(main)/insight/[id]',
-    params: { id: 'SIM-001-voltage', vehicleId: 'SIM-001' },
-  });
-  await fireEvent.press(screen.getByText('View report preview'));
-  expect(mockPush).toHaveBeenCalledWith({
-    pathname: '/(main)/report/[id]',
-    params: { id: 'SIM-001' },
-  });
-});
 it('saves a session-only vehicle without requesting inferred telemetry', async () => {
   await render(
     <VehicleDataProvider>
@@ -110,8 +91,7 @@ it('saves a session-only vehicle without requesting inferred telemetry', async (
 it('shows waiting, collecting and unavailable assessment without a numeric score', async () => {
   await render(
     <VehicleDataProvider>
-      <Home />
-      <DemoControls />
+      <Harness />
     </VehicleDataProvider>,
   );
   await fireEvent.press(await screen.findByText('Waiting for readings'));
