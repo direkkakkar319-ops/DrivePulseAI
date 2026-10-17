@@ -1,0 +1,32 @@
+{
+  "center": {
+    "HV_Bat_Voltage": 379.59,
+    "Pack_1_C_Temp": 24.3,
+    "SOC": 81.7796
+  },
+  "features": [
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "fit_rows": 1623891,
+  "fit_split": "train",
+  "median": {
+    "HV_Bat_Voltage": 379.59,
+    "Pack_1_C_Temp": 24.3,
+    "SOC": 81.7796
+  },
+  "missing_policy": "exclude",
+  "output_features": [
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "scale": {
+    "HV_Bat_Voltage": 33.670000000000016,
+    "Pack_1_C_Temp": 14.86,
+    "SOC": 26.39555
+  },
+  "scaling": "robust",
+  "zero_scale_features": []
+}
