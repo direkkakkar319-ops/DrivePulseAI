@@ -1,0 +1,47 @@
+{
+  "center": {
+    "HV_Bat_Voltage": 378.6,
+    "Motor_Temp": 39.0,
+    "Pack_1_C_Temp": 25.2,
+    "SOC": 81.2896,
+    "Speed": 27.9,
+    "Torque": 2.25
+  },
+  "features": [
+    "Speed",
+    "Torque",
+    "Motor_Temp",
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "fit_rows": 1540563,
+  "fit_split": "train",
+  "median": {
+    "HV_Bat_Voltage": 378.6,
+    "Motor_Temp": 39.0,
+    "Pack_1_C_Temp": 25.2,
+    "SOC": 81.2896,
+    "Speed": 27.9,
+    "Torque": 2.25
+  },
+  "missing_policy": "exclude",
+  "output_features": [
+    "Speed",
+    "Torque",
+    "Motor_Temp",
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "scale": {
+    "HV_Bat_Voltage": 35.02000000000004,
+    "Motor_Temp": 21.0,
+    "Pack_1_C_Temp": 13.91,
+    "SOC": 28.066649999999996,
+    "Speed": 70.8,
+    "Torque": 25.75
+  },
+  "scaling": "robust",
+  "zero_scale_features": []
+}
