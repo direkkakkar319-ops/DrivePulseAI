@@ -199,6 +199,13 @@ def test_battery_windows_safe_despite_drivetrain_dropout(
 
 
 def test_original_artifacts_and_config_unchanged(battery_config: dict) -> None:
+    parent = (
+        ROOT
+        / "ml/artifacts/nissan_leaf_2018/preparation"
+        / battery_config["parent_run_id"]
+    )
+    if not parent.exists():
+        pytest.skip("Parent preparation artifacts are Git-ignored")
     original, hashes = verify_parent(ROOT, battery_config)
     assert original["run_id"] == "d7e9e32e1ff2981a"
     assert len(hashes) == len(original["outputs"]) + 2
@@ -246,6 +253,8 @@ def test_battery_release_integrity_when_present(battery_config: dict) -> None:
             + row["feature_rows"]
         )
     directory = ROOT / summary["artifact_directory"]
+    if not directory.exists():
+        pytest.skip("Battery preparation artifacts are Git-ignored")
     for name, info in summary["outputs"].items():
         assert digest(directory / name) == info["sha256"], name
     report = (

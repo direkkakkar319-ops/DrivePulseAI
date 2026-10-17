@@ -214,6 +214,13 @@ def test_preparation_preserved() -> None:
             ROOT / "ml/notebooks/nissan_leaf_2018/config/isolation_forest.json"
         ).read_text()
     )
+    directory = (
+        ROOT
+        / "ml/artifacts/nissan_leaf_2018/preparation"
+        / config["preparation_run_id"]
+    )
+    if not directory.exists():
+        pytest.skip("Battery preparation artifacts are Git-ignored")
     directory, prepared, hashes = verify_preparation(config)
     assert prepared["config"]["features"] == FEATURES
     assert directory.name == config["preparation_run_id"]
