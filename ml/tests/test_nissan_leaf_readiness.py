@@ -25,7 +25,10 @@ from readiness import (
 @pytest.fixture
 def excerpt() -> pd.DataFrame:
     """Read only the first 16 genuine processed records."""
-    return pd.read_csv(DATA / "processed/Dataset_Preprocessed.csv", nrows=16)
+    source = DATA / "processed/Dataset_Preprocessed.csv"
+    if not source.exists():
+        pytest.skip("Official source CSV is Git-ignored; run this check after acquisition")
+    return pd.read_csv(source, nrows=16)
 
 
 def test_inventory_completeness() -> None:

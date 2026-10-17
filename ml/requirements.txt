@@ -1,0 +1,11 @@
+# Versions used for the saved Nissan Leaf preparation and Isolation Forest run.
+# The source CSVs and fitted artifacts are obtained separately; this file installs code dependencies.
+numpy==2.5.1
+pandas==2.3.3
+scipy==1.18.0
+matplotlib==3.11.1
+scikit-learn==1.9.0
+pyarrow==25.0.0
+joblib==1.5.3
+pytest==9.1.1
+ruff==0.16.1
