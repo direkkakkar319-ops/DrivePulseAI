@@ -174,8 +174,25 @@ Date: 2026-11-13. The user confirmed the recommended strategy: separate passenge
 
 Step 2 is **🟡 partial / gate failed for the complete three-stage chain**. The multi-source strategy is recorded, but no passenger-car run-to-failure/TTE source exists and the Shenzhen files are inaccessible. No model training began. The next decision is whether to revise the scope to battery SOH plus contemporaneous fault classification or keep searching for a licensed car/EV EOL/TTE source.
 
+## Local PR-readiness verification — 2026-11-13
+
+The requested PR could not be raised because this environment has no `gh` executable and GitHub HTTPS push returned `fatal: could not read Username` with prompts disabled. Before handoff, every committed change from `origin/main..HEAD` was checked locally:
+
+| Check | Result / evidence |
+|---|---|
+| Changed-file inventory | 18 paths reviewed with `git diff --name-status origin/main..HEAD`: `.gitignore`; four status reports (`scope.md`, `progress.md`, `remaining.md`, `datasets.md`); `tasks_done.md`; Step 1/2 audit scripts and JSON reports; requirements lock; reproducibility helper; two download scripts; two dataset provenance READMEs. |
+| Scope protection | `git diff --name-only origin/main..HEAD | rg '^(backend/|mobile/)'` returned no paths. No backend or mobile files changed. |
+| Raw-data protection | `git ls-files 'data/automotive_prognostics/**/raw/**'` returned no tracked raw files. Tongji checksum was revalidated: MD5 `88c3832d748c0adf8caa94173aada563`, SHA-256 `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`, 129,606,252 bytes. |
+| Reproducibility | `scripts/download_tongji_rest.py` reported “already verified”; `ml/scripts/audit_tongji_rest.py` and `ml/scripts/audit_shenzhen_metadata.py` reran successfully; generated reports produced no working-tree diff. |
+| Code quality | Ruff check passed for all four new Python scripts; pre-commit hooks passed on both Step 2 commits; `git diff --check origin/main..HEAD` passed. |
+| Tests | `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **41 passed in 7.25 seconds**. |
+| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, and `d3ed5e0` are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
+
+PR status: **not created** until GitHub credentials/CLI access are supplied. The branch is locally clean on `pipeline/data-and-training`; the only remaining gate is the unresolved passenger-car RUL/TTE scope decision.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded branch/environment setup, test evidence, seed helper and MLflow limitation.
 - 2026-11-13 — Workflow Step 1: added reproducible dataset validation evidence, per-model verdicts, leakage findings, and the Step 2 strategy gate.
 - 2026-11-13 — Workflow Step 2: recorded the confirmed multi-source strategy, Tongji acquisition/audit, Shenzhen metadata verification and HTTP 403 block, and the failed complete-chain gate.
+- 2026-11-13 — PR-readiness verification: reviewed all 18 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.
