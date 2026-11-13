@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Audit the untouched Tongji release using only the Python standard library."""
 
 from __future__ import annotations
