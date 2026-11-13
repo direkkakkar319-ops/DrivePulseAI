@@ -27,6 +27,8 @@ data/raw/*
 data/automotive_prognostics/**
 !data/automotive_prognostics/**/
 !data/automotive_prognostics/**/README.md
+# Existing 20-car source-release bundle is retained locally for audit only.
+data/automotive_prognostics/onroad_ev_capacity/source_release/**
 ml/artifacts/*
 !ml/artifacts/.gitkeep
 mlruns/
