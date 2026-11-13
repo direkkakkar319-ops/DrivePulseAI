@@ -165,8 +165,8 @@ The acquired 20-car data remains quarantined from model work pending data-specif
 
 - Source/version/license: Zenodo record 16868546, DOI `10.5281/zenodo.16868546`, CC BY 4.0. Raw archive is unchanged at `data/automotive_prognostics/tongji_rest/v1/raw/data.zip`; provenance and checksums are in that folder's README.
 - Reproducible audit: `./.venv/bin/python ml/scripts/audit_tongji_rest.py`; output `ml/reports/data_validation/step2_tongji_rest.json`.
-- Audit result: 154 XLSX files, 26,450 data rows, 148 train files and 6 test files. The files expose fast/slow feature families with 123–184 columns and fields such as `t_start`, `t_end`, `mileage`, SOC, voltage, capacity, `soh`, internal-resistance/voltage statistics and battery feature summaries. The archive contains 78 `car_identifier` values.
-- Split/leakage result: the nominal train/test directories are not independent-vehicle splits. `GE16` and `HQ05` occur in both; only `P215` is test-only. The audit also counted 39 backward `t_start` steps (30 train-fast, 9 train-slow). These must be removed from any claimed held-out evaluation.
+- Audit result: 154 XLSX files, 28,317 data rows (26,450 train and 1,867 test), 148 train files and 6 test files. The files expose fast/slow feature families with 123–184 columns and fields such as `t_start`, `t_end`, `mileage`, SOC, voltage, capacity, `soh`, internal-resistance/voltage statistics and battery feature summaries. The archive contains 78 `car_identifier` values.
+- Split/leakage result: the nominal train/test directories are not independent-vehicle splits. `GE16` and `HQ05` occur in both; only `P215` is test-only. The loader now assigns every row of those three test-directory vehicles to evaluation, moving all official-train rows for `GE16` and `HQ05` with them. This yields only three identified evaluation vehicles; use that small holdout cautiously. The audit also counted 39 backward `t_start` steps (30 train-fast, 9 train-slow).
 - Target verdict: `soh` and capacity are measured/derived health proxies, not a documented run-to-end-of-life event. No future-failure horizon, censoring rule, or mechanical component label is present. **Anomaly: 🟡 partial for battery-signal novelty; RUL: ❌ invalid as observed RUL; health/SOH regression: 🟡 usable only after a vehicle-disjoint split; failure: ❌ invalid.**
 
 ### Shenzhen EV charging-fault release
@@ -185,7 +185,7 @@ The dataset audit changes were re-run after commit: Tongji’s downloader report
 
 ## Loader update
 
-`ml/src/data/loaders.py` now includes `load_tongji_rest`, which reads the verified Zenodo ZIP/XLSX release without pickle deserialization and preserves source file, official split, feature family, asset identity and dataset metadata. Existing APS, KIT and carOBD loaders now expose explicit identity/label-semantics metadata. These changes improve ingestion and leakage control; they do not make any dataset valid for RUL or forward failure prediction and no model was trained.
+`ml/src/data/loaders.py` includes `load_tongji_rest`, which reads the verified Zenodo ZIP/XLSX release without pickle deserialization and preserves source file, original directory (`source_split`), corrected vehicle partition (`split`), feature family, asset identity and dataset metadata. Existing APS, KIT and carOBD loaders expose explicit identity/label-semantics metadata. These changes improve ingestion and leakage control; they do not make any dataset valid for RUL or forward failure prediction and no model was trained.
 
 ## Change log
 

@@ -161,7 +161,7 @@ Date: 2026-11-13. The user confirmed the recommended strategy: separate passenge
 
 - Added reproducible downloader `scripts/download_tongji_rest.py`; it fetched the official Zenodo record 16868546 archive to `data/automotive_prognostics/tongji_rest/v1/raw/data.zip` and verified the expected 129,606,252 bytes and MD5 `88c3832d748c0adf8caa94173aada563`.
 - Verified SHA-256: `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`. The raw archive remains unchanged and ignored by Git. Added provenance at `data/automotive_prognostics/tongji_rest/v1/README.md`.
-- Added `ml/scripts/audit_tongji_rest.py` and generated `ml/reports/data_validation/step2_tongji_rest.json`. It parsed the XLSX XML without installing openpyxl: 154 XLSX files, 26,450 data rows, 148 train files, 6 test files, 78 car identifiers, 123–184-column schema variants, and fast/slow feature families.
+- Added `ml/scripts/audit_tongji_rest.py` and generated `ml/reports/data_validation/step2_tongji_rest.json`. It parsed the XLSX XML without installing openpyxl: 154 XLSX files, 28,317 data rows (26,450 train and 1,867 test), 148 train files, 6 test files, 78 car identifiers, 123–184-column schema variants, and fast/slow feature families.
 - Leakage/quality findings: `GE16` and `HQ05` appear in both nominal train and test directories; only `P215` is test-only. The audit counted 39 backward `t_start` steps (30 train-fast, 9 train-slow). `soh`/capacity are health proxies, not a documented run-to-end-of-life or future-failure target. Verdict: candidate SOH/health regression or battery novelty only after a vehicle-disjoint split; not valid RUL or forward failure data.
 
 ### Shenzhen metadata verification and blocked acquisition
@@ -208,3 +208,12 @@ PR status: **not created** until GitHub credentials/CLI access are supplied. The
 - 2026-11-13 — Workflow Step 2: recorded the confirmed multi-source strategy, Tongji acquisition/audit, Shenzhen metadata verification and HTTP 403 block, and the failed complete-chain gate.
 - 2026-11-13 — PR-readiness verification: reviewed all 20 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.
 - 2026-11-13 — Loader contract verification: expanded the inventory to 21 paths after `592b2b8`, reran the 43-test suite and Ruff, and confirmed the PR remains data/ingestion-only.
+
+## PR work — vehicle-disjoint Tongji evaluation and remaining source gates
+
+- Updated `load_tongji_rest` to derive its evaluation vehicle set from every official test-directory workbook, then assign all rows for those assets—including `GE16` and `HQ05` rows stored under the nominal train directory—to evaluation. `source_split` preserves original directory provenance; `split` now means corrected vehicle-disjoint partition. Kind/split filters apply after global asset assignment so separately loaded feature families use the same grouping.
+- The verified release has 3 identified evaluation vehicles (`GE16`, `HQ05`, `P215`). Rows without `car_identifier` retain their workbook-stem fallback identity and are marked `file_stem`; that is not verified vehicle identity. The loader audit report now records corrected partition sizes and the overlap vehicles moved.
+- Added unit coverage for vehicle grouping plus archive-backed checks that GE16/HQ05 stay wholly in evaluation and resulting train/evaluation asset IDs are disjoint.
+- Retried the official Shenzhen downloader with network access. Mendeley metadata was reachable, but its official archive endpoint again returned HTTP 403. No partial archive was retained; checksum, workbook schemas, vehicle IDs and fault labels remain unaudited.
+- Reviewed primary public records for the 347-EV dataset and 20-car source. Public records still do not establish passenger-car body style, explain the 348 released labels versus 347 in the paper, or grant data-specific reuse rights for the 20-car archive. These require publisher/author/rights-holder responses and remain blocked; no assumptions were added.
+- No model training, backend/mobile changes, or raw-data commits.

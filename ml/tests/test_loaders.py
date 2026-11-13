@@ -3,7 +3,13 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from src.data.loaders import load_aps, load_carobd, load_kit_obd, load_tongji_rest
+from src.data.loaders import (
+    _assign_tongji_vehicle_splits,
+    load_aps,
+    load_carobd,
+    load_kit_obd,
+    load_tongji_rest,
+)
 
 APS_DIR = (
     Path(__file__).parents[2] / "data" / "automotive_failure" / "scania_aps" / "raw"
@@ -114,12 +120,42 @@ def test_load_tongji_missing_path(tmp_path: Path):
         load_tongji_rest(tmp_path / "nope")
 
 
+def test_tongji_split_assignment_groups_vehicle_across_source_directories():
+    records = pd.DataFrame(
+        {
+            "asset_id": ["GE16", "GE16", "HQ05", "P215", "DE01"],
+            "source_split": ["train", "test", "train", "test", "train"],
+        }
+    )
+
+    assigned, evaluation_ids = _assign_tongji_vehicle_splits(records)
+
+    assert evaluation_ids == {"GE16", "P215"}
+    assert assigned["split"].tolist() == ["test", "test", "train", "test", "train"]
+
+
 @pytest.mark.skipif(not TONGJI_ZIP.exists(), reason="Tongji data not checked out")
 def test_load_tongji_test_split_preserves_asset_contract():
-    df = load_tongji_rest(TONGJI_ZIP, split="test", kind="slow")
-    assert len(df) == 183
+    df = load_tongji_rest(TONGJI_ZIP, split="test")
     assert set(df["split"]) == {"test"}
-    assert set(df["feature_kind"]) == {"slow"}
+    assert {"fast", "slow"}.issubset(set(df["feature_kind"]))
     assert {"asset_id", "asset_id_type", "soh", "cap"}.issubset(df.columns)
     assert df.attrs["dataset_version"] == "zenodo-16868546"
     assert "RUL/TTE" in df.attrs["label_semantics"]
+    assert "HQ05" in set(df["asset_id"])
+    assert set(df.loc[df["asset_id"].isin(["GE16", "HQ05"]), "source_split"]) == {
+        "train",
+        "test",
+    }
+    assert not df.attrs["official_split"]
+    assert {"GE16", "HQ05", "P215"}.issubset(set(df.attrs["evaluation_asset_ids"]))
+
+
+@pytest.mark.skipif(not TONGJI_ZIP.exists(), reason="Tongji data not checked out")
+def test_load_tongji_train_and_test_are_vehicle_disjoint():
+    train = load_tongji_rest(TONGJI_ZIP, split="train")
+    test = load_tongji_rest(TONGJI_ZIP, split="test")
+
+    assert set(train["asset_id"]).isdisjoint(set(test["asset_id"]))
+    assert {"GE16", "HQ05"}.issubset(set(test["asset_id"]))
+    assert set(test["asset_id"]) == set(test.attrs["evaluation_asset_ids"])

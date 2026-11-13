@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Record the official Shenzhen Mendeley metadata without downloading its zip."""
 
 from __future__ import annotations
