@@ -5,7 +5,7 @@
 - Publisher description: 300 discontinued fleet EVs; 0–500,000 km; 0.5–4 years; roughly 850 million records sampled every 10 seconds. The full archive is listed as 72 GB compressed / 581 GB uncompressed; a 100 MB sample is offered.
 - Publicly listed fields: terminal time, SOC, speed, odometer, charge status, pack voltage/current, min/max cell voltage, min/max temperature, cell-voltage list and temperature-probe list.
 - Publisher lists CC BY-NC-SA 4.0 and requires agreeing to separate research-only terms. The terms prohibit commercial use and external services and restrict redistribution without authorization. The download form requests name, phone, email, institution and use purpose.
-- Access status: sample acquisition is pending the applicant details and the user's confirmation of the publisher terms. No sample or full archive is present in this repository. Do not commit downloaded data; the publisher's terms restrict redistribution. If access is granted, store the source archive locally under the ignored `raw/` directory and record its checksum and audit report here.
+- Access status: the user supplied the required application fields and explicitly confirmed the terms. Two official form submission attempts both returned HTTP 524, and no confirmation email or sample arrived. Further automated retries are stopped. No sample or full archive is present in this repository. The user can submit the form in a browser; do not commit downloaded data because the publisher's terms restrict redistribution. If access is granted, store the source archive locally under the ignored `raw/` directory and record its checksum and audit report here.
 
 ## Model-target assessment from public evidence
 

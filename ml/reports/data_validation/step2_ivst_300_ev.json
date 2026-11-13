@@ -51,7 +51,7 @@
       "acceptance of terms"
     ],
     "sample_acquired": false,
-    "sample_acquisition_status": "pending applicant details and user's confirmation of terms",
+    "sample_acquisition_status": "two official form submission attempts returned HTTP 524; user received no confirmation; no sample acquired; automated retries stopped",
     "checksum": null
   },
   "target_evidence": {
