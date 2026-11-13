@@ -44,7 +44,7 @@ Data tree summary: current data folders include `data/automotive_failure/scania_
 
 ## Overall completion estimate
 
-**21% complete for the passenger-car/EV target.** This is an audit estimate, not a measurement of product quality. Rubric: data 25% × 10% = 2.50 points; models 35% × average 6.7% (anomaly 0%, RUL 0%, failure-classification code 20%) = 2.33; backend 15% × 35% = 5.25; Android 15% × 65% = 9.75; tests/docs/deploy 10% × 16.5% = 1.65. Total = 2.50 + 2.33 + 5.25 + 9.75 + 1.65 = **21.48%** (rounded to 21%). The data score increased only for reproducible acquisition/audit; no car model validation credit is claimed.
+**22% complete for the passenger-car/EV target.** This is an audit estimate, not a measurement of product quality. Rubric: data 25% × 15% = 3.75 points; models 35% × average 6.7% (anomaly 0%, RUL 0%, failure-classification code 20%) = 2.33; backend 15% × 35% = 5.25; Android 15% × 65% = 9.75; tests/docs/deploy 10% × 16.5% = 1.65. Total = 3.75 + 2.33 + 5.25 + 9.75 + 1.65 = **22.73%** (rounded to 22%). The data score reflects reproducible acquisition, validation, and loader-contract work; no model-training or car metric credit is claimed.
 
 ## Milestone table
 
@@ -199,7 +199,11 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 
 ## PR-readiness verification — 2026-11-13
 
-**Status: 🟡 Local verification complete; remote PR blocked by authentication.** Every path in `git diff --name-status origin/main..HEAD` was reviewed. Ruff passed, all 41 ML tests passed, both audit reports regenerated without differences, Tongji checksum/size revalidated, no raw data is tracked, and no `backend/` or `mobile/` path changed. The branch is clean on `pipeline/data-and-training`. GitHub CLI is unavailable and HTTPS push cannot read credentials, so no PR URL or remote CI result exists yet; details are in `tasks_done.md`.
+**Status: 🟡 Local verification complete; remote PR blocked by authentication.** Every path in `git diff --name-status origin/main..HEAD` was reviewed. Ruff passed, all 43 ML tests passed, both audit reports regenerated without differences, Tongji checksum/size revalidated, no raw data is tracked, and no `backend/` or `mobile/` path changed. The branch is clean on `pipeline/data-and-training`. GitHub CLI is unavailable and HTTPS push cannot read credentials, so no PR URL or remote CI result exists yet; details are in `tasks_done.md`.
+
+## Loader contract update — 2026-11-13
+
+**Status: ✅ Implemented and verified; no training performed.** `ml/src/data/loaders.py` now exposes `load_tongji_rest` for the checksum-verified Zenodo archive or extracted XLSX files. It parses XLSX XML without pickle deserialization, preserves `source_file`, official split, fast/slow feature family, `asset_id`, and `asset_id_type`, and attaches dataset/license/label metadata. Existing APS, KIT, and carOBD loaders now attach explicit identity and label-semantics metadata instead of implying that recording or row IDs are verified vehicles. `ml/src/data/__init__.py` exports the loader, and `ml/tests/test_loaders.py` adds missing-path and Tongji contract tests. This is ingestion/contract work only; no model training or evaluation was added.
 
 ## Change log
 
@@ -207,3 +211,4 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 - 2026-11-13 — Step 1: recorded the validation command/output, dataset verdicts, leakage findings, failed gate, and Step 2 decision requirement.
 - 2026-11-13 — Step 2: confirmed the multi-source strategy, acquired/audited Tongji, verified Shenzhen metadata, documented HTTP 403 acquisition blockage, and kept model training gated.
 - 2026-11-13 — PR-readiness verification: reviewed all changed paths and reran checks, tests, checksums and audit reports; recorded the authentication blocker and unchanged gate status.
+- 2026-11-13 — Loader contract update: added and tested the Tongji loader plus explicit provenance/identity metadata on existing loaders; 43 ML tests pass.

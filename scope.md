@@ -105,9 +105,10 @@ Targets below are project acceptance criteria to decide, not claims that the cur
 
 ## Execution record note
 
-No scope contract was changed during PR-readiness verification. The current contract remains passenger cars/passenger EVs only, with the three-stage chain gated until a valid car/EV RUL or time-to-event source is acquired. Local verification found no backend/mobile changes and 41 ML tests passed; the PR itself could not be created because GitHub credentials/CLI access were unavailable (recorded in `tasks_done.md`).
+No scope contract was changed during PR-readiness verification. The current contract remains passenger cars/passenger EVs only, with the three-stage chain gated until a valid car/EV RUL or time-to-event source is acquired. The current PR objective is dataset collection/provenance, validation, and safe loader updates—not model training. Local verification found no backend/mobile changes and 43 ML tests passed; the PR itself could not be created because GitHub credentials/CLI access were unavailable (recorded in `tasks_done.md`).
 
 ## Change log
 
 - 2026-11-13 — Scope frozen to passenger cars/passenger EVs; truck and surrogate datasets excluded from car claims.
 - 2026-11-13 — PR-readiness verification recorded without changing functional requirements or model contracts.
+- 2026-11-13 — Clarified that this PR prioritizes dataset verification and loader updates; model training remains out of scope.

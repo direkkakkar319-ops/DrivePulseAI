@@ -183,8 +183,13 @@ The recommended multi-source strategy is accepted for separate benchmarks: KIT r
 
 The dataset audit changes were re-run after commit: Tongji’s downloader reported the expected checksum/size, both Step 2 audit reports regenerated without a diff, and no raw archive is tracked. No dataset verdict changed. The planned PR is not yet remote because GitHub authentication is unavailable; this does not alter the Step 2 failed gate or the dataset strategy.
 
+## Loader update
+
+`ml/src/data/loaders.py` now includes `load_tongji_rest`, which reads the verified Zenodo ZIP/XLSX release without pickle deserialization and preserves source file, official split, feature family, asset identity and dataset metadata. Existing APS, KIT and carOBD loaders now expose explicit identity/label-semantics metadata. These changes improve ingestion and leakage control; they do not make any dataset valid for RUL or forward failure prediction and no model was trained.
+
 ## Change log
 
 - 2026-11-13 — Step 1: added the reproducible structural validation run, per-model verdict table, failed gate, and Step 2 strategy options.
 - 2026-11-13 — Step 2: user confirmed separate passenger-car/EV sources with explicit interfaces; acquired and audited Tongji under CC BY 4.0, verified Shenzhen metadata but recorded the official S3 download as HTTP 403-blocked.
 - 2026-11-13 — PR handoff: recorded repeat audit/checksum verification and the absence of a remote PR due to missing GitHub authentication; dataset verdicts unchanged.
+- 2026-11-13 — Loader update: recorded the new Tongji ingestion path and provenance metadata on existing loaders; dataset verdicts and the failed RUL gate remain unchanged.

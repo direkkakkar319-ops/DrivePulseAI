@@ -3,14 +3,10 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from src.data.loaders import load_aps, load_carobd, load_kit_obd
+from src.data.loaders import load_aps, load_carobd, load_kit_obd, load_tongji_rest
 
 APS_DIR = (
-    Path(__file__).parents[2]
-    / "data"
-    / "automotive_failure"
-    / "scania_aps"
-    / "raw"
+    Path(__file__).parents[2] / "data" / "automotive_failure" / "scania_aps" / "raw"
 )
 KIT_DIR = (
     Path(__file__).parents[2]
@@ -21,13 +17,18 @@ KIT_DIR = (
     / "recordings"
     / "OBD-II-Dataset"
 )
-CAROBD_DIR = (
-    Path(__file__).parents[2] / "data" / "automotive_obd" / "carobd" / "raw"
+CAROBD_DIR = Path(__file__).parents[2] / "data" / "automotive_obd" / "carobd" / "raw"
+TONGJI_ZIP = (
+    Path(__file__).parents[2]
+    / "data"
+    / "automotive_prognostics"
+    / "tongji_rest"
+    / "v1"
+    / "raw"
+    / "data.zip"
 )
 
-needs_data = pytest.mark.skipif(
-    not APS_DIR.exists(), reason="APS data not checked out"
-)
+needs_data = pytest.mark.skipif(not APS_DIR.exists(), reason="APS data not checked out")
 
 
 @needs_data
@@ -106,3 +107,19 @@ def test_load_carobd_bad_header(tmp_path: Path):
 def test_load_carobd_missing_path(tmp_path: Path):
     with pytest.raises(FileNotFoundError, match="No carOBD recordings"):
         load_carobd(tmp_path / "nope")
+
+
+def test_load_tongji_missing_path(tmp_path: Path):
+    with pytest.raises(FileNotFoundError, match="Tongji release not found"):
+        load_tongji_rest(tmp_path / "nope")
+
+
+@pytest.mark.skipif(not TONGJI_ZIP.exists(), reason="Tongji data not checked out")
+def test_load_tongji_test_split_preserves_asset_contract():
+    df = load_tongji_rest(TONGJI_ZIP, split="test", kind="slow")
+    assert len(df) == 183
+    assert set(df["split"]) == {"test"}
+    assert set(df["feature_kind"]) == {"slow"}
+    assert {"asset_id", "asset_id_type", "soh", "cap"}.issubset(df.columns)
+    assert df.attrs["dataset_version"] == "zenodo-16868546"
+    assert "RUL/TTE" in df.attrs["label_semantics"]

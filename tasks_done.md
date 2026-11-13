@@ -180,13 +180,22 @@ The requested PR could not be raised because this environment has no `gh` execut
 
 | Check | Result / evidence |
 |---|---|
-| Changed-file inventory | 18 paths reviewed with `git diff --name-status origin/main..HEAD`: `.gitignore`; four status reports (`scope.md`, `progress.md`, `remaining.md`, `datasets.md`); `tasks_done.md`; Step 1/2 audit scripts and JSON reports; requirements lock; reproducibility helper; two download scripts; two dataset provenance READMEs. |
+| Changed-file inventory | 20 paths reviewed with `git diff --name-status origin/main..HEAD`: the five status reports; `.gitignore`; Step 1/2 audit scripts and JSON reports; requirements lock; reproducibility helper; two download scripts; two dataset provenance READMEs; and the loader contract files `ml/src/data/loaders.py`, `ml/src/data/__init__.py`, `ml/tests/test_loaders.py`. |
 | Scope protection | `git diff --name-only origin/main..HEAD | rg '^(backend/|mobile/)'` returned no paths. No backend or mobile files changed. |
 | Raw-data protection | `git ls-files 'data/automotive_prognostics/**/raw/**'` returned no tracked raw files. Tongji checksum was revalidated: MD5 `88c3832d748c0adf8caa94173aada563`, SHA-256 `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`, 129,606,252 bytes. |
-| Reproducibility | `scripts/download_tongji_rest.py` reported “already verified”; `ml/scripts/audit_tongji_rest.py` and `ml/scripts/audit_shenzhen_metadata.py` reran successfully; generated reports produced no working-tree diff. |
+| Reproducibility | `scripts/download_tongji_rest.py` reported “already verified”; both audit scripts reran successfully; generated reports produced no working-tree diff; the Tongji loader test passed against the local archive. |
 | Code quality | Ruff check passed for all four new Python scripts; pre-commit hooks passed on both Step 2 commits; `git diff --check origin/main..HEAD` passed. |
-| Tests | `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **41 passed in 7.25 seconds**. |
-| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, `d3ed5e0`, and `b430843` are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
+| Tests | `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **43 passed, 5 warnings in 6.63 seconds**. |
+| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, `d3ed5e0`, `b430843`, and the loader/docs commits are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
+
+## Loader contract implementation — 2026-11-13
+
+- Added `load_tongji_rest` to `ml/src/data/loaders.py` and exported it from `ml/src/data/__init__.py`.
+- The loader accepts the verified Tongji ZIP or extracted XLSX files, parses workbook XML with the standard library, supports `split` and `kind` filters, and returns `source_file`, `split`, `feature_kind`, `asset_id`, and `asset_id_type` fields.
+- Loader metadata records Zenodo version, CC BY 4.0, identity semantics, health-proxy label semantics, official-split status, and the known `GE16`/`HQ05` overlap warning.
+- Existing APS/KIT/carOBD loaders now attach explicit provenance, identity and label semantics through `DataFrame.attrs`; no existing model-training behavior was invoked.
+- Added tests for missing paths and the local Tongji test/slow contract. Result: `43 passed, 5 warnings`.
+- This PR remains data/ingestion focused. Model training, model metrics and end-to-end claims remain intentionally out of scope.
 
 PR status: **not created** until GitHub credentials/CLI access are supplied. The branch is locally clean on `pipeline/data-and-training`; the only remaining gate is the unresolved passenger-car RUL/TTE scope decision.
 
@@ -195,4 +204,4 @@ PR status: **not created** until GitHub credentials/CLI access are supplied. The
 - 2026-11-13 — Step 0: recorded branch/environment setup, test evidence, seed helper and MLflow limitation.
 - 2026-11-13 — Workflow Step 1: added reproducible dataset validation evidence, per-model verdicts, leakage findings, and the Step 2 strategy gate.
 - 2026-11-13 — Workflow Step 2: recorded the confirmed multi-source strategy, Tongji acquisition/audit, Shenzhen metadata verification and HTTP 403 block, and the failed complete-chain gate.
-- 2026-11-13 — PR-readiness verification: reviewed all 18 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.
+- 2026-11-13 — PR-readiness verification: reviewed all 20 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.

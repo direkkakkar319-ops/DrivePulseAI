@@ -20,7 +20,7 @@ The strategy decision is complete: use separate passenger-car/EV sources with ex
 |---|---|---:|
 | Scope/data decision | Domain frozen to passenger cars/EVs; choose initial subsystem and intended product claim; reconcile PR #49 two-task proposal and PR #50 battery anomaly demo | S–M, 1–2 days |
 | Dataset acquisition/governance | Resolve 347-EV body style, 347/348 label discrepancy, full sample joins and horizon; get explicit 20-car data rights; obtain the Shenzhen archive or record it as inaccessible; find verified car RUL/event labels. Component X v3 is truck-only and excluded. | L, 5–10 days plus external response delay |
-| Preprocessing | Rewrite/validate schema-specific loaders, time/ID semantics, windowing, train-only imputation/scaling, trip/asset split protocols; deprecate cross-domain aliases | L, 4–7 days |
+| Preprocessing/loaders | Complete schema-specific loaders, time/ID semantics, windowing, train-only imputation/scaling, trip/asset split protocols; deprecate cross-domain aliases. Tongji loader contract is now implemented, but vehicle-disjoint split enforcement remains. | L, 3–6 days |
 | Anomaly | Implement component/vehicle anomaly pipeline, calibration and metrics; use KIT/verified Nissan Leaf where suitable; record unsupervised limitation | M, 3–5 days |
 | RUL / health | Do not model on 20-car data until data rights are granted. Tongji can support an SOH/health regression baseline only after a vehicle-disjoint split; it does not supply RUL/TTE. Obtain independent EOL labels for true RUL and evaluate by held-out vehicle. | L, 5–8 days after rights/data decision |
 | Failure classification | Hold 347-EV data until car body type, count discrepancy, complete label joins and cutoff/horizon are clarified; then decide if narrow vehicle-level abnormality classification is valid. Obtain dated car failure events for forward-horizon claims. | L, 5–8 days after clarification |
@@ -35,7 +35,7 @@ The strategy decision is complete: use separate passenger-car/EV sources with ex
 
 1. **Resolve the data contract.** Decide whether to revise the product to battery SOH + contemporaneous fault classification or continue searching for a licensed passenger-car EOL/TTE source. Done when `scope.md`, `datasets.md` and accepted label/horizon definitions agree. (S–M, 1–2 days.)
 2. **Close the candidate gates.** Obtain written 347-EV body/join/horizon confirmation, explicit 20-car data rights, and either the Shenzhen archive or a documented rejection because the official asset remains inaccessible. Done when each candidate has keep/reject status and provenance. (M, 2–5 days plus external response.)
-3. **Implement only an approved baseline.** If SOH scope is approved, add a vehicle-disjoint Tongji loader/split and a simple health regression baseline; if true RUL is retained, do not train until an EOL/TTE source passes validation. Done when a held-out-vehicle metric and leakage report are reproducible. (L, 4–7 days after decision.)
+3. **Finish loader/data-contract work—no model training in this PR.** Add vehicle-disjoint split enforcement and schema tests for each accepted dataset; keep unverified carOBD, 20-car rights-blocked data, and unacquired Shenzhen data quarantined. Done when loaders return versioned provenance/identity metadata and tests pass. (M, 2–4 days.)
 
 ## Phased plan
 
@@ -108,7 +108,7 @@ Step 1 adds no backend/mobile request; model output contracts remain unchanged b
 
 ## PR handoff status
 
-Local verification is complete: all changed paths were reviewed, 41 ML tests and Ruff passed, audit reports are reproducible, raw data is ignored, and backend/mobile remain untouched. A remote PR is still pending GitHub authentication (`gh` unavailable and HTTPS push rejected without credentials). Once authenticated, push `pipeline/data-and-training`, open the PR against `main`, and rerun the same verification against the PR diff and CI checks. The data-contract/RUL gate remains the substantive project blocker.
+Local verification is complete: all changed paths were reviewed, 43 ML tests and Ruff passed, audit reports are reproducible, raw data is ignored, and backend/mobile remain untouched. A remote PR is still pending GitHub authentication (`gh` unavailable and HTTPS push rejected without credentials). Once authenticated, push `pipeline/data-and-training`, open the PR against `main`, and rerun the same verification against the PR diff and CI checks. The current PR is for dataset verification and loader correctness; model training remains deferred. The data-contract/RUL gate remains the substantive project blocker.
 
 ## Change log
 

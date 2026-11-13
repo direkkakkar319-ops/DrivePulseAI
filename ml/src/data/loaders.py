@@ -1,6 +1,13 @@
+import io
+import re
+import zipfile
 from pathlib import Path
+from xml.etree import ElementTree
 
 import pandas as pd
+
+XLSX_NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+XLSX_REL_ID = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
 
 # File starts with a ~20-line GPL copyright preamble; the header row begins
 # with "class,". Verified against the canonical train file (header at line 20).
@@ -40,6 +47,12 @@ def load_aps(filepath: str | Path, split: str = "train") -> pd.DataFrame:
     df["failure"] = (df["class"] == "pos").astype(int)
     df["vehicle_id"] = f"APS-{split}-" + df.index.astype(str)
     df["source"] = "scania_aps"
+    df.attrs.update(
+        dataset_version="local_scania_aps_release",
+        identity_type="row_identity_only",
+        label_semantics="pos=APS component failure; neg=other component failure",
+        official_split=True,
+    )
     return df
 
 
@@ -95,8 +108,7 @@ def load_kit_obd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
         df = pd.read_csv(f)
         if len(df.columns) != len(KIT_COLUMNS):
             raise ValueError(
-                f"{f.name}: expected {len(KIT_COLUMNS)} columns, "
-                f"got {len(df.columns)}"
+                f"{f.name}: expected {len(KIT_COLUMNS)} columns, got {len(df.columns)}"
             )
         df.columns = KIT_COLUMNS
         df["timestamp"] = pd.to_timedelta(
@@ -104,8 +116,16 @@ def load_kit_obd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
         ).dt.total_seconds()
         df["vehicle_id"] = f"KIT-{f.stem}"
         df["source"] = "kit_obd"
+        df.attrs.update(
+            dataset_version="KIT-OBD-II-DOI-10.35097/1130",
+            identity_type="recording_or_trip_not_verified_vehicle",
+            label_semantics="no_failure_labels",
+            official_split=False,
+        )
         dfs = dfs + [df]
-    return pd.concat(dfs, ignore_index=True)
+    result = pd.concat(dfs, ignore_index=True)
+    result.attrs.update(dfs[0].attrs)
+    return result
 
 
 def load_carobd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
@@ -140,9 +160,7 @@ def load_carobd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
     for f in files:
         header = pd.read_csv(f, nrows=0).columns.tolist()
         if len(header) != 27:
-            raise ValueError(
-                f"{f.name}: expected 27 header columns, got {len(header)}"
-            )
+            raise ValueError(f"{f.name}: expected 27 header columns, got {len(header)}")
         # usecols pins the read to the 27 named positions so the trailing
         # empty 28th field present in most rows can never shift signals.
         df = pd.read_csv(f, usecols=list(range(27)))
@@ -163,5 +181,148 @@ def load_carobd(filepath: str | Path, pattern: str = "*.csv") -> pd.DataFrame:
                 df[c] = pd.to_numeric(df[c], errors="coerce")
         df["vehicle_id"] = f"carOBD-{f.stem}"
         df["source"] = "carobd"
+        df.attrs.update(
+            dataset_version="unverified_local_carobd_candidate",
+            identity_type="recording_or_trip_not_verified_vehicle",
+            label_semantics="no_verified_failure_labels",
+            official_split=False,
+        )
         dfs = dfs + [df]
-    return pd.concat(dfs, ignore_index=True)
+    result = pd.concat(dfs, ignore_index=True)
+    result.attrs.update(dfs[0].attrs)
+    return result
+
+
+def _xlsx_column_number(cell_ref: str) -> int:
+    letters = re.match(r"[A-Z]+", cell_ref).group(0)
+    number = 0
+    for letter in letters:
+        number = number * 26 + ord(letter) - ord("A") + 1
+    return number - 1
+
+
+def _read_xlsx_rows(payload: bytes) -> list[dict[int, str]]:
+    """Read simple Tongji feature workbooks without pickle or Excel execution."""
+    with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+        shared: list[str] = []
+        if "xl/sharedStrings.xml" in archive.namelist():
+            root = ElementTree.fromstring(archive.read("xl/sharedStrings.xml"))
+            shared = [
+                "".join(item.itertext()) for item in root.findall("m:si", XLSX_NS)
+            ]
+        workbook = ElementTree.fromstring(archive.read("xl/workbook.xml"))
+        relationships = ElementTree.fromstring(
+            archive.read("xl/_rels/workbook.xml.rels")
+        )
+        relation_map = {
+            relation.attrib["Id"]: relation.attrib["Target"]
+            for relation in relationships
+            if relation.attrib.get("Type", "").endswith("/worksheet")
+        }
+        sheet = workbook.find("m:sheets/m:sheet", XLSX_NS)
+        target = relation_map[sheet.attrib[XLSX_REL_ID]].lstrip("/")
+        if not target.startswith("xl/"):
+            target = "xl/" + target
+        root = ElementTree.fromstring(archive.read(target))
+        rows: list[dict[int, str]] = []
+        for row in root.findall("m:sheetData/m:row", XLSX_NS):
+            values: dict[int, str] = {}
+            for cell in row.findall("m:c", XLSX_NS):
+                value = cell.find("m:v", XLSX_NS)
+                text = "" if value is None else value.text or ""
+                if cell.attrib.get("t") == "s" and text.isdigit():
+                    text = shared[int(text)]
+                values[_xlsx_column_number(cell.attrib["r"])] = text
+            if values:
+                rows.append(values)
+        return rows
+
+
+def _load_tongji_workbook(name: str, payload: bytes) -> pd.DataFrame:
+    rows = _read_xlsx_rows(payload)
+    if not rows:
+        return pd.DataFrame()
+    header = rows[0]
+    columns = [header[index] for index in sorted(header)]
+    records = [
+        {header[index]: row.get(index, "") for index in sorted(header)}
+        for row in rows[1:]
+    ]
+    result = pd.DataFrame.from_records(records, columns=columns)
+    for column in result.columns:
+        if column != "car_identifier":
+            result[column] = pd.to_numeric(result[column], errors="coerce")
+    path = Path(name)
+    result["source_file"] = path.name
+    result["split"] = "test" if "data_test" in path.parts else "train"
+    result["feature_kind"] = "slow" if "_slow_" in path.name else "fast"
+    if "car_identifier" in result:
+        identifier = result["car_identifier"].astype("string")
+    else:
+        identifier = pd.Series(pd.NA, index=result.index, dtype="string")
+    result["asset_id"] = identifier.fillna(path.stem)
+    result["asset_id_type"] = identifier.notna().map(
+        {True: "car_identifier", False: "file_stem"}
+    )
+    return result
+
+
+def load_tongji_rest(
+    filepath: str | Path,
+    split: str | None = None,
+    kind: str | None = None,
+) -> pd.DataFrame:
+    """Load Tongji's CC BY real-world EV features without deserializing pickles.
+
+    The release contains heterogeneous fast/slow XLSX schemas and its nominal
+    train/test directories have vehicle overlap. This loader preserves the source
+    file, split and asset identity fields so callers can enforce a vehicle-disjoint
+    split; it does not claim an RUL or future-failure target.
+    """
+    if split not in (None, "train", "test"):
+        raise ValueError("split must be None, 'train', or 'test'")
+    if kind not in (None, "fast", "slow"):
+        raise ValueError("kind must be None, 'fast', or 'slow'")
+    source = Path(filepath)
+    if not source.exists():
+        raise FileNotFoundError(f"Tongji release not found: {source}")
+    records: list[pd.DataFrame] = []
+    if source.is_dir():
+        files = sorted(source.rglob("*.xlsx"))
+        for file in files:
+            name = file.as_posix()
+            if split and ("data_test" in name) != (split == "test"):
+                continue
+            if kind and ("_slow_" in file.name) != (kind == "slow"):
+                continue
+            records.append(_load_tongji_workbook(name, file.read_bytes()))
+    elif source.suffix.lower() == ".zip":
+        with zipfile.ZipFile(source) as archive:
+            names = sorted(
+                name for name in archive.namelist() if name.endswith(".xlsx")
+            )
+            for name in names:
+                name_split = "test" if "data_test" in name else "train"
+                name_kind = "slow" if "_slow_" in name else "fast"
+                if split and name_split != split:
+                    continue
+                if kind and name_kind != kind:
+                    continue
+                records.append(_load_tongji_workbook(name, archive.read(name)))
+    else:
+        raise ValueError(f"Expected a directory or .zip archive: {source}")
+    records = [record for record in records if not record.empty]
+    if not records:
+        raise FileNotFoundError(
+            f"No Tongji XLSX files matched split={split!r}, kind={kind!r}"
+        )
+    result = pd.concat(records, ignore_index=True, sort=False)
+    result.attrs.update(
+        dataset_version="zenodo-16868546",
+        license="CC BY 4.0",
+        identity_type="car_identifier_or_source_file",
+        label_semantics="soh/capacity health proxies; no documented RUL/TTE",
+        official_split=True,
+        split_overlap_warning="GE16 and HQ05 occur in both nominal splits",
+    )
+    return result
