@@ -7,7 +7,6 @@ import random
 
 import numpy as np
 
-
 GLOBAL_SEED = 42
 
 

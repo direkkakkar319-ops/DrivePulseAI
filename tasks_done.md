@@ -142,6 +142,18 @@ Excluded pairings include KIT/carOBD/DieselOBD for RUL; KIT/carOBD for mechanica
 
 Next action: ask the 347-EV authors/publisher to confirm passenger-car body class, explain the 348 released labels versus 347 paper count, and document each sample’s vehicle-label join and prediction cutoff. Separately obtain explicit data rights for the 20-car archive. Do not train on either dataset until its applicable gate is satisfied. No backend/mobile/model-training code has been changed; Step 0 added only `ml/src/reproducibility.py`.
 
+## Workflow Step 1 — formal dataset validation
+
+**Status: ⚠️ Gate failed for a valid three-stage passenger-car chain.**
+
+- Command: `./.venv/bin/python ml/scripts/validate_datasets_step1.py`.
+- Output: `ml/reports/data_validation/step1.json`.
+- The run checked KIT and carOBD CSV schemas, missing cells, duplicate rows and timestamp ordering; Scania APS CSV labels/missingness/duplicates; DieselOBD XLSX row widths/missingness/duplicates; and tar archive inventories for 347-EV. It did not deserialize arbitrary EV pickle payloads.
+- Verified highlights: KIT 81 files/2,693,824 rows/3,653 missing cells/0 duplicates/5 backward timestamp steps; carOBD 129 files/304,299 rows/29,328 duplicates and malformed row widths; DieselOBD 118,477 train and 33,838 test rows with 90,657/26,280 duplicates; APS 60,000 train and 16,000 test rows with 1,000/375 positives and 850,015/228,680 missing tokens; 347-EV tar inventories 476,746/194,253/29,603 members.
+- Per-model verdicts are recorded in `datasets.md`: only limited anomaly exploration is partially valid; passenger-car RUL and forward failure classification are invalid; APS/Component X are truck-only; 20-car rights and 347-EV eligibility remain blocked.
+- Step 2 is now a decision gate. Recommended strategy: separate, explicitly interfaced passenger-car/EV sources, while continuing to seek a unified licensed source. No download or model training was started.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded branch/environment setup, test evidence, seed helper and MLflow limitation.
+- 2026-11-13 — Workflow Step 1: added reproducible dataset validation evidence, per-model verdicts, leakage findings, and the Step 2 strategy gate.

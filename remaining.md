@@ -6,6 +6,10 @@ This is the gap between the target in [scope.md](scope.md) and the checked-out i
 
 The Step 0 gate passed in the existing repository `.venv`: 41 ML tests pass. Use `./.venv/bin/python` for the workflow. The system Python is missing the ML dependencies, and MLflow is listed but not installed; installing or activating a different environment is a setup dependency before any MLflow-backed experiment. The global seed convention is 42 (`ml/src/reproducibility.py`).
 
+## Step 1 update
+
+The Step 1 gate failed for the intended chain. Validation evidence is in `ml/reports/data_validation/step1.json`. KIT can support only unsupervised anomaly exploration; carOBD requires provenance/schema work; DieselOBD has unresolved semantics and cross-split duplicates; APS and Component X are truck-only; the 20-car source lacks cleared data rights and independent EOL; the 347-EV source lacks confirmed passenger-car body type, complete joins, an explained count discrepancy, and a dated horizon. No RUL or forward car-failure model may start yet.
+
 ## Gap analysis
 
 | Component | Remaining work | Size / effort |
@@ -25,9 +29,10 @@ The Step 0 gate passed in the existing repository `.venv`: 41 ML tests pass. Use
 
 ## Next three steps
 
-1. **Resolve dataset eligibility before model work.** Request confirmation from the 347-EV publisher/authors about passenger-car body class, why local release labels enumerate 348 vehicles versus 347 in the paper, how PKL `car` IDs join label CSVs, and how an eligible prediction cutoff/horizon is defined. Separately obtain an explicit data-specific license/permission for the 20-car archive. Done when written evidence is recorded or the candidate is rejected. (S effort, external response time unknown.)
-2. **Complete gated validation or reject the candidate.** If written answers/permission arrive, validate all vehicle/sample joins with safe parsing, record schema and group split, and decide if the labels support the claim. Otherwise keep data quarantined and source a licensed passenger-car dataset. Done when an explicit keep/reject decision is documented. (M–L, 2–5 days plus access.)
-3. **Freeze the task contract, then start a baseline.** Select only a cleared dataset/label, define component/window schema, target horizon, vehicle-level split, and leakage exclusions. Touch ML loaders/preprocessing only after the data gate passes. Done when held-out assets and a baseline metric can be reproduced from a documented config. (L, 4–7 days.)
+1. **Choose the Step 2 dataset strategy.** Confirm the recommended per-stage passenger-car/EV strategy versus waiting for one unified source. Done when the strategy, accepted claims and download candidates are recorded in `datasets.md`. (S, 30 minutes.)
+2. **Resolve dataset eligibility before model work.** Request confirmation from the 347-EV publisher/authors about passenger-car body class, why local release labels enumerate 348 vehicles versus 347 in the paper, how PKL `car` IDs join label CSVs, and how an eligible prediction cutoff/horizon is defined. Separately obtain an explicit data-specific license/permission for the 20-car archive. Done when written evidence is recorded or the candidate is rejected. (S effort, external response time unknown.)
+3. **Complete gated validation or reject the candidate.** If written answers/permission arrive, validate all vehicle/sample joins with safe parsing, record schema and group split, and decide if the labels support the claim. Otherwise keep data quarantined and source a licensed passenger-car dataset. Done when an explicit keep/reject decision is documented. (M–L, 2–5 days plus access.)
+4. **Freeze the task contract, then start a baseline.** Select only a cleared dataset/label, define component/window schema, target horizon, vehicle-level split, and leakage exclusions. Touch ML loaders/preprocessing only after the data gate passes. Done when held-out assets and a baseline metric can be reproduced from a documented config. (L, 4–7 days.)
 
 ## Phased plan
 
@@ -96,6 +101,9 @@ The current app already has navigation, auth/profile integration, vehicle forms,
 
 No request from Step 0. Backend and mobile were not modified.
 
+Step 1 adds no backend/mobile request; model output contracts remain unchanged because no model was trained.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded the environment gate, interpreter requirement, seed convention, and no backend/mobile requests.
+- 2026-11-13 — Step 1: recorded the failed data gate, validation evidence, strategy decision point, and updated next steps.

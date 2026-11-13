@@ -6,6 +6,23 @@ Audit date: 2026-11-13. Local dataset counts and validation notes below are from
 
 ## Part A — datasets currently present or referenced
 
+### Formal Step 1 validation run — 2026-11-13
+
+Command: `./.venv/bin/python ml/scripts/validate_datasets_step1.py`. The non-mutating output is [step1.json](ml/reports/data_validation/step1.json). The script parses CSV/XLSX structure, counts missing and duplicate rows, checks KIT/carOBD timestamp order, inventories the tar archives without deserializing EV pickles, and records absent references. Existing full-join evidence for Component X and the 20-car archive is cited from `tasks_done.md`.
+
+| Dataset | Structural evidence | Anomaly Detection | RUL / Health | Failure Classification | Cars-only disposition |
+|---|---|---|---|---|---|
+| KIT Automotive OBD-II | 81 files; 2,693,824 rows; 11 columns/file; 3,653 missing cells; 0 duplicate rows; 5 backward timestamp steps; no official split or mechanical labels. | 🟡 **Partially valid** for unsupervised Seat Leon telemetry novelty only. | ❌ **Invalid**; no degradation or endpoint. | ❌ **Invalid**; road-condition names are not failure labels. | Keep only as a separate exploratory anomaly benchmark. |
+| carOBD candidate | 129 files; 304,299 rows; 27-column headers; row widths include 28-field trailing-empty records, 17/18/23-field truncated rows; 29,328 duplicate rows; no timestamp/vehicle identity or official split. | 🟡 **Partially valid** only after provenance and schema decisions. | ❌ **Invalid**; no RUL/event target. | ❌ **Invalid**; no verified failure target and no independent units. | Retain raw for audit; do not train a validated model. |
+| DieselOBD workbooks | 118,477 train and 33,838 test rows; 27 columns including a blank column; 90,657 train and 26,280 test duplicate rows. Prior audit found 173 exact rows shared across splits. Source, labels, units and vehicle IDs are unverified. | ❓ **Cannot determine**; automotive-looking signals are not enough. | ❌ **Invalid**; no time-to-event target. | ❌ **Invalid**; target semantics and split identity are unverified. | Exclude from model work pending provenance and label evidence. |
+| Scania APS | 60,000 train (1,000 pos/59,000 neg), 16,000 test (375 pos/15,625 neg); 170 anonymized features; 850,015/228,680 `na` cells; no duplicate rows; no vehicle/time IDs. `neg` means another component failed, not healthy. | ❌ **Invalid** for unsupervised anomaly evaluation. | ❌ **Invalid**; no trajectories/TTE. | ⚠️ **Partial only** for the narrow heavy-truck APS-vs-other-component task; invalid for this passenger-car product. | Keep only as an explicitly separate truck benchmark. |
+| SCANIA Component X v3 | Official files are present and the detailed join/split audit is in `tasks_done.md` Step 2; all IDs/splits joined there. | ❌ **Invalid for car claims**; heavy truck. | ⚠️ **Technically usable only for truck TTE**, outside scope. | ❌ **Invalid for car claims**; truck component labels. | Exclude from this project’s training and performance claims. |
+| 20-car BAIC EU500 capacity archive | 20 vehicle archives; 16,100,728 rows/11 fields from prior full stream audit; capacity is derived from current/SOC; no official split or independent EOL label; data rights unresolved. | 🟡 **Partial** battery novelty only, no fault truth; rights block use. | ⚠️ **Partial for SOH/capacity forecasting**, ❌ for observed RUL; rights block use. | ❌ **Invalid**; no failure/EOL label. | Keep quarantined until data-specific rights are obtained. |
+| 347-EV Figshare archive | Three CC BY 4.0 archives; 700,587 PKL members; seven battery fields plus timestamp; local labels enumerate 348 IDs/55 abnormal/293 normal versus paper 347/55/292. Passenger-car body style, complete joins and event horizon unresolved. | 🟡 **Partial** pending passenger-car and join/count clarification. | ❌ **Invalid**; no verified TTE/EOL target. | 🟡 **Partial** only for grouped vehicle-level abnormality; ❌ for forward failure-within-horizon prediction. | Keep raw audit copy; no training until the open gates pass. |
+| AI4I / C-MAPSS / VED dynamic references | No local raw files found by the run. AI4I is synthetic industrial; C-MAPSS is simulated aircraft; VED dynamic telemetry is absent. | ❌ **Invalid for car claims**. | ❌ **Invalid for car claims** (C-MAPSS is aircraft). | ❌ **Invalid for car claims**. | Do not download or relabel as automotive without a separate strategy decision. |
+
+The formal run did not fabricate labels, vehicle IDs, timestamps, or sampling rates. No dataset passes all three model requirements, so the Step 1 gate fails for the intended chain.
+
 ### Current local raw datasets
 
 | Dataset / local source | Size, schema, labels, units | Per-model verdict | Verdict |
@@ -57,6 +74,16 @@ The paper says near-failure data were removed so detection could occur ahead of 
 3. **Failure Classification: CHANGE for passenger-car claims.** Scania APS and Component X labels are truck-only. KIT/carOBD lack verified future mechanical failure labels. A passenger-car/EV failure source must specify observed subsystem events, prediction horizon and censoring/negative follow-up; do not use AI4I as automotive evidence.
 
 **Combined verdict:** no consistent passenger-car/EV dataset story supports the entire chain yet. Component X v3 is well-formed for a separate truck-component study but explicitly out of scope here. KIT can support only car telemetry novelty exploration; Scania APS cannot support car classification. These datasets must remain separate and must not be joined into a car performance claim.
+
+## Step 2 strategy decision pending
+
+The gate requires a user decision before any new download. Options are:
+
+1. **Unified passenger-EV source:** preferred if a source supplies battery telemetry, independent degradation/health targets and dated failure outcomes for the same vehicles. None currently verified in this repository.
+2. **Per-stage passenger-car/EV sources with an explicit interface:** use KIT only for unsupervised anomaly exploration, a rights-cleared EV capacity/SOH source for health forecasting, and a separately verified vehicle-level failure source. This supports separate benchmarks and software handoff tests, but cannot support one empirical chained performance claim across different assets.
+3. **Surrogate source:** use Component X or C-MAPSS for method debugging only. This is not acceptable evidence for passenger-car performance.
+
+**Recommended strategy:** choose option 2 while continuing to search for a unified source. Do not download another large or restricted dataset until you confirm this strategy. The first product claim should be passenger-EV battery anomaly/capacity health, with RUL and forward failure classification explicitly deferred until independent event labels and rights are available.
 
 ## Part C — candidate dataset sources
 
@@ -129,3 +156,7 @@ The acquired 20-car data remains quarantined from model work pending data-specif
 - Local carOBD source/license and DieselOBD origin/labels remain unverified; do not infer them from directory names. The 20-car EV repository’s MIT LICENSE covers software/documentation wording, while a separate license or permission for vehicle data was not found. The 347-EV source is CC BY 4.0, but passenger-car body style, the paper/release count discrepancy and exhaustive joins remain unverified.
 - The current local tree has no raw AI4I, C-MAPSS, NASA battery or VED data. Component X v3 and the 20-car EV capacity archives are present under `data/automotive_prognostics/`; historical inventory details are from `data/README.md`, notebooks and branches where applicable.
 - HCRL and XJTU-SY source pages were checked for dataset description/access, but no explicit reuse license was verified.
+
+## Change log
+
+- 2026-11-13 — Step 1: added the reproducible structural validation run, per-model verdict table, failed gate, and Step 2 strategy options.

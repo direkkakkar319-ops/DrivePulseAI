@@ -15,6 +15,18 @@
 
 Step 0 gate: **pass** using the existing `.venv`; the system interpreter alone is not a valid ML environment. Step 1 dataset validation is next.
 
+## Step 1 — dataset validation (2026-11-13)
+
+**Status: ⚠️ Gate failed for the intended three-stage passenger-car chain.**
+
+- Validation command: `./.venv/bin/python ml/scripts/validate_datasets_step1.py`; evidence: `ml/reports/data_validation/step1.json`.
+- KIT is 🟡 partial for unsupervised car telemetry novelty only. carOBD is 🟡 partial pending provenance/schema resolution. DieselOBD is ❓/❌ because source, labels, units, IDs and split identity are unverified and the prior audit found 173 rows shared across train/test. Scania APS is ⚠️ only for its narrow heavy-truck APS classification task. Component X is technically prognostic truck data but out of the passenger-car scope. The 20-car archive has derived capacity/SOH targets but unresolved rights and no EOL label. The 347-EV archive has weak vehicle-level abnormality labels, an unresolved 347/348 count discrepancy, and unverified passenger-car body type.
+- No current dataset is valid for passenger-car RUL and no current dataset is valid for independent forward passenger-car failure prediction. No dataset supports all three stages with aligned labels. AI4I, C-MAPSS and VED dynamic data are absent locally and remain out-of-domain or unverified references.
+- Leakage findings recorded: no independent unit/time IDs in APS; `neg` is not healthy; carOBD/DieselOBD lack verified unit identity; DieselOBD has cross-split identical rows; KIT has no fault label; 20-car capacity is derived from the same charge window; 347-EV labels are vehicle-level and not dated events.
+- Step 1 gate: **fail**. Step 2 requires a dataset strategy decision before any new download. Recommended option: per-stage passenger-car/EV datasets with explicit interfaces, while continuing to seek one unified licensed source.
+
+Milestone M1 remains 🟡 Partial at **50%**: the validation run is reproducible, but the car-only data contract is not accepted for RUL/failure.
+
 ## Repository map
 
 Top-level directories: `.agents/`, `.aws/`, `.codex/`, `.github/`, `backend/`, `data/`, `docs/`, `frontend/`, `ml/`, `mobile/`, `scripts/`, `simulator/`; root configs include `.env.example`, `requirements.txt`, `docker-compose.yml`, `docker-compose.dev.yml`, `.pre-commit-config.yaml`, and `LICENSE`. Generated/local directories also present: `.venv`, `.pytest_cache`, `.ruff_cache`, `backend/.venv`, `backend/node_modules`, `frontend/node_modules`, `frontend/.next*`, `mobile/node_modules`, and `mobile/.expo` (environment/runtime, not source components). No Dockerfile found in the current file inventory; compose files exist.
@@ -167,7 +179,7 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 - **Hardcoded paths/seeds:** APS script uses repo-derived default path and fixed seed 42; old mapping loaders reportedly use synthetic row IDs and whole-input stats (`data/README.md`). No seed configuration/reproducibility manifest across all stages.
 - **Synthetic data:** AI4I family itself is synthetic and industrial; local derivative source/version/license is unverified per `data/README.md`. Simulator profiles generate synthetic signals (`simulator/src/`); these are not real vehicle faults.
 - **Artifacts:** three APS bundles are saved, unlike anomaly/RUL. No `.pt`/`.onnx`, MLflow run, registry, or end-to-end inference bundle found.
-- **Repository state:** many tracked paths were modified before audit began; reported current-tree conclusions may differ from pristine `9d79a59`. No source modifications were made by this audit.
+- **Repository state:** many tracked paths were modified before audit began; reported current-tree conclusions may differ from pristine `9d79a59`. Step 0 added only the shared seed helper; no backend/mobile/model-training code was changed.
 
 
 ## Dataset audit update — 2026-11-13
@@ -179,3 +191,4 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 ## Change log
 
 - 2026-11-13 — Step 0: recorded the reproducible environment baseline, test result, branch, seed convention, and dependency/tracking limitation.
+- 2026-11-13 — Step 1: recorded the validation command/output, dataset verdicts, leakage findings, failed gate, and Step 2 decision requirement.
