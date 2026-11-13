@@ -1,0 +1,8 @@
+# Exact packages used by the Step 0 environment check (Python 3.12, Linux x86_64).
+# Generated from the existing local .venv; update deliberately when the
+# environment changes. The broader install surface remains in requirements.txt.
+numpy==2.4.6
+pandas==2.3.3
+scikit-learn==1.7.2
+xgboost==3.4.0
+pytest==9.1.1
