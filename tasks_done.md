@@ -153,7 +153,29 @@ Next action: ask the 347-EV authors/publisher to confirm passenger-car body clas
 - Per-model verdicts are recorded in `datasets.md`: only limited anomaly exploration is partially valid; passenger-car RUL and forward failure classification are invalid; APS/Component X are truck-only; 20-car rights and 347-EV eligibility remain blocked.
 - Step 2 is now a decision gate. Recommended strategy: separate, explicitly interfaced passenger-car/EV sources, while continuing to seek a unified licensed source. No download or model training was started.
 
+## Workflow Step 2 — confirmed strategy and passenger-EV replacement audit
+
+Date: 2026-11-13. The user confirmed the recommended strategy: separate passenger-car/EV datasets with explicit interfaces, while continuing to seek a unified licensed source. No backend/mobile files were touched.
+
+### Tongji acquisition and audit
+
+- Added reproducible downloader `scripts/download_tongji_rest.py`; it fetched the official Zenodo record 16868546 archive to `data/automotive_prognostics/tongji_rest/v1/raw/data.zip` and verified the expected 129,606,252 bytes and MD5 `88c3832d748c0adf8caa94173aada563`.
+- Verified SHA-256: `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`. The raw archive remains unchanged and ignored by Git. Added provenance at `data/automotive_prognostics/tongji_rest/v1/README.md`.
+- Added `ml/scripts/audit_tongji_rest.py` and generated `ml/reports/data_validation/step2_tongji_rest.json`. It parsed the XLSX XML without installing openpyxl: 154 XLSX files, 26,450 data rows, 148 train files, 6 test files, 78 car identifiers, 123–184-column schema variants, and fast/slow feature families.
+- Leakage/quality findings: `GE16` and `HQ05` appear in both nominal train and test directories; only `P215` is test-only. The audit counted 39 backward `t_start` steps (30 train-fast, 9 train-slow). `soh`/capacity are health proxies, not a documented run-to-end-of-life or future-failure target. Verdict: candidate SOH/health regression or battery novelty only after a vehicle-disjoint split; not valid RUL or forward failure data.
+
+### Shenzhen metadata verification and blocked acquisition
+
+- Added `scripts/download_shenzhen_ev_fault.py`, `ml/scripts/audit_shenzhen_metadata.py`, and `data/automotive_prognostics/shenzhen_ev_fault/v3/README.md`.
+- Official Mendeley snapshot/API confirmed CC BY 4.0, version 3, two XLSX files, 21,175 charging sequences, 1,547,432 one-minute samples, 10,154 EVs and `label=1` faulty battery / `0` normal. The archive metadata reports 207,174,326 bytes and SHA-256 `6b5c77c331e173ac6cab7a0ff2791320cb4fe4c3ffbe9d90205902dbc703eac3`.
+- The official S3 asset returned HTTP 403 after repeated direct/API attempts. No partial file was retained. Exact URL to fetch manually if access is restored: `https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/c7gg94tmvz-3.zip`. This is a metadata-only candidate until the files are acquired and audited. Its label is contemporaneous battery fault, not RUL/TTE.
+
+### Gate result
+
+Step 2 is **🟡 partial / gate failed for the complete three-stage chain**. The multi-source strategy is recorded, but no passenger-car run-to-failure/TTE source exists and the Shenzhen files are inaccessible. No model training began. The next decision is whether to revise the scope to battery SOH plus contemporaneous fault classification or keep searching for a licensed car/EV EOL/TTE source.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded branch/environment setup, test evidence, seed helper and MLflow limitation.
 - 2026-11-13 — Workflow Step 1: added reproducible dataset validation evidence, per-model verdicts, leakage findings, and the Step 2 strategy gate.
+- 2026-11-13 — Workflow Step 2: recorded the confirmed multi-source strategy, Tongji acquisition/audit, Shenzhen metadata verification and HTTP 403 block, and the failed complete-chain gate.

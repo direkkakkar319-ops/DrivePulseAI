@@ -1,0 +1,29 @@
+{
+  "source": "Mendeley Data DOI 10.17632/c7gg94tmvz.3",
+  "api_snapshot": "https://data.mendeley.com/public-api/datasets/c7gg94tmvz/snapshot/3",
+  "archive_api": "https://data.mendeley.com/api/datasets-v2/datasets/c7gg94tmvz/zip?version=3",
+  "license": "CC BY 4.0",
+  "publish_date": "2024-10-08T06:47:45.472Z",
+  "archive": {
+    "url": "https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/c7gg94tmvz-3.zip",
+    "size": 207174326,
+    "sha256_hash": "6b5c77c331e173ac6cab7a0ff2791320cb4fe4c3ffbe9d90205902dbc703eac3",
+    "status": "FINISH",
+    "created_on": "2024-10-08T06:48:00.561343",
+    "modified_on": "2024-10-08T07:10:11.437335"
+  },
+  "metadata_assertions": {
+    "charging_sequences": 21175,
+    "sampling_points": 1547432,
+    "ev_count": 10154,
+    "sampling_interval": "1 minute",
+    "label_definition": "1=faulty battery, 0=normal",
+    "files": [
+      "processed_data.xlsx",
+      "processed_data_longer_than_30.xlsx"
+    ],
+    "description_contains_expected_counts": true
+  },
+  "acquisition_status": "blocked_http_403_from_official_s3_asset",
+  "raw_asset_present": false
+}

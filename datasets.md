@@ -157,6 +157,29 @@ The acquired 20-car data remains quarantined from model work pending data-specif
 - The current local tree has no raw AI4I, C-MAPSS, NASA battery or VED data. Component X v3 and the 20-car EV capacity archives are present under `data/automotive_prognostics/`; historical inventory details are from `data/README.md`, notebooks and branches where applicable.
 - HCRL and XJTU-SY source pages were checked for dataset description/access, but no explicit reuse license was verified.
 
+## Step 2 — passenger-car/EV replacement audit
+
+**Status: 🟡 Partial; strategy confirmed, one health/SOH source acquired, failure source acquisition blocked, and no valid car RUL/TTE source found.**
+
+### Tongji real-world EV SOH release
+
+- Source/version/license: Zenodo record 16868546, DOI `10.5281/zenodo.16868546`, CC BY 4.0. Raw archive is unchanged at `data/automotive_prognostics/tongji_rest/v1/raw/data.zip`; provenance and checksums are in that folder's README.
+- Reproducible audit: `./.venv/bin/python ml/scripts/audit_tongji_rest.py`; output `ml/reports/data_validation/step2_tongji_rest.json`.
+- Audit result: 154 XLSX files, 26,450 data rows, 148 train files and 6 test files. The files expose fast/slow feature families with 123–184 columns and fields such as `t_start`, `t_end`, `mileage`, SOC, voltage, capacity, `soh`, internal-resistance/voltage statistics and battery feature summaries. The archive contains 78 `car_identifier` values.
+- Split/leakage result: the nominal train/test directories are not independent-vehicle splits. `GE16` and `HQ05` occur in both; only `P215` is test-only. The audit also counted 39 backward `t_start` steps (30 train-fast, 9 train-slow). These must be removed from any claimed held-out evaluation.
+- Target verdict: `soh` and capacity are measured/derived health proxies, not a documented run-to-end-of-life event. No future-failure horizon, censoring rule, or mechanical component label is present. **Anomaly: 🟡 partial for battery-signal novelty; RUL: ❌ invalid as observed RUL; health/SOH regression: 🟡 usable only after a vehicle-disjoint split; failure: ❌ invalid.**
+
+### Shenzhen EV charging-fault release
+
+- Official Mendeley snapshot and archive API were checked by `ml/scripts/audit_shenzhen_metadata.py`; output `ml/reports/data_validation/step2_shenzhen_ev_fault.json`. The metadata confirms CC BY 4.0, release v3, two XLSX files, 21,175 charging sequences, 1,547,432 one-minute samples, 10,154 EVs, and `label=1` faulty battery / `0` normal.
+- The release is a contemporaneous battery-fault classification source, not a documented future failure-within-horizon or RUL source. Passenger-car status is supported by the Astrolabe registry but is not explicit in the primary Mendeley description; this remains a caveat until file-level inspection.
+- The official API advertised a 207,174,326-byte ZIP and SHA-256 `6b5c77c331e173ac6cab7a0ff2791320cb4fe4c3ffbe9d90205902dbc703eac3`. The returned S3 URL produced HTTP 403 after repeated direct/API attempts, so no raw file or partial download was retained. **Failure: 🟡 potentially valid only for contemporaneous battery-fault classification after acquisition and vehicle-disjoint audit; RUL: ❌; anomaly: 🟡 only if labels/events can be mapped.**
+
+### Step 2 gate and data-contract consequence
+
+The recommended multi-source strategy is accepted for separate benchmarks: KIT remains an unsupervised OBD novelty benchmark; Tongji is a candidate SOH/health regression benchmark; Shenzhen is a candidate battery-fault benchmark once the official asset can be fetched. They must not be joined as if they represent the same vehicles or used for one end-to-end performance claim. The Step 2 gate for the intended three-stage chain remains **failed** because no passenger-car run-to-failure/TTE target and no acquired, audited forward-failure dataset exists. Step 3 model training is therefore blocked until the scope is explicitly reduced to SOH plus contemporaneous fault classification or a licensed car/EV TTE source is found.
+
 ## Change log
 
 - 2026-11-13 — Step 1: added the reproducible structural validation run, per-model verdict table, failed gate, and Step 2 strategy options.
+- 2026-11-13 — Step 2: user confirmed separate passenger-car/EV sources with explicit interfaces; acquired and audited Tongji under CC BY 4.0, verified Shenzhen metadata but recorded the official S3 download as HTTP 403-blocked.

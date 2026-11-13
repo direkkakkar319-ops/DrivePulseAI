@@ -44,7 +44,7 @@ Data tree summary: current data folders include `data/automotive_failure/scania_
 
 ## Overall completion estimate
 
-**20% complete for the passenger-car/EV target.** This is an audit estimate, not a measurement of product quality. Rubric: data 25% × 5% = 1.25 points; models 35% × average 6.7% (anomaly 0%, RUL 0%, failure-classification code 20%) = 2.33; backend 15% × 35% = 5.25; Android 15% × 65% = 9.75; tests/docs/deploy 10% × 16.5% = 1.65. Total = 1.25 + 2.33 + 5.25 + 9.75 + 1.65 = **20.2%** (rounded to 20%). Model credit reflects code artifact only: the existing failure baseline is Scania heavy-truck APS, outside the car domain, and earns no car validation credit.
+**21% complete for the passenger-car/EV target.** This is an audit estimate, not a measurement of product quality. Rubric: data 25% × 10% = 2.50 points; models 35% × average 6.7% (anomaly 0%, RUL 0%, failure-classification code 20%) = 2.33; backend 15% × 35% = 5.25; Android 15% × 65% = 9.75; tests/docs/deploy 10% × 16.5% = 1.65. Total = 2.50 + 2.33 + 5.25 + 9.75 + 1.65 = **21.48%** (rounded to 21%). The data score increased only for reproducible acquisition/audit; no car model validation credit is claimed.
 
 ## Milestone table
 
@@ -188,7 +188,17 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 - **20-car BAIC EU500 capacity dataset:** ⚠️ Rights remain unresolved. The public repository has an MIT LICENSE whose grant refers to software/documentation; no separate data license or data-specific permission was found. Keep raw archives quarantined from training and redistribution.
 - **Model readiness:** no model training was performed. The 347-EV data may be considered for narrow vehicle-level battery abnormality work only after passenger-car status, count discrepancy and joins are clarified; it is not RUL data. The 20-car data cannot be used for capacity/SOH work until data rights are resolved.
 
+## Step 2 — dataset replacement and audit (2026-11-13)
+
+**Status: 🟡 Partial; gate failed for the complete chain.**
+
+- User confirmed the recommended strategy: separate passenger-car/EV datasets with explicit stage interfaces. No cross-domain performance claim is made.
+- Tongji Zenodo record 16868546 was acquired reproducibly with `scripts/download_tongji_rest.py`. The raw 129,606,252-byte archive is checksum-verified (MD5 `88c3832d748c0adf8caa94173aada563`; SHA-256 `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`) and remains ignored/unmodified. `ml/scripts/audit_tongji_rest.py` found 154 XLSX files, 26,450 data rows, 78 car identifiers, 123–184-column schema variants, and train/test vehicle overlap (`GE16`, `HQ05`). It is a candidate SOH/health benchmark, not verified RUL/TTE.
+- Shenzhen Mendeley DOI `10.17632/c7gg94tmvz.3` metadata was verified by `ml/scripts/audit_shenzhen_metadata.py`: CC BY 4.0, 207,174,326-byte release, 21,175 sequences, 1,547,432 samples, 10,154 EVs, and `1=faulty battery/0=normal`. The official S3 asset returned HTTP 403 in this environment; no raw file was retained, so no model training is authorized from it.
+- No passenger-car run-to-failure/TTE source was found. No model training or backend/mobile edits were performed. Step 3 is blocked until the project either approves a health/SOH-plus-contemporaneous-fault scope or acquires a legally usable car/EV event-labeled RUL source.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded the reproducible environment baseline, test result, branch, seed convention, and dependency/tracking limitation.
 - 2026-11-13 — Step 1: recorded the validation command/output, dataset verdicts, leakage findings, failed gate, and Step 2 decision requirement.
+- 2026-11-13 — Step 2: confirmed the multi-source strategy, acquired/audited Tongji, verified Shenzhen metadata, documented HTTP 403 acquisition blockage, and kept model training gated.

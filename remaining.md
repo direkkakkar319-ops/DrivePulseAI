@@ -10,15 +10,19 @@ The Step 0 gate passed in the existing repository `.venv`: 41 ML tests pass. Use
 
 The Step 1 gate failed for the intended chain. Validation evidence is in `ml/reports/data_validation/step1.json`. KIT can support only unsupervised anomaly exploration; carOBD requires provenance/schema work; DieselOBD has unresolved semantics and cross-split duplicates; APS and Component X are truck-only; the 20-car source lacks cleared data rights and independent EOL; the 347-EV source lacks confirmed passenger-car body type, complete joins, an explained count discrepancy, and a dated horizon. No RUL or forward car-failure model may start yet.
 
+## Step 2 update
+
+The strategy decision is complete: use separate passenger-car/EV sources with explicit interfaces and never combine domains into one performance claim. Tongji is acquired and audited as a candidate SOH/health source, but its official train/test directories overlap on two vehicle IDs and it has no documented EOL/TTE target. Shenzhen metadata is verified as CC BY 4.0 with a battery-fault label, but the official 207 MB archive is blocked by HTTP 403 in this environment. The complete-chain gate therefore remains failed; no model training has started.
+
 ## Gap analysis
 
 | Component | Remaining work | Size / effort |
 |---|---|---:|
 | Scope/data decision | Domain frozen to passenger cars/EVs; choose initial subsystem and intended product claim; reconcile PR #49 two-task proposal and PR #50 battery anomaly demo | S–M, 1–2 days |
-| Dataset acquisition/governance | Resolve 347-EV body style, 347/348 label discrepancy, full sample joins and horizon; get explicit 20-car data rights; find verified car RUL/event labels. Component X v3 is truck-only and excluded. | L, 5–10 days plus external response delay |
+| Dataset acquisition/governance | Resolve 347-EV body style, 347/348 label discrepancy, full sample joins and horizon; get explicit 20-car data rights; obtain the Shenzhen archive or record it as inaccessible; find verified car RUL/event labels. Component X v3 is truck-only and excluded. | L, 5–10 days plus external response delay |
 | Preprocessing | Rewrite/validate schema-specific loaders, time/ID semantics, windowing, train-only imputation/scaling, trip/asset split protocols; deprecate cross-domain aliases | L, 4–7 days |
 | Anomaly | Implement component/vehicle anomaly pipeline, calibration and metrics; use KIT/verified Nissan Leaf where suitable; record unsupervised limitation | M, 3–5 days |
-| RUL / health | Do not model on 20-car data until data rights are granted; if resolved, choose capacity/SOH forecasting versus true EOL-based RUL. Obtain independent EOL labels for RUL and evaluate by held-out vehicle. | L, 5–8 days after rights/data decision |
+| RUL / health | Do not model on 20-car data until data rights are granted. Tongji can support an SOH/health regression baseline only after a vehicle-disjoint split; it does not supply RUL/TTE. Obtain independent EOL labels for true RUL and evaluate by held-out vehicle. | L, 5–8 days after rights/data decision |
 | Failure classification | Hold 347-EV data until car body type, count discrepancy, complete label joins and cutoff/horizon are clarified; then decide if narrow vehicle-level abnormality classification is valid. Obtain dated car failure events for forward-horizon claims. | L, 5–8 days after clarification |
 | Chained inference | Freeze stage contracts, train with pipeline-generated out-of-fold upstream predictions, orchestrate, version and test end to end | L, 5–8 days |
 | Backend/API | Implement telemetry, vehicles and assessment CRUD/inference endpoints; persist result; authz; error/readiness behavior; integration tests | L, 5–8 days |
@@ -29,10 +33,9 @@ The Step 1 gate failed for the intended chain. Validation evidence is in `ml/rep
 
 ## Next three steps
 
-1. **Choose the Step 2 dataset strategy.** Confirm the recommended per-stage passenger-car/EV strategy versus waiting for one unified source. Done when the strategy, accepted claims and download candidates are recorded in `datasets.md`. (S, 30 minutes.)
-2. **Resolve dataset eligibility before model work.** Request confirmation from the 347-EV publisher/authors about passenger-car body class, why local release labels enumerate 348 vehicles versus 347 in the paper, how PKL `car` IDs join label CSVs, and how an eligible prediction cutoff/horizon is defined. Separately obtain an explicit data-specific license/permission for the 20-car archive. Done when written evidence is recorded or the candidate is rejected. (S effort, external response time unknown.)
-3. **Complete gated validation or reject the candidate.** If written answers/permission arrive, validate all vehicle/sample joins with safe parsing, record schema and group split, and decide if the labels support the claim. Otherwise keep data quarantined and source a licensed passenger-car dataset. Done when an explicit keep/reject decision is documented. (M–L, 2–5 days plus access.)
-4. **Freeze the task contract, then start a baseline.** Select only a cleared dataset/label, define component/window schema, target horizon, vehicle-level split, and leakage exclusions. Touch ML loaders/preprocessing only after the data gate passes. Done when held-out assets and a baseline metric can be reproduced from a documented config. (L, 4–7 days.)
+1. **Resolve the data contract.** Decide whether to revise the product to battery SOH + contemporaneous fault classification or continue searching for a licensed passenger-car EOL/TTE source. Done when `scope.md`, `datasets.md` and accepted label/horizon definitions agree. (S–M, 1–2 days.)
+2. **Close the candidate gates.** Obtain written 347-EV body/join/horizon confirmation, explicit 20-car data rights, and either the Shenzhen archive or a documented rejection because the official asset remains inaccessible. Done when each candidate has keep/reject status and provenance. (M, 2–5 days plus external response.)
+3. **Implement only an approved baseline.** If SOH scope is approved, add a vehicle-disjoint Tongji loader/split and a simple health regression baseline; if true RUL is retained, do not train until an EOL/TTE source passes validation. Done when a held-out-vehicle metric and leakage report are reproducible. (L, 4–7 days after decision.)
 
 ## Phased plan
 
@@ -107,3 +110,4 @@ Step 1 adds no backend/mobile request; model output contracts remain unchanged b
 
 - 2026-11-13 — Step 0: recorded the environment gate, interpreter requirement, seed convention, and no backend/mobile requests.
 - 2026-11-13 — Step 1: recorded the failed data gate, validation evidence, strategy decision point, and updated next steps.
+- 2026-11-13 — Step 2: recorded the confirmed multi-source strategy, Tongji audit, Shenzhen HTTP 403 blocker, and revised next steps.
