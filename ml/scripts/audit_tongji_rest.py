@@ -91,6 +91,7 @@ def main() -> None:
     }
     aggregate_rows: Counter[str] = Counter()
     aggregate_units: dict[str, set[str]] = defaultdict(set)
+    aggregate_asset_rows: Counter[tuple[str, str]] = Counter()
     aggregate_headers: dict[str, set[tuple[str, ...]]] = defaultdict(set)
     aggregate_soh: dict[str, list[float]] = defaultdict(list)
     aggregate_cap: dict[str, list[float]] = defaultdict(list)
@@ -129,8 +130,12 @@ def main() -> None:
                 identifier = next(
                     (i for i, value in names.items() if value == "car_identifier"), None
                 )
-                if identifier is not None and row.get(identifier, ""):
-                    aggregate_units[split].add(row[identifier])
+                asset_id = row.get(identifier, "") if identifier is not None else ""
+                if asset_id:
+                    aggregate_units[split].add(asset_id)
+                else:
+                    asset_id = pathlib.PurePosixPath(name).stem
+                aggregate_asset_rows[(split, asset_id)] += 1
                 time_index = next(
                     (i for i, value in names.items() if value == "t_start"), None
                 )
@@ -146,6 +151,16 @@ def main() -> None:
             aggregate_headers[key].add(tuple(header.values()))
             aggregate["files"][name] = stats
 
+    evaluation_ids = {
+        asset_id
+        for (source_split, asset_id) in aggregate_asset_rows
+        if source_split == "test"
+    }
+    effective_rows: Counter[str] = Counter()
+    for (source_split, asset_id), row_count in aggregate_asset_rows.items():
+        partition = "test" if asset_id in evaluation_ids else "train"
+        effective_rows[partition] += row_count
+
     summary: dict[str, object] = {
         "xlsx_files": len(aggregate["files"]),
         "rows_by_split_and_kind": dict(aggregate_rows),
@@ -155,6 +170,23 @@ def main() -> None:
         "car_id_overlap_train_test": sorted(
             aggregate_units["train"] & aggregate_units["test"]
         ),
+        "vehicle_disjoint_partition": {
+            "protocol": "all rows for a known vehicle in the official test directory are assigned to evaluation; unidentified files retain file-stem identity",
+            "train_asset_count": len(
+                {
+                    asset_id
+                    for source_split, asset_id in aggregate_asset_rows
+                    if source_split == "train"
+                }
+                - evaluation_ids
+            ),
+            "evaluation_asset_ids": sorted(evaluation_ids),
+            "evaluation_asset_count": len(evaluation_ids),
+            "rows_by_partition": dict(effective_rows),
+            "source_train_overlap_assets_moved_to_evaluation": sorted(
+                aggregate_units["train"] & evaluation_ids
+            ),
+        },
         "header_variants_by_split_and_kind": {
             key: len(value) for key, value in aggregate_headers.items()
         },

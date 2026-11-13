@@ -12,7 +12,7 @@ The Step 1 gate failed for the intended chain. Validation evidence is in `ml/rep
 
 ## Step 2 update
 
-The strategy decision is complete: use separate passenger-car/EV sources with explicit interfaces and never combine domains into one performance claim. Tongji is acquired and audited as a candidate SOH/health source, but its official train/test directories overlap on two vehicle IDs and it has no documented EOL/TTE target. Shenzhen metadata is verified as CC BY 4.0 with a battery-fault label, but the official 207 MB archive is blocked by HTTP 403 in this environment. The complete-chain gate therefore remains failed; no model training has started.
+The strategy decision is complete: use separate passenger-car/EV sources with explicit interfaces and never combine domains into one performance claim. Tongji is acquired and audited as a candidate SOH/health source; the loader now groups all records by vehicle, moving `GE16` and `HQ05` fully into its three-vehicle evaluation partition. It has no documented EOL/TTE target. Shenzhen metadata is verified as CC BY 4.0 with a battery-fault label, but the official 207 MB archive remains blocked by HTTP 403. The complete-chain gate therefore remains failed; no model training has started.
 
 ## Gap analysis
 
@@ -20,7 +20,7 @@ The strategy decision is complete: use separate passenger-car/EV sources with ex
 |---|---|---:|
 | Scope/data decision | Domain frozen to passenger cars/EVs; choose initial subsystem and intended product claim; reconcile PR #49 two-task proposal and PR #50 battery anomaly demo | S–M, 1–2 days |
 | Dataset acquisition/governance | Resolve 347-EV body style, 347/348 label discrepancy, full sample joins and horizon; get explicit 20-car data rights; obtain the Shenzhen archive or record it as inaccessible; find verified car RUL/event labels. Component X v3 is truck-only and excluded. | L, 5–10 days plus external response delay |
-| Preprocessing/loaders | Complete schema-specific loaders, time/ID semantics, windowing, train-only imputation/scaling, trip/asset split protocols; deprecate cross-domain aliases. Tongji loader contract is now implemented, but vehicle-disjoint split enforcement remains. | L, 3–6 days |
+| Preprocessing/loaders | Complete schema-specific loaders, time/ID semantics, windowing, train-only imputation/scaling, trip/asset split protocols; deprecate cross-domain aliases. Tongji vehicle-disjoint split enforcement is implemented; schema-specific loader work remains gated on acquired/audited assets. | L, 3–6 days |
 | Anomaly | Implement component/vehicle anomaly pipeline, calibration and metrics; use KIT/verified Nissan Leaf where suitable; record unsupervised limitation | M, 3–5 days |
 | RUL / health | Do not model on 20-car data until data rights are granted. Tongji can support an SOH/health regression baseline only after a vehicle-disjoint split; it does not supply RUL/TTE. Obtain independent EOL labels for true RUL and evaluate by held-out vehicle. | L, 5–8 days after rights/data decision |
 | Failure classification | Hold 347-EV data until car body type, count discrepancy, complete label joins and cutoff/horizon are clarified; then decide if narrow vehicle-level abnormality classification is valid. Obtain dated car failure events for forward-horizon claims. | L, 5–8 days after clarification |
@@ -35,7 +35,7 @@ The strategy decision is complete: use separate passenger-car/EV sources with ex
 
 1. **Resolve the data contract.** Decide whether to revise the product to battery SOH + contemporaneous fault classification or continue searching for a licensed passenger-car EOL/TTE source. Done when `scope.md`, `datasets.md` and accepted label/horizon definitions agree. (S–M, 1–2 days.)
 2. **Close the candidate gates.** Obtain written 347-EV body/join/horizon confirmation, explicit 20-car data rights, and either the Shenzhen archive or a documented rejection because the official asset remains inaccessible. Done when each candidate has keep/reject status and provenance. (M, 2–5 days plus external response.)
-3. **Finish loader/data-contract work—no model training in this PR.** Add vehicle-disjoint split enforcement and schema tests for each accepted dataset; keep unverified carOBD, 20-car rights-blocked data, and unacquired Shenzhen data quarantined. Done when loaders return versioned provenance/identity metadata and tests pass. (M, 2–4 days.)
+3. **Finish loader/data-contract work—no model training in this PR.** Add schema tests for each acquired/approved dataset; keep unverified carOBD, 20-car rights-blocked data, and unacquired Shenzhen data quarantined. Tongji split enforcement is complete and tested. (M, 2–4 days.)
 
 ## Phased plan
 

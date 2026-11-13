@@ -254,7 +254,7 @@ def _load_tongji_workbook(name: str, payload: bytes) -> pd.DataFrame:
             result[column] = pd.to_numeric(result[column], errors="coerce")
     path = Path(name)
     result["source_file"] = path.name
-    result["split"] = "test" if "data_test" in path.parts else "train"
+    result["source_split"] = "test" if "data_test" in path.parts else "train"
     result["feature_kind"] = "slow" if "_slow_" in path.name else "fast"
     if "car_identifier" in result:
         identifier = result["car_identifier"].astype("string")
@@ -267,17 +267,32 @@ def _load_tongji_workbook(name: str, payload: bytes) -> pd.DataFrame:
     return result
 
 
+def _assign_tongji_vehicle_splits(
+    result: pd.DataFrame,
+) -> tuple[pd.DataFrame, set[str]]:
+    """Move every asset observed in the official test directory to evaluation."""
+    evaluation_ids = set(
+        result.loc[result["source_split"] == "test", "asset_id"].dropna().astype(str)
+    )
+    result = result.copy()
+    result["split"] = (
+        result["asset_id"]
+        .astype(str)
+        .map(lambda asset_id: "test" if asset_id in evaluation_ids else "train")
+    )
+    return result, evaluation_ids
+
+
 def load_tongji_rest(
     filepath: str | Path,
     split: str | None = None,
     kind: str | None = None,
 ) -> pd.DataFrame:
-    """Load Tongji's CC BY real-world EV features without deserializing pickles.
+    """Load Tongji features with a vehicle-disjoint train/evaluation partition.
 
-    The release contains heterogeneous fast/slow XLSX schemas and its nominal
-    train/test directories have vehicle overlap. This loader preserves the source
-    file, split and asset identity fields so callers can enforce a vehicle-disjoint
-    split; it does not claim an RUL or future-failure target.
+    Any vehicle appearing in the official test directory is assigned wholly to
+    ``test``. Thus all records for GE16 and HQ05, including their official-train
+    files, remain in evaluation. ``source_split`` retains the release directory.
     """
     if split not in (None, "train", "test"):
         raise ValueError("split must be None, 'train', or 'test'")
@@ -291,10 +306,6 @@ def load_tongji_rest(
         files = sorted(source.rglob("*.xlsx"))
         for file in files:
             name = file.as_posix()
-            if split and ("data_test" in name) != (split == "test"):
-                continue
-            if kind and ("_slow_" in file.name) != (kind == "slow"):
-                continue
             records.append(_load_tongji_workbook(name, file.read_bytes()))
     elif source.suffix.lower() == ".zip":
         with zipfile.ZipFile(source) as archive:
@@ -302,12 +313,6 @@ def load_tongji_rest(
                 name for name in archive.namelist() if name.endswith(".xlsx")
             )
             for name in names:
-                name_split = "test" if "data_test" in name else "train"
-                name_kind = "slow" if "_slow_" in name else "fast"
-                if split and name_split != split:
-                    continue
-                if kind and name_kind != kind:
-                    continue
                 records.append(_load_tongji_workbook(name, archive.read(name)))
     else:
         raise ValueError(f"Expected a directory or .zip archive: {source}")
@@ -317,12 +322,23 @@ def load_tongji_rest(
             f"No Tongji XLSX files matched split={split!r}, kind={kind!r}"
         )
     result = pd.concat(records, ignore_index=True, sort=False)
+    result, evaluation_ids = _assign_tongji_vehicle_splits(result)
+    if split:
+        result = result.loc[result["split"] == split].reset_index(drop=True)
+    if kind:
+        result = result.loc[result["feature_kind"] == kind].reset_index(drop=True)
+    if result.empty:
+        raise FileNotFoundError(
+            f"No Tongji XLSX rows matched vehicle-disjoint split={split!r}, kind={kind!r}"
+        )
     result.attrs.update(
         dataset_version="zenodo-16868546",
         license="CC BY 4.0",
         identity_type="car_identifier_or_source_file",
         label_semantics="soh/capacity health proxies; no documented RUL/TTE",
-        official_split=True,
-        split_overlap_warning="GE16 and HQ05 occur in both nominal splits",
+        official_split=False,
+        split_protocol="vehicle-disjoint; any asset_id present in official test is held out",
+        evaluation_asset_ids=sorted(evaluation_ids),
+        source_split_column="source_split",
     )
     return result

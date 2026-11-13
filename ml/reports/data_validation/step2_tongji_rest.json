@@ -22810,6 +22810,27 @@
       "GE16",
       "HQ05"
     ],
+    "vehicle_disjoint_partition": {
+      "protocol": "all rows for a known vehicle in the official test directory are assigned to evaluation; unidentified files retain file-stem identity",
+      "train_asset_count": 109,
+      "evaluation_asset_ids": [
+        "GE16",
+        "HQ05",
+        "Lab_fast_feature",
+        "NMC01_Car02_fast_feature",
+        "NMC01_slow_feature",
+        "P215"
+      ],
+      "evaluation_asset_count": 6,
+      "rows_by_partition": {
+        "test": 2093,
+        "train": 26224
+      },
+      "source_train_overlap_assets_moved_to_evaluation": [
+        "GE16",
+        "HQ05"
+      ]
+    },
     "header_variants_by_split_and_kind": {
       "test_fast": 5,
       "test_slow": 1,

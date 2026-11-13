@@ -9,7 +9,7 @@
 - Audit: `ml/scripts/audit_tongji_rest.py`; report `ml/reports/data_validation/step2_tongji_rest.json`.
 
 The archive contains 154 XLSX feature files: 148 under the official `data/data_train/`
-directory and 6 under `data/data_test/`. The audit found 26,450 data rows, 78
+directory and 6 under `data/data_test/`. The audit found 28,317 data rows, 78
 `car_identifier` values, 123--184 columns depending on file variant, and fast/slow
 charging feature families. `soh` and capacity are supplied measurements/features;
 there is no documented run-to-end-of-life event or future-failure horizon in this
@@ -20,3 +20,13 @@ validated RUL or forward-failure dataset without an additional event definition.
 
 Raw files are intentionally not committed. This README and the audit report are the
 provenance record; the original archive must remain unchanged.
+
+`load_tongji_rest` now constructs a vehicle-disjoint partition: every row for a
+`car_identifier` found in the official test directory is assigned to evaluation,
+including the official-train rows for `GE16` and `HQ05`. The resulting evaluation
+group contains only three identified vehicles (`GE16`, `HQ05`, `P215`), so its
+small asset count must be considered when interpreting any later benchmark. The
+loader retains the original directory in `source_split` and exposes the corrected
+partition in `split`. For rows without a `car_identifier`, the loader uses the
+source workbook stem and reports `asset_id_type=file_stem`; this fallback is not a
+verified vehicle identity.
