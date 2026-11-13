@@ -22,6 +22,10 @@ htmlcov/
 # Data & Model Artifacts
 data/raw/*
 !data/raw/README.md
+# External audit datasets are kept out of commits; provenance and checksums
+# belong in the Markdown audit reports.
+data/automotive_prognostics/*
+!data/automotive_prognostics/README.md
 ml/artifacts/*
 !ml/artifacts/.gitkeep
 mlruns/
