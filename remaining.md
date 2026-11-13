@@ -106,8 +106,13 @@ No request from Step 0. Backend and mobile were not modified.
 
 Step 1 adds no backend/mobile request; model output contracts remain unchanged because no model was trained.
 
+## PR handoff status
+
+Local verification is complete: all changed paths were reviewed, 41 ML tests and Ruff passed, audit reports are reproducible, raw data is ignored, and backend/mobile remain untouched. A remote PR is still pending GitHub authentication (`gh` unavailable and HTTPS push rejected without credentials). Once authenticated, push `pipeline/data-and-training`, open the PR against `main`, and rerun the same verification against the PR diff and CI checks. The data-contract/RUL gate remains the substantive project blocker.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded the environment gate, interpreter requirement, seed convention, and no backend/mobile requests.
 - 2026-11-13 — Step 1: recorded the failed data gate, validation evidence, strategy decision point, and updated next steps.
 - 2026-11-13 — Step 2: recorded the confirmed multi-source strategy, Tongji audit, Shenzhen HTTP 403 blocker, and revised next steps.
+- 2026-11-13 — PR handoff: recorded complete local change verification and the missing GitHub authentication required to create the PR.

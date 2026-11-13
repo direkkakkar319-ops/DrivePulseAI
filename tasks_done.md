@@ -186,7 +186,7 @@ The requested PR could not be raised because this environment has no `gh` execut
 | Reproducibility | `scripts/download_tongji_rest.py` reported “already verified”; `ml/scripts/audit_tongji_rest.py` and `ml/scripts/audit_shenzhen_metadata.py` reran successfully; generated reports produced no working-tree diff. |
 | Code quality | Ruff check passed for all four new Python scripts; pre-commit hooks passed on both Step 2 commits; `git diff --check origin/main..HEAD` passed. |
 | Tests | `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **41 passed in 7.25 seconds**. |
-| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, and `d3ed5e0` are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
+| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, `d3ed5e0`, and `b430843` are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
 
 PR status: **not created** until GitHub credentials/CLI access are supplied. The branch is locally clean on `pipeline/data-and-training`; the only remaining gate is the unresolved passenger-car RUL/TTE scope decision.
 

@@ -102,3 +102,12 @@ Targets below are project acceptance criteria to decide, not claims that the cur
 5. Decide whether the three-stage chain is a hard production architecture or a staged research demonstration. Stage 3 must not get a synthetic proxy label derived from Stage 2 and then be presented as independent prediction.
 6. Set quantitative operating targets and latency hardware only after choosing the deployment context.
 7. README drift: root README describes AI4I/C-MAPSS mapped to automotive equivalents and three models as a platform (`README.md`, lines 48–54, 135); current data audit rejects cross-domain column relabeling and notes AI4I/C-MAPSS removed from canonical data (`data/README.md`). PR #49 proposed reducing the original three-task plan to a feasible two-task plan; PR #50 proposes a Nissan Leaf battery anomaly/replay scope. The user decision now resolves the vehicle domain to passenger cars/EVs; the subsystem and label source remain open.
+
+## Execution record note
+
+No scope contract was changed during PR-readiness verification. The current contract remains passenger cars/passenger EVs only, with the three-stage chain gated until a valid car/EV RUL or time-to-event source is acquired. Local verification found no backend/mobile changes and 41 ML tests passed; the PR itself could not be created because GitHub credentials/CLI access were unavailable (recorded in `tasks_done.md`).
+
+## Change log
+
+- 2026-11-13 — Scope frozen to passenger cars/passenger EVs; truck and surrogate datasets excluded from car claims.
+- 2026-11-13 — PR-readiness verification recorded without changing functional requirements or model contracts.

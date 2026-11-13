@@ -197,8 +197,13 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 - Shenzhen Mendeley DOI `10.17632/c7gg94tmvz.3` metadata was verified by `ml/scripts/audit_shenzhen_metadata.py`: CC BY 4.0, 207,174,326-byte release, 21,175 sequences, 1,547,432 samples, 10,154 EVs, and `1=faulty battery/0=normal`. The official S3 asset returned HTTP 403 in this environment; no raw file was retained, so no model training is authorized from it.
 - No passenger-car run-to-failure/TTE source was found. No model training or backend/mobile edits were performed. Step 3 is blocked until the project either approves a health/SOH-plus-contemporaneous-fault scope or acquires a legally usable car/EV event-labeled RUL source.
 
+## PR-readiness verification — 2026-11-13
+
+**Status: 🟡 Local verification complete; remote PR blocked by authentication.** Every path in `git diff --name-status origin/main..HEAD` was reviewed. Ruff passed, all 41 ML tests passed, both audit reports regenerated without differences, Tongji checksum/size revalidated, no raw data is tracked, and no `backend/` or `mobile/` path changed. The branch is clean on `pipeline/data-and-training`. GitHub CLI is unavailable and HTTPS push cannot read credentials, so no PR URL or remote CI result exists yet; details are in `tasks_done.md`.
+
 ## Change log
 
 - 2026-11-13 — Step 0: recorded the reproducible environment baseline, test result, branch, seed convention, and dependency/tracking limitation.
 - 2026-11-13 — Step 1: recorded the validation command/output, dataset verdicts, leakage findings, failed gate, and Step 2 decision requirement.
 - 2026-11-13 — Step 2: confirmed the multi-source strategy, acquired/audited Tongji, verified Shenzhen metadata, documented HTTP 403 acquisition blockage, and kept model training gated.
+- 2026-11-13 — PR-readiness verification: reviewed all changed paths and reran checks, tests, checksums and audit reports; recorded the authentication blocker and unchanged gate status.

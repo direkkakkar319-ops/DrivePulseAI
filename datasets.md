@@ -179,7 +179,12 @@ The acquired 20-car data remains quarantined from model work pending data-specif
 
 The recommended multi-source strategy is accepted for separate benchmarks: KIT remains an unsupervised OBD novelty benchmark; Tongji is a candidate SOH/health regression benchmark; Shenzhen is a candidate battery-fault benchmark once the official asset can be fetched. They must not be joined as if they represent the same vehicles or used for one end-to-end performance claim. The Step 2 gate for the intended three-stage chain remains **failed** because no passenger-car run-to-failure/TTE target and no acquired, audited forward-failure dataset exists. Step 3 model training is therefore blocked until the scope is explicitly reduced to SOH plus contemporaneous fault classification or a licensed car/EV TTE source is found.
 
+## Verification and PR handoff
+
+The dataset audit changes were re-run after commit: Tongji’s downloader reported the expected checksum/size, both Step 2 audit reports regenerated without a diff, and no raw archive is tracked. No dataset verdict changed. The planned PR is not yet remote because GitHub authentication is unavailable; this does not alter the Step 2 failed gate or the dataset strategy.
+
 ## Change log
 
 - 2026-11-13 — Step 1: added the reproducible structural validation run, per-model verdict table, failed gate, and Step 2 strategy options.
 - 2026-11-13 — Step 2: user confirmed separate passenger-car/EV sources with explicit interfaces; acquired and audited Tongji under CC BY 4.0, verified Shenzhen metadata but recorded the official S3 download as HTTP 403-blocked.
+- 2026-11-13 — PR handoff: recorded repeat audit/checksum verification and the absence of a remote PR due to missing GitHub authentication; dataset verdicts unchanged.
