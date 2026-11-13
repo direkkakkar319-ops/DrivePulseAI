@@ -199,7 +199,7 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 
 ## PR-readiness verification — 2026-11-13
 
-**Status: 🟡 Local verification complete; remote PR blocked by authentication.** Every path in `git diff --name-status origin/main..HEAD` was reviewed. Ruff passed, all 43 ML tests passed, both audit reports regenerated without differences, Tongji checksum/size revalidated, no raw data is tracked, and no `backend/` or `mobile/` path changed. The branch is clean on `pipeline/data-and-training`. GitHub CLI is unavailable and HTTPS push cannot read credentials, so no PR URL or remote CI result exists yet; details are in `tasks_done.md`.
+**Historical status for the earlier `pipeline/data-and-training` handoff:** local verification was complete while that PR was blocked by authentication. This was superseded by PRs #51 and #52, which were merged, and later PR #53, which is recorded below as merged commit `251e7ac`.
 
 ## Loader contract update — 2026-11-13
 
@@ -220,3 +220,11 @@ Tongji loading now enforces a vehicle-disjoint partition across the full source 
 ## IVST 300-EV candidate audit — 2026-11-13
 
 The official IVST page and associated 2025 Nature Communications paper were reviewed. Public metadata describes 300 fleet EVs and high-frequency telemetry; the paper's documented target is SOH, derived from telemetry. The public page advertises RUL/fault use cases, but it does not document EOL labels, event times, censoring or a prediction horizon. Vehicle body class and stable file-level IDs also require sample inspection. The 100 MB sample and 72 GB archive require an application with applicant details and explicit acceptance of research-only terms that prohibit commercial use/external services and restrict redistribution. The user confirmed noncommercial college-project use and accepted the terms. Two official form submissions returned HTTP 524; the user received no confirmation and no data file was obtained. Automated retries stopped; the user can apply in a browser. The metadata audit is in `ml/reports/data_validation/step2_ivst_300_ev.json`.
+
+## Oxford RUL and Zenodo 515-EV acquisition/audit — 2026-11-13
+
+- PR #53 was merged to `main` as squash merge `251e7ac` after all six checks passed. The local `main` was fast-forwarded; both local and remote PR branches were deleted. No tracked data files were added.
+- Oxford Battery Degradation Dataset 1 was downloaded from the official Oxford Research Archive; all three source files match the archive-declared byte sizes and have recorded SHA-256 hashes. MATLAB parsing verified eight cells and 519 characterization records. The source readme lacks an EOL cutoff. Under an explicitly exploratory 75%-of-first-measured-capacity threshold, only two cells cross; six are right-censored. Treat this as a small lab RUL benchmark only, not an EV fleet model source.
+- The Zenodo `10.5281/zenodo.10656500` record API reports CC BY 4.0. Its seven source archives (38,063,456,304 bytes) are downloaded locally and all per-file sizes/MD5 values match Zenodo. Archive inventory finds 514 numbered vehicle folders, not the published 515: DTI 80, GIS 41, QAS 393. DTI and QAS label workbooks provide binary `Num`/`Label` values, but do not define label semantics; GIS has no label file. No unsafe pickle deserialization was performed.
+- The associated paper reports four retrospective fault types and 1,135 abnormal-moment samples, but the files do not yet show a verified sample-to-vehicle/event-label join. Do not train yet. The release is a current-fault classification candidate; it does not establish forward-failure horizon or RUL. A vehicle-disjoint evaluation is required.
+- Audit details and local paths are recorded in `data/automotive_prognostics/oxford_battery_degradation/v1/README.md`, `data/automotive_prognostics/ev_fault_515/v1/README.md`, and `ml/reports/data_validation/step2_oxford_515_battery.json`.

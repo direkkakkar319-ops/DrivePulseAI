@@ -188,7 +188,7 @@ The recommended multi-source strategy is accepted for separate benchmarks: KIT r
 
 ## Verification and PR handoff
 
-The dataset audit changes were re-run after commit: Tongji’s downloader reported the expected checksum/size, both Step 2 audit reports regenerated without a diff, and no raw archive is tracked. No dataset verdict changed. The planned PR is not yet remote because GitHub authentication is unavailable; this does not alter the Step 2 failed gate or the dataset strategy.
+Historical note: at that audit point, the planned PR had not yet been created because GitHub authentication was unavailable. Subsequent PRs #51, #52 and #53 were merged; the latest merge and its dataset findings are recorded below.
 
 ## Loader update
 
@@ -200,3 +200,10 @@ The dataset audit changes were re-run after commit: Tongji’s downloader report
 - 2026-11-13 — Step 2: user confirmed separate passenger-car/EV sources with explicit interfaces; acquired and audited Tongji under CC BY 4.0, verified Shenzhen metadata but recorded the official S3 download as HTTP 403-blocked.
 - 2026-11-13 — PR handoff: recorded repeat audit/checksum verification and the absence of a remote PR due to missing GitHub authentication; dataset verdicts unchanged.
 - 2026-11-13 — Loader update: recorded the new Tongji ingestion path and provenance metadata on existing loaders; dataset verdicts and the failed RUL gate remain unchanged.
+
+### Oxford RUL and Zenodo 515-EV fault-diagnosis alternatives — 2026-11-13
+
+- **Oxford Battery Degradation Dataset 1:** official files were downloaded into `data/automotive_prognostics/oxford_battery_degradation/v1/raw/` and SHA-256 verified. The MATLAB structure parses as eight Kokam pouch cells and 519 characterization records, with unequal/gapped cycle histories from cycle 0 through 5,000–8,200. The official readme says tests ended at EOL but does not define the EOL cutoff or provide native RUL labels. With an explicitly exploratory 75%-of-first-measured-discharge-capacity convention, only Cell2 (cycle 7,400) and Cell5 (cycle 5,000) cross the threshold; six are right-censored. **RUL verdict: useful only as a small laboratory method-development benchmark after defining a target and handling censoring; not enough for robust passenger-EV RUL claims.** It is not EV fleet telemetry.
+- **Zenodo 515-EV source:** all seven official archives (38,063,456,304 bytes total) were downloaded to the Git-ignored `data/automotive_prognostics/ev_fault_515/v1/raw/`; all byte counts and MD5 hashes match Zenodo API metadata. The API reports CC BY 4.0. The package contains 514 numbered vehicle folders (DTI 80, GIS 41, QAS 393), while the paper/record says 515; the one-vehicle discrepancy is unresolved. `DTI.zip` and `QAS_5.zip` include `Num`/`Label` spreadsheets with binary values, 77/3 for DTI and 335/58 for QAS respectively. The label meaning is not defined in those sheets; GIS has no label workbook. The other files are `.pkl` tensors, not deserialized.
+- The paper reports 1,135 retrospectively labelled abnormal-moment samples and four fault types (internal short circuit, excessive aging, thermal runaway, electrolyte leakage), but the delivered archives do not establish a verified join from those event labels to the numbered folders and tensor records. **Current fault classification verdict: promising candidate, still blocked from training pending safe tensor parsing and authoritative label/ID/sample joins. Future-failure prediction: unsupported because there is no documented prediction horizon or censoring. RUL: unsupported.** The paper's 3:1 event-sample split is not evidence of a vehicle-disjoint evaluation.
+- Detailed provenance and integrity records: `data/automotive_prognostics/oxford_battery_degradation/v1/README.md`, `data/automotive_prognostics/ev_fault_515/v1/README.md`, and `ml/reports/data_validation/step2_oxford_515_battery.json`. Raw archives remain local and Git-ignored; no model was trained.

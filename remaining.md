@@ -106,9 +106,9 @@ No request from Step 0. Backend and mobile were not modified.
 
 Step 1 adds no backend/mobile request; model output contracts remain unchanged because no model was trained.
 
-## PR handoff status
+## Historical PR handoff status — superseded
 
-Local verification is complete: all changed paths were reviewed, 43 ML tests and Ruff passed, audit reports are reproducible, raw data is ignored, and backend/mobile remain untouched. A remote PR is still pending GitHub authentication (`gh` unavailable and HTTPS push rejected without credentials). Once authenticated, push `pipeline/data-and-training`, open the PR against `main`, and rerun the same verification against the PR diff and CI checks. The current PR is for dataset verification and loader correctness; model training remains deferred. The data-contract/RUL gate remains the substantive project blocker.
+The earlier `pipeline/data-and-training` PR handoff was blocked by missing GitHub authentication at that time. PRs #51 and #52 and later PR #53 have since been merged. Follow-up dataset issues and target gates are listed below; model training remains deferred.
 
 ## Change log
 
@@ -116,3 +116,10 @@ Local verification is complete: all changed paths were reviewed, 43 ML tests and
 - 2026-11-13 — Step 1: recorded the failed data gate, validation evidence, strategy decision point, and updated next steps.
 - 2026-11-13 — Step 2: recorded the confirmed multi-source strategy, Tongji audit, Shenzhen HTTP 403 blocker, and revised next steps.
 - 2026-11-13 — PR handoff: recorded complete local change verification and the missing GitHub authentication required to create the PR.
+
+## Follow-up after PR #53 — alternatives audited, targets still gated
+
+- **Oxford RUL:** source acquired and parsed, but only eight lab cells are present. No EOL cutoff/native RUL labels are supplied in the official readme; six of eight cells do not cross the exploratory 75%-of-first-measured-capacity threshold. If retained, use only as a small laboratory benchmark with an explicit threshold/censoring protocol. Continue searching for a properly licensed EV/vehicle run-to-EOL target for passenger-EV claims.
+- **Zenodo 515-EV fault source:** all seven archives are present locally and source MD5s match. Resolve (1) 514 released numbered folders versus 515 published vehicles, (2) meaning of `Label` in the DTI/QAS workbooks, (3) where the paper's 1,135 four-bit retrospective event labels live and how they join to vehicle/time samples, and (4) safe parsing of tensor `.pkl` files. Do not use unrestricted pickle deserialization. Use a vehicle-disjoint split if those mappings become verifiable.
+- The Zenodo source supports a candidate for **current/retrospective fault classification**, not future failure prediction: no prediction horizon/censoring is documented. It does not support RUL. No model training has been approved or performed.
+- Keep Oxford, Zenodo, Tongji, IVST, and other sources as separate benchmarks. Do not infer joins or combine them into an end-to-end metric.
