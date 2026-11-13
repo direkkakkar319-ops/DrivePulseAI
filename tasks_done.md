@@ -180,13 +180,13 @@ The requested PR could not be raised because this environment has no `gh` execut
 
 | Check | Result / evidence |
 |---|---|
-| Changed-file inventory | 20 paths reviewed with `git diff --name-status origin/main..HEAD`: the five status reports; `.gitignore`; Step 1/2 audit scripts and JSON reports; requirements lock; reproducibility helper; two download scripts; two dataset provenance READMEs; and the loader contract files `ml/src/data/loaders.py`, `ml/src/data/__init__.py`, `ml/tests/test_loaders.py`. |
+| Changed-file inventory | 21 paths reviewed with `git diff --name-status origin/main..HEAD`: the five status reports; `.gitignore`; Step 1/2 audit scripts and JSON reports; requirements lock; reproducibility helper; two download scripts; two dataset provenance READMEs; and the loader contract files `ml/src/data/loaders.py`, `ml/src/data/__init__.py`, `ml/tests/test_loaders.py`. |
 | Scope protection | `git diff --name-only origin/main..HEAD | rg '^(backend/|mobile/)'` returned no paths. No backend or mobile files changed. |
 | Raw-data protection | `git ls-files 'data/automotive_prognostics/**/raw/**'` returned no tracked raw files. Tongji checksum was revalidated: MD5 `88c3832d748c0adf8caa94173aada563`, SHA-256 `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`, 129,606,252 bytes. |
 | Reproducibility | `scripts/download_tongji_rest.py` reported “already verified”; both audit scripts reran successfully; generated reports produced no working-tree diff; the Tongji loader test passed against the local archive. |
-| Code quality | Ruff check passed for all four new Python scripts; pre-commit hooks passed on both Step 2 commits; `git diff --check origin/main..HEAD` passed. |
+| Code quality | Ruff check passed for all four new scripts plus the loader/test files; pre-commit hooks passed on every commit; `git diff --check origin/main..HEAD` passed. |
 | Tests | `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **43 passed, 5 warnings in 6.63 seconds**. |
-| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, `d3ed5e0`, `b430843`, and the loader/docs commits are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
+| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, `d3ed5e0`, `b430843`, `aece7eb`, and `592b2b8` are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
 
 ## Loader contract implementation — 2026-11-13
 
@@ -197,6 +197,8 @@ The requested PR could not be raised because this environment has no `gh` execut
 - Added tests for missing paths and the local Tongji test/slow contract. Result: `43 passed, 5 warnings`.
 - This PR remains data/ingestion focused. Model training, model metrics and end-to-end claims remain intentionally out of scope.
 
+The post-loader diff was rechecked after commit `592b2b8`: 21 changed paths total, `backend/` and `mobile/` still absent, and the full ML test suite remained at 43 passed with 5 warnings.
+
 PR status: **not created** until GitHub credentials/CLI access are supplied. The branch is locally clean on `pipeline/data-and-training`; the only remaining gate is the unresolved passenger-car RUL/TTE scope decision.
 
 ## Change log
@@ -205,3 +207,4 @@ PR status: **not created** until GitHub credentials/CLI access are supplied. The
 - 2026-11-13 — Workflow Step 1: added reproducible dataset validation evidence, per-model verdicts, leakage findings, and the Step 2 strategy gate.
 - 2026-11-13 — Workflow Step 2: recorded the confirmed multi-source strategy, Tongji acquisition/audit, Shenzhen metadata verification and HTTP 403 block, and the failed complete-chain gate.
 - 2026-11-13 — PR-readiness verification: reviewed all 20 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.
+- 2026-11-13 — Loader contract verification: expanded the inventory to 21 paths after `592b2b8`, reran the 43-test suite and Ruff, and confirmed the PR remains data/ingestion-only.
