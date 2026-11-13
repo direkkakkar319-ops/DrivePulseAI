@@ -1,0 +1,76 @@
+{
+  "audit_date": "2026-11-13",
+  "purpose": "Source and target audit only; no preprocessing or model training",
+  "sources": {
+    "oxford_battery_degradation_1": {
+      "url": "https://ora.ox.ac.uk/objects/uuid:03ba4b01-cfed-46d3-9b1a-7d4a7bdf6fac",
+      "doi": "10.5287/bodleian:KO2kdmYGg",
+      "license": "ODC-ODbL-1.0; individual contents DbCL-1.0",
+      "raw_path": "data/automotive_prognostics/oxford_battery_degradation/v1/raw",
+      "files": [
+        {"name": "Oxford_Battery_Degradation_Dataset_1.mat", "bytes": 266164290, "sha256": "a8f0b928f4ea77d7ba98b97194b78cc77336f2338fee8b57573d043f0cf26781"},
+        {"name": "ExampleDC_C1.mat", "bytes": 72593, "sha256": "144cdf5aec7467bcce5445e132495e8477f4e08d9963c221d8ba5d7970a7a97d"},
+        {"name": "Readme.txt", "bytes": 5643, "sha256": "f04c8bdae97e98632b9daeaa7c71631990dbf5ecbf38711347fc470baefc0def"}
+      ],
+      "observed_structure": {
+        "cells": 8,
+        "characterization_records": 519,
+        "cycle_endpoint_range": [5000, 8200],
+        "signals": ["time_s", "voltage_V", "charge_mAh", "temperature_C"],
+        "per_record_protocols": ["C1ch", "C1dc", "OCVch", "OCVdc"],
+        "gapped_cycle_indices": true,
+        "eol_rule_in_source_readme": null,
+        "native_rul_labels": false
+      },
+      "exploratory_target_analysis": {
+        "threshold": "75% of first measured 1C discharge capacity; analysis convention only, not asserted as official source rule",
+        "cells_crossing_threshold": {"Cell2": 7400, "Cell5": 5000},
+        "cells_not_observed_crossing": ["Cell1", "Cell3", "Cell4", "Cell6", "Cell7", "Cell8"],
+        "interpretation": "right-censored at the last released observation under this convention"
+      },
+      "verdict": {
+        "rul": "limited laboratory method-development benchmark only; define an EOL threshold and account for censoring; eight cells are insufficient for robust passenger-EV claims",
+        "health_regression": "laboratory capacity/SOH benchmark candidate",
+        "failure_classification": "unsupported"
+      }
+    },
+    "zenodo_ev_fault_515": {
+      "url": "https://zenodo.org/records/10656500",
+      "doi": "10.5281/zenodo.10656500",
+      "paper_doi": "10.1038/s41467-025-56832-8",
+      "license": "CC-BY-4.0 (Zenodo API metadata)",
+      "raw_path": "data/automotive_prognostics/ev_fault_515/v1/raw",
+      "total_bytes": 38063456304,
+      "file_count": 7,
+      "all_recorded_sizes_and_md5_verified": true,
+      "archive_vehicle_folder_counts": {"DTI": 80, "GIS": 41, "QAS": 393, "total": 514},
+      "published_vehicle_count": 515,
+      "vehicle_count_discrepancy": 1,
+      "observed_files": {
+        "per_vehicle": ["vin_1.pkl", "vin_2.pkl", "vin_3.pkl"],
+        "label_workbooks": ["DTI.zip: DTI/Labels.xls", "QAS_5.zip: Labels.xls"],
+        "other_archives_with_label_readme_candidates": false,
+        "pickle_deserialized": false
+      },
+      "binary_label_counts_only_semantics_unverified": {
+        "DTI": {"id_count": 80, "label_0": 77, "label_1": 3},
+        "QAS": {"id_count": 393, "label_0": 335, "label_1": 58},
+        "GIS": "no label workbook found"
+      },
+      "paper_reports": {
+        "valid_entries": 18200000,
+        "four_fault_types": ["internal short circuit", "excessive aging", "thermal runaway", "electrolyte leakage"],
+        "fault_label_samples": 1135,
+        "fault_labels_assigned_retrospectively": true,
+        "prediction_horizon_documented": false,
+        "paper_split_vehicle_disjoint": false
+      },
+      "verdict": {
+        "current_fault_classification": "promising candidate, blocked from training until sample-level labels and joins are recovered; verify binary-label semantics and vehicle IDs",
+        "future_failure_prediction": "unsupported; retrospective abnormal-moment labels do not establish a future horizon",
+        "rul": "unsupported",
+        "safe_loader": "pending; tensor pickle files have not been unpickled"
+      }
+    }
+  }
+}

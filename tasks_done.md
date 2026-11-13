@@ -199,7 +199,7 @@ The requested PR could not be raised because this environment has no `gh` execut
 
 The post-loader diff was rechecked after commit `592b2b8`: 21 changed paths total, `backend/` and `mobile/` still absent, and the full ML test suite remained at 43 passed with 5 warnings.
 
-PR status: **not created** until GitHub credentials/CLI access are supplied. The branch is locally clean on `pipeline/data-and-training`; the only remaining gate is the unresolved passenger-car RUL/TTE scope decision.
+Historical PR status for `pipeline/data-and-training`: no PR had been created at that point because GitHub authentication was unavailable. PRs #51 and #52 and later PR #53 have since been merged; see the later entries below.
 
 ## Change log
 
@@ -225,3 +225,11 @@ PR status: **not created** until GitHub credentials/CLI access are supplied. The
 - Retried the official Shenzhen downloader with network access. Mendeley metadata was reachable, but its official archive endpoint again returned HTTP 403. No partial archive was retained; checksum, workbook schemas, vehicle IDs and fault labels remain unaudited.
 - Reviewed primary public records for the 347-EV dataset and 20-car source. Public records still do not establish passenger-car body style, explain the 348 released labels versus 347 in the paper, or grant data-specific reuse rights for the 20-car archive. These require publisher/author/rights-holder responses and remain blocked; no assumptions were added.
 - No model training, backend/mobile changes, or raw-data commits.
+
+## PR #53 merge and alternate battery source downloads — 2026-11-13
+
+- PR #53 passed all six remote checks and was squash-merged to `main` as `251e7ac`. The remote PR branch and its local branch were deleted; local `main` was fast-forwarded. `agent_context.md` remains untracked by request.
+- Downloaded the three Oxford Battery Degradation Dataset 1 source files to the Git-ignored `data/automotive_prognostics/oxford_battery_degradation/v1/raw/`. Verified file sizes and SHA-256 values; parsed the MAT file to confirm eight cells and 519 characterization records. No training/preprocessing performed.
+- Downloaded all seven Zenodo `10.5281/zenodo.10656500` archives (38,063,456,304 bytes) to Git-ignored `data/automotive_prognostics/ev_fault_515/v1/raw/`. All file sizes and source MD5 values match Zenodo. The Zenodo API reports CC BY 4.0.
+- Audited ZIP directory structures: 514 numbered folders (DTI 80, GIS 41, QAS 393), one fewer than the record's 515 claim. DTI and QAS spreadsheets contain 80 and 393 binary labels respectively; their meaning is not documented in the sheets. Paper-reported 1,135 four-fault event labels are not yet joined to folder/tensor records. `.pkl` files were not unpickled.
+- RUL/health/fault findings and explicit blockers are recorded in the two dataset READMEs and `ml/reports/data_validation/step2_oxford_515_battery.json`. No raw archive is tracked.
