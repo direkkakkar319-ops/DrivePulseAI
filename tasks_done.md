@@ -209,6 +209,14 @@ PR status: **not created** until GitHub credentials/CLI access are supplied. The
 - 2026-11-13 — PR-readiness verification: reviewed all 20 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.
 - 2026-11-13 — Loader contract verification: expanded the inventory to 21 paths after `592b2b8`, reran the 43-test suite and Ruff, and confirmed the PR remains data/ingestion-only.
 
+## IVST 300-EV dataset metadata audit — 2026-11-13
+
+- Added a provenance record at `data/automotive_prognostics/ivst_300_ev/v1/README.md` and metadata-only report `ml/reports/data_validation/step2_ivst_300_ev.json`.
+- Official page describes 300 fleet EVs, 0.5–4 years, 0–500,000 km, roughly 850 million 10-second records, and 100 MB sample / 72 GB full archive. The associated paper documents SOH labels derived from telemetry, not direct EOL or failure targets.
+- RUL and future-failure target suitability remains unverified: the public data description does not specify EOL events, failure timestamps, censoring, or horizon. Passenger-car body class and stable file-level vehicle IDs are also pending sample audit.
+- Access requires an application with personal/contact details and agreement to research-only terms (CC BY-NC-SA 4.0; no commercial use/external services; no redistribution without authorization). The user confirmed noncommercial college-project intent and will provide the application details and explicit terms confirmation. Do not submit before receiving them. No sample was downloaded or raw data committed.
+- No model training or product-scope change. Current decision: promising SOH candidate; not yet validated for RUL or failure prediction.
+
 ## PR work — vehicle-disjoint Tongji evaluation and remaining source gates
 
 - Updated `load_tongji_rest` to derive its evaluation vehicle set from every official test-directory workbook, then assign all rows for those assets—including `GE16` and `HQ05` rows stored under the nominal train directory—to evaluation. `source_split` preserves original directory provenance; `split` now means corrected vehicle-disjoint partition. Kind/split filters apply after global asset assignment so separately loaded feature families use the same grouping.
