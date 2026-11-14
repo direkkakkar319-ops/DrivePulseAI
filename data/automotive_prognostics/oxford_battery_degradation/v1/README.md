@@ -23,12 +23,14 @@ The source readme says tests ran until end of life, but does not define the EOL 
 
 The 2026-11-14 EDA found a further target issue: Cell2's first observed crossing at cycle 7,400 rebounds above the threshold in the next two records. The 7,400 discharge curve is shorter than neighboring records. Cell5's first crossing is at its final record, with no post-crossing follow-up. See [`ml/reports/eda/oxford_battery_eda.md`](../../../../ml/reports/eda/oxford_battery_eda.md).
 
+For target auditability, the project keeps 75% as an exploratory cutoff and now separately checks for two consecutive characterizations at or below it. This is a conservative project screening convention, not an Oxford-provided or universal EOL definition. The rerun found zero confirmed events and zero RUL labels under this rule. Literature describes capacity EOL thresholds as application-dependent, often around 70–80%; see [Paarmann et al. (2024)](https://doi.org/10.1002/batt.202300594).
+
 ## Use decision
 
-- **RUL:** an exploratory per-cell Theil–Sen capacity-trend prototype has been run against the first-observed 75% target. Rolling-origin errors are large, the target remains ambiguous, and meaningful cell-disjoint RUL evaluation is unsupported. This is not a validated or production RUL model.
+- **RUL:** the historical per-cell Theil–Sen trend prototype was evaluated against the unconfirmed first-crossing proxy and had large rolling-origin errors. The stricter two-reading screen confirms no EOL events, so this release does not currently supply a defensible supervised RUL target. The prototype is not validated or suitable for production.
 - **SOH/health:** measured capacity trajectories can support a separate laboratory regression benchmark.
 - **Failure classification / future failure:** no fault-class or future-event labels are provided in the released files.
-- Reproducible local preprocessing, EDA, and trend evaluation: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py`, `python3 ml/scripts/eda_oxford_battery.py`, then `python3 -m ml.scripts.evaluate_oxford_rul_trend`, after installing `ml/requirements.txt`. Preprocessed data stay local and ignored by Git; checked-in reports are in `ml/reports/eda/` and `ml/reports/modeling/`. The trend evaluation uses first-crossing labels for exploration only. Keep cells disjoint and do not use measured capacity to predict SOH derived from that same capacity.
+- Reproducible local preprocessing and EDA: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py` and `python3 ml/scripts/eda_oxford_battery.py` after installing `ml/requirements.txt`. Preprocessed data stay local and ignored by Git; checked-in reports are in `ml/reports/eda/` and `ml/reports/modeling/`. The separate trend evaluation reproduces only the historical first-crossing experiment, not confirmed EOL RUL. Keep cells disjoint and do not use measured capacity to predict SOH derived from that same capacity.
 
 Raw source files are retained unchanged and ignored by Git. The per-cell trend prototype is an exploratory rule-based regression baseline, not a trained transferable model. It produced large errors in the rolling-origin evaluation; see `ml/reports/modeling/oxford_rul_trend_baseline.md`. Resolve the target definition and threshold-crossing quality before further RUL modeling.
 

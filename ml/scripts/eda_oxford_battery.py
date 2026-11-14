@@ -19,6 +19,7 @@ DATA_PATH = (
 )
 REPORT_PATH = ROOT / "ml/reports/eda/oxford_battery_eda.json"
 RUL_COLUMN = "rul_drive_cycles_threshold_derived"
+PERSISTENT_RUL_COLUMN = "rul_drive_cycles_persistent_75pct"
 
 
 def audit_cell(cell_id: str, rows: pd.DataFrame) -> dict:
@@ -58,6 +59,8 @@ def audit_cell(cell_id: str, rows: pd.DataFrame) -> dict:
             break
         consecutive_below += 1
     rul = rows[RUL_COLUMN].dropna().to_numpy(dtype=float)
+    persistent_rul = rows[PERSISTENT_RUL_COLUMN].dropna().to_numpy(dtype=float)
+    persistent_event_rows = rows.loc[rows[PERSISTENT_RUL_COLUMN] == 0]
     positive_increases = increases[increases > 0]
     return {
         "cell_id": cell_id,
@@ -108,6 +111,13 @@ def audit_cell(cell_id: str, rows: pd.DataFrame) -> dict:
         ),
         "right_censored": crossing_cycle is None,
         "rows_with_derived_rul": len(rul),
+        "persistent_threshold_event_cycle": (
+            int(persistent_event_rows.iloc[0]["characterization_cycle"])
+            if not persistent_event_rows.empty
+            else None
+        ),
+        "persistent_threshold_confirmed": not persistent_event_rows.empty,
+        "rows_with_persistent_rul": len(persistent_rul),
         "derived_rul_min_cycles": float(np.min(rul)) if len(rul) else None,
         "derived_rul_max_cycles": float(np.max(rul)) if len(rul) else None,
         "derived_rul_median_cycles": float(np.median(rul)) if len(rul) else None,
@@ -129,6 +139,7 @@ def main() -> None:
         "eol_threshold_fraction",
         "eol_threshold_capacity_mah",
         RUL_COLUMN,
+        PERSISTENT_RUL_COLUMN,
         "right_censored_at_last_observation",
     }
     missing_columns = sorted(required - set(frame.columns))
@@ -157,6 +168,13 @@ def main() -> None:
         "cells_with_observed_threshold_crossing": [cell["cell_id"] for cell in events],
         "right_censored_cells": [cell["cell_id"] for cell in censored],
         "rows_with_observed_threshold_rul": int(frame[RUL_COLUMN].notna().sum()),
+        "persistent_confirmation_records": 2,
+        "cells_with_persistent_threshold_event": [
+            cell["cell_id"] for cell in cells if cell["persistent_threshold_confirmed"]
+        ],
+        "rows_with_persistent_threshold_rul": int(
+            frame[PERSISTENT_RUL_COLUMN].notna().sum()
+        ),
         "cells_with_two_consecutive_below_threshold_records": [
             cell["cell_id"]
             for cell in cells
@@ -169,6 +187,7 @@ def main() -> None:
         "cell_audit": cells,
         "interpretation": [
             "The 75% capacity threshold is an exploratory convention, not an Oxford-provided EOL definition.",
+            "A separate conservative screening label requires two consecutive below-threshold characterizations; this project convention is not an Oxford or universal standard.",
             "A crossing is observed only at characterization checkpoints; the exact crossing time between checkpoints is unknown.",
             "Only two cells cross the chosen threshold, while six are right-censored.",
             "Rows within a cell are repeated observations and must not be randomly split across train and evaluation.",

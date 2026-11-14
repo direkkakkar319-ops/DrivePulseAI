@@ -24,6 +24,7 @@ OUTPUT_DIR = (
     ROOT / "data/automotive_prognostics/oxford_battery_degradation/v1/processed"
 )
 EOL_FRACTION = 0.75
+EOL_CONFIRMATION_RECORDS = 2
 CYCLE_PATTERN = re.compile(r"^cyc(\d+)$")
 
 
@@ -86,9 +87,32 @@ def build_rows(mat: dict) -> tuple[list[dict], dict]:
             ),
             None,
         )
+        persistent_crossing_index = next(
+            (
+                index
+                for index in range(len(observations) - EOL_CONFIRMATION_RECORDS + 1)
+                if all(
+                    values["capacity_1c_discharge_mah"] <= threshold
+                    for _, values in observations[
+                        index : index + EOL_CONFIRMATION_RECORDS
+                    ]
+                )
+            ),
+            None,
+        )
+        persistent_crossing = (
+            observations[persistent_crossing_index][0]
+            if persistent_crossing_index is not None
+            else None
+        )
         for cycle, values in observations:
             rul = (
                 crossing - cycle if crossing is not None and cycle <= crossing else None
+            )
+            persistent_rul = (
+                persistent_crossing - cycle
+                if persistent_crossing is not None and cycle <= persistent_crossing
+                else None
             )
             rows.append(
                 {
@@ -102,6 +126,8 @@ def build_rows(mat: dict) -> tuple[list[dict], dict]:
                     "eol_threshold_capacity_mah": threshold,
                     "rul_drive_cycles_threshold_derived": rul,
                     "rul_observed_under_threshold": crossing is not None,
+                    "rul_drive_cycles_persistent_75pct": persistent_rul,
+                    "persistent_eol_confirmed": persistent_crossing is not None,
                     "right_censored_at_last_observation": crossing is None,
                 }
             )
@@ -112,6 +138,8 @@ def build_rows(mat: dict) -> tuple[list[dict], dict]:
             "baseline_capacity_mah": baseline,
             "eol_threshold_capacity_mah": threshold,
             "first_threshold_crossing_cycle": crossing,
+            "persistent_threshold_event_cycle": persistent_crossing,
+            "persistent_threshold_confirmed": persistent_crossing is not None,
             "right_censored": crossing is None,
         }
     return rows, cell_audit
@@ -142,10 +170,16 @@ def main() -> None:
                 f"characterization cycle minus first observed cycle at or below "
                 f"{EOL_FRACTION:.0%} of baseline capacity; cycle units are drive cycles"
             ),
+            "rul_persistent_screen": (
+                f"cycle distance to the first of {EOL_CONFIRMATION_RECORDS} consecutive "
+                f"characterizations at or below {EOL_FRACTION:.0%} of baseline capacity; "
+                "this is a project screening convention, not an Oxford-provided EOL rule"
+            ),
         },
         "limitations": [
             "75% is an explicit exploratory convention, not an official source EOL rule.",
             "Only threshold-crossing cells receive RUL values; other cells are right-censored.",
+            "Persistent RUL labels require two consecutive below-threshold records; this rule is a conservative project convention, not a validated standard.",
             "Only eight laboratory cells are available; do not claim robust EV-fleet RUL performance.",
             "Only two cells cross the threshold, so a meaningful cell-disjoint RUL train/validation/test evaluation is unsupported.",
             "Rows are characterization observations, not independent samples; split by cell before modeling.",

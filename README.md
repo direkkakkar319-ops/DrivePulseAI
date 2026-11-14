@@ -14,7 +14,7 @@ production diagnostics or maintenance predictions.
 | --- | --- | --- |
 | Android app | Firebase sign-in and a clearly labelled demo garage with illustrative vehicle, sensor, insight, and report screens | Live vehicle data, backend-backed vehicle records, and production assessments |
 | Backend | FastAPI health route and authenticated Firebase user-profile synchronization with PostgreSQL | Telemetry ingestion, vehicle APIs, prediction services, and report generation |
-| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford lab-cell Theil–Sen RUL trend prototype | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
+| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford battery capacity/RUL target audit and historical trend baseline | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
 
 The mobile demo uses deterministic, session-only fixtures. Its assessments are
 illustrations, not measurements from a real vehicle. See [mobile setup](mobile/README.md)
@@ -64,10 +64,11 @@ the repository's software license.
 
 - **KIT OBD-II:** supports exploratory automotive telemetry novelty scoring; it
   has no verified mechanical fault labels, RUL target, or verified vehicle IDs.
-- **Oxford battery data:** small laboratory-cell data for limited SOH/RUL method
-  exploration. A Theil–Sen capacity-trend prototype produced large rolling-origin
-  errors and is not a usable or validated RUL predictor; this is not evidence of
-  passenger-EV fleet performance.
+- **Oxford battery data:** supports capacity/SOH exploration. The historical
+  Theil–Sen trend experiment used an unconfirmed first-crossing proxy and had
+  large errors. A stricter two-reading 75% screen confirms no EOL events, so this
+  release currently has no defensible supervised RUL target and is not evidence
+  of passenger-EV fleet performance.
 - **Tongji EV data:** candidate for vehicle-disjoint SOH experiments; SOH is not
   observed RUL or a future-failure label.
 - **Scania APS and Component X:** heavy-truck datasets. They must not support

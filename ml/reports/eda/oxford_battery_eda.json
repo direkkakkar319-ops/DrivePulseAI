@@ -6,7 +6,8 @@
   "cells": 8,
   "duplicate_cell_cycle_rows": 0,
   "missing_numeric_values_by_column": {
-    "rul_drive_cycles_threshold_derived": 403
+    "rul_drive_cycles_threshold_derived": 403,
+    "rul_drive_cycles_persistent_75pct": 519
   },
   "threshold_fraction": 0.75,
   "cells_with_observed_threshold_crossing": [
@@ -22,6 +23,9 @@
     "Cell8"
   ],
   "rows_with_observed_threshold_rul": 116,
+  "persistent_confirmation_records": 2,
+  "cells_with_persistent_threshold_event": [],
+  "rows_with_persistent_threshold_rul": 0,
   "cells_with_two_consecutive_below_threshold_records": [],
   "total_characterization_cycles": {
     "minimum": 0,
@@ -54,6 +58,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": true,
       "rows_with_derived_rul": 0,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": null,
       "derived_rul_max_cycles": null,
       "derived_rul_median_cycles": null
@@ -88,6 +95,9 @@
       "crossing_recovered_above_threshold": true,
       "right_censored": false,
       "rows_with_derived_rul": 70,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": 0.0,
       "derived_rul_max_cycles": 7400.0,
       "derived_rul_median_cycles": 3650.0
@@ -118,6 +128,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": true,
       "rows_with_derived_rul": 0,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": null,
       "derived_rul_max_cycles": null,
       "derived_rul_median_cycles": null
@@ -148,6 +161,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": true,
       "rows_with_derived_rul": 0,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": null,
       "derived_rul_max_cycles": null,
       "derived_rul_median_cycles": null
@@ -178,6 +194,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": false,
       "rows_with_derived_rul": 46,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": 0.0,
       "derived_rul_max_cycles": 5000.0,
       "derived_rul_median_cycles": 2550.0
@@ -208,6 +227,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": true,
       "rows_with_derived_rul": 0,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": null,
       "derived_rul_max_cycles": null,
       "derived_rul_median_cycles": null
@@ -238,6 +260,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": true,
       "rows_with_derived_rul": 0,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": null,
       "derived_rul_max_cycles": null,
       "derived_rul_median_cycles": null
@@ -268,6 +293,9 @@
       "crossing_recovered_above_threshold": false,
       "right_censored": true,
       "rows_with_derived_rul": 0,
+      "persistent_threshold_event_cycle": null,
+      "persistent_threshold_confirmed": false,
+      "rows_with_persistent_rul": 0,
       "derived_rul_min_cycles": null,
       "derived_rul_max_cycles": null,
       "derived_rul_median_cycles": null
@@ -275,6 +303,7 @@
   ],
   "interpretation": [
     "The 75% capacity threshold is an exploratory convention, not an Oxford-provided EOL definition.",
+    "A separate conservative screening label requires two consecutive below-threshold characterizations; this project convention is not an Oxford or universal standard.",
     "A crossing is observed only at characterization checkpoints; the exact crossing time between checkpoints is unknown.",
     "Only two cells cross the chosen threshold, while six are right-censored.",
     "Rows within a cell are repeated observations and must not be randomly split across train and evaluation.",

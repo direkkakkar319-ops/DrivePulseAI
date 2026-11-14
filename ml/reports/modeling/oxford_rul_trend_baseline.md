@@ -4,6 +4,10 @@
 **Dataset DOI:** `10.5287/bodleian:KO2kdmYGg`
 **Model:** local Theil–Sen robust linear trend extrapolation
 
+**Status:** historical exploratory baseline against an unconfirmed first-crossing
+proxy. A later two-consecutive-reading screen confirms no EOL events in this
+release; the metrics below are not validation against confirmed EOL RUL.
+
 ## Why this model
 
 Only two cells have first-observed crossings of the exploratory 75%-capacity
@@ -24,6 +28,10 @@ the estimator uses only that cell's observations at or before the cutoff. The
 observed target is `first_crossing_cycle - cutoff_cycle`. Origins with fewer than
 four observations in the lookback or a non-declining fitted trend are skipped.
 These are rolling origins from the same two cells, not independent test cells.
+This is a same-cell trend diagnostic only. It must not be reported as a
+cell-disjoint generalization evaluation; the later two-reading target audit
+finds no confirmed event cells, so confirmed-EOL cross-cell evaluation cannot
+be performed on this release.
 
 ## Results
 
@@ -38,6 +46,16 @@ Cell2's predicted RUL is about 518 cycles versus 100 cycles to its first
 observed crossing. At cycle 4,800, Cell5's prediction is about 2,968 cycles
 versus 200 cycles to its endpoint crossing. The pooled metrics summarize these
 correlated origins only; they do not estimate performance on a new cell.
+
+No confidence interval or prediction interval is reported: the 107 origins are
+repeated points from two cells, not independent units, and two cells are
+insufficient for stable cell-level uncertainty estimation. The Theil–Sen rule
+was not compared with a train-cell median baseline; that comparison requires
+independent training cells and is not validly estimable from this two-cell
+proxy setup. On a future eligible dataset, compare against a training-cell
+median-RUL predictor and report per-cell MAE, RMSE, median absolute error, signed
+bias, cell-level spread, and prediction-interval coverage plus width. Do not
+bootstrap rolling origins as if they were independent cells.
 
 Full per-origin results are in
 [`oxford_rul_trend_baseline.json`](oxford_rul_trend_baseline.json). Reproduce

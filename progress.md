@@ -28,17 +28,19 @@ The model artifact remains local in ignored `ml/artifacts/`.
 Reran `ml/scripts/preprocess_oxford_battery.py` from the retained original MAT
 file: it reproduced 519 characterization rows across 8 cells. Added
 `ml/scripts/eda_oxford_battery.py` and EDA reports in `ml/reports/eda/`. The
-existing 75%-of-first-capacity convention labels 116 rows across two nominal
-crossing cells; 403 rows have no RUL target. Cell2 first drops below threshold
-at cycle 7,400, then rebounds above it at cycles 7,500 and 7,600; its 7,400
-source discharge curve is also shorter than neighboring records. Cell5 crosses
-only at its final cycle 5,000. No cell has two consecutive below-threshold
-records from its first crossing. An exploratory Theil–Sen per-cell capacity
-trend baseline was subsequently evaluated; it had pooled rolling-origin MAE
-1,419 cycles and RMSE 2,406 cycles, with poor and cell-dependent results. It is
-not a validated or transferable RUL model. The first-crossing target remains
-ambiguous, and eight cells/two nominal crossings do not support meaningful
-cell-disjoint evaluation. See
+first-crossing 75%-of-first-capacity proxy labels 116 rows across two cells and
+is retained only to reproduce the historical trend experiment. Cell2 crosses
+at cycle 7,400 then rebounds above threshold at 7,500 and 7,600; Cell5 crosses
+only at its final record, cycle 5,000. Research confirms EOL capacity thresholds
+are use-case dependent, commonly around 70–80%, rather than a universal cutoff
+([Paarmann et al., 2024](https://doi.org/10.1002/batt.202300594)). The project
+now uses two consecutive below-75% readings as a conservative screening
+convention, not a universal standard. Rerunning preprocessing and EDA verified
+zero confirmed events and zero persistent-rule RUL rows. The historical
+Theil–Sen baseline had pooled rolling-origin MAE 1,419 cycles and RMSE 2,406
+cycles against the unconfirmed proxy; it is not a validated RUL model. This
+release has no defensible supervised RUL target or meaningful cell-disjoint
+evaluation. See
 [`ml/reports/modeling/oxford_rul_trend_baseline.md`](ml/reports/modeling/oxford_rul_trend_baseline.md).
 
 **Baseline:** local checkout `main` at `9d79a59` (commit subject “Audit and organize datasets…”), as of 2026-11-13. The workspace already had extensive modifications before this report; they were preserved. Audit reports and `tasks_done.md` are documentation additions; Component X v3 publisher files were acquired under `data/automotive_prognostics/scania_component_x/v3/raw/` and retained unchanged. **User scope decision: passenger cars and passenger EVs only.** Truck datasets are excluded from car performance claims.

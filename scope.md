@@ -102,7 +102,7 @@ Targets below are project acceptance criteria to decide, not claims that the cur
 5. Decide whether the three-stage chain is a hard production architecture or a staged research demonstration. Stage 3 must not get a synthetic proxy label derived from Stage 2 and then be presented as independent prediction.
 6. Set quantitative operating targets and latency hardware only after choosing the deployment context.
 7. README drift noted in the original 2026-11-13 audit has been corrected: the root README now describes the passenger-car/EV research prototype and current KIT experiment without automotive mappings for AI4I/C-MAPSS. PR #49 proposed reducing the original three-task plan to a feasible two-task plan; PR #50 proposed a Nissan Leaf battery anomaly/replay scope. The user decision resolves the domain to passenger cars/EVs; the subsystem and label source remain open.
-8. Oxford Battery Degradation Dataset 1 preprocessing and EDA are complete, and a per-cell Theil–Sen trend prototype has been evaluated. Its errors are large, and the 75%-of-first-capacity target remains exploratory: Cell2's first crossing is transient and Cell5 has no post-crossing record. Do not treat the prototype as a validated RUL model or generalize it to passenger EVs.
+8. Oxford Battery Degradation Dataset 1 preprocessing and EDA are complete. The project's exploratory 75% capacity cutoff is not source-defined; a conservative two-consecutive-reading screen confirms zero events in the available records. The historical Theil–Sen experiment against first-crossing proxy labels had large errors. Oxford can support capacity/SOH exploration, but currently has no confirmed supervised RUL target and cannot support passenger-EV RUL claims.
 
 ## Execution record note
 
