@@ -37,7 +37,15 @@
         }
       ],
       "@react-native-firebase/app",
-      "react-native-nitro-google-signin"
+      "react-native-nitro-google-signin",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow DrivePulse AI to select an optional profile photo.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
