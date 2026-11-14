@@ -12,10 +12,9 @@ from xgboost import XGBRegressor
 
 
 class XGBoostForecastAnomalyDetector:
-    """Predict next-window signals and score unusually large forecast errors.
+    """Forecast the next telemetry window and flag unusually large errors as novel.
 
-    This is a label-free novelty detector. Its scores do not identify or diagnose
-    mechanical faults.
+    Novelty scores are not verified fault diagnoses.
     """
 
     def __init__(
@@ -24,6 +23,7 @@ class XGBoostForecastAnomalyDetector:
         threshold_quantile: float = 0.99,
         random_state: int = 42,
     ) -> None:
+        """Set XGBoost options, target signals, and the novelty threshold percentile."""
         if not target_names:
             raise ValueError("target_names must contain at least one signal")
         if not 0 < threshold_quantile < 1:
@@ -49,6 +49,7 @@ class XGBoostForecastAnomalyDetector:
 
     @staticmethod
     def _features(features: pd.DataFrame | np.ndarray) -> pd.DataFrame:
+        """Convert inputs to a finite numeric DataFrame or raise a clear error."""
         frame = (
             features.copy()
             if isinstance(features, pd.DataFrame)
@@ -67,6 +68,7 @@ class XGBoostForecastAnomalyDetector:
     def fit(
         self, features: pd.DataFrame, targets: pd.DataFrame
     ) -> XGBoostForecastAnomalyDetector:
+        """Train on current-window features and the next-window signal targets."""
         x = self._features(features)
         y = self._features(targets)
         if len(x) != len(y) or len(x) < 2:
@@ -80,6 +82,7 @@ class XGBoostForecastAnomalyDetector:
         return self
 
     def _residuals(self, features: pd.DataFrame, targets: pd.DataFrame) -> np.ndarray:
+        """Calculate per-signal differences between observed and forecast values."""
         if self.feature_names is None:
             raise RuntimeError("fit must be called before scoring")
         x = self._features(features)
@@ -93,6 +96,7 @@ class XGBoostForecastAnomalyDetector:
         return y.to_numpy() - self.model.predict(x)
 
     def score(self, features: pd.DataFrame, targets: pd.DataFrame) -> np.ndarray:
+        """Return one scale-normalized forecast-error novelty score per row."""
         if self.residual_scale is None:
             raise RuntimeError("fit must be called before scoring")
         residuals = self._residuals(features, targets)
@@ -100,6 +104,7 @@ class XGBoostForecastAnomalyDetector:
         return np.sqrt(np.mean(np.square(scaled), axis=1))
 
     def calibrate(self, features: pd.DataFrame, targets: pd.DataFrame) -> np.ndarray:
+        """Learn per-signal error scales and set the threshold from calibration rows."""
         residuals = self._residuals(features, targets)
         scale = np.sqrt(np.mean(np.square(residuals), axis=0))
         self.residual_scale = np.where(scale > 1e-12, scale, 1.0)
@@ -108,6 +113,7 @@ class XGBoostForecastAnomalyDetector:
         return scores
 
     def predict(self, features: pd.DataFrame, targets: pd.DataFrame) -> pd.DataFrame:
+        """Return each row's novelty score and whether it exceeds the threshold."""
         if self.threshold is None:
             raise RuntimeError("fit and calibrate must be called before prediction")
         scores = self.score(features, targets)
@@ -117,12 +123,14 @@ class XGBoostForecastAnomalyDetector:
         )
 
     def save(self, path: str | Path) -> None:
+        """Save the fitted and calibrated detector as a joblib artifact."""
         if self.threshold is None or self.feature_names is None:
             raise RuntimeError("fit and calibrate must be called before saving")
         joblib.dump(self, path)
 
     @classmethod
     def load(cls, path: str | Path) -> XGBoostForecastAnomalyDetector:
+        """Load a saved detector and verify the artifact has the expected type."""
         detector = joblib.load(path)
         if not isinstance(detector, cls):
             raise TypeError(
