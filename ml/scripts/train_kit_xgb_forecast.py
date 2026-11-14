@@ -97,24 +97,95 @@ def summarize(scores: np.ndarray, threshold: float) -> dict:
     }
 
 
+def synthetic_sensitivity(
+    model: XGBoostForecastAnomalyDetector,
+    features: pd.DataFrame,
+    targets: pd.DataFrame,
+) -> dict:
+    """Measure response to artificial single-signal shifts, not real faults."""
+    if model.residual_scale is None or model.threshold is None:
+        raise RuntimeError("model must be calibrated before synthetic evaluation")
+    results = {}
+    for index, name in enumerate(model.target_names):
+        channel = name.removesuffix("__median")
+        results[channel] = {}
+        for multiplier in (2, 5, 10, 20):
+            perturbed = targets.copy()
+            perturbed[name] = perturbed[name] + multiplier * model.residual_scale[index]
+            results[channel][f"{multiplier}x_calibration_scale"] = float(
+                np.mean(model.score(features, perturbed) > model.threshold)
+            )
+    return results
+
+
+def select_forecast_modes(
+    features: pd.DataFrame,
+    targets: pd.DataFrame,
+    metadata: pd.DataFrame,
+    fit_dates: set[str],
+) -> tuple[dict[str, str], dict]:
+    """Select XGBoost or persistence per signal using only fit-date holdout."""
+    ordered_dates = sorted(fit_dates)
+    select_count = max(1, math.ceil(len(ordered_dates) * 0.20))
+    selection_dates = set(ordered_dates[-select_count:])
+    model_fit_dates = set(ordered_dates[:-select_count])
+    if not model_fit_dates:
+        raise ValueError("need at least two fit dates for model selection")
+    fit_mask = (metadata["split"] == "train") & metadata["recording_date"].isin(
+        model_fit_dates
+    )
+    selection_mask = (metadata["split"] == "train") & metadata["recording_date"].isin(
+        selection_dates
+    )
+    selector = XGBoostForecastAnomalyDetector(target_names=list(targets.columns))
+    selector.fit(features.loc[fit_mask], targets.loc[fit_mask])
+    predicted = selector.model.predict(features.loc[selection_mask])
+    observed = targets.loc[selection_mask].to_numpy()
+    persistence = features.loc[selection_mask, list(targets.columns)].to_numpy()
+    modes = {}
+    errors = {}
+    for index, name in enumerate(targets.columns):
+        xgb_mae = float(np.mean(np.abs(observed[:, index] - predicted[:, index])))
+        persistence_mae = float(
+            np.mean(np.abs(observed[:, index] - persistence[:, index]))
+        )
+        mode = "xgboost" if xgb_mae <= persistence_mae else "persistence"
+        modes[name] = mode
+        errors[name.removesuffix("__median")] = {
+            "xgboost_selection_mae": xgb_mae,
+            "persistence_selection_mae": persistence_mae,
+            "selected_forecaster": mode,
+        }
+    return modes, {
+        "fit_dates": sorted(model_fit_dates),
+        "selection_dates": sorted(selection_dates),
+        "per_signal": errors,
+    }
+
+
 def forecast_errors(
     model: XGBoostForecastAnomalyDetector,
     features: pd.DataFrame,
     targets: pd.DataFrame,
 ) -> dict:
-    """Compare per-signal forecast errors with a last-window persistence baseline."""
-    predictions = model.model.predict(features)
+    """Compare selected, XGBoost, and persistence forecast errors per signal."""
+    predictions = model.forecast(features)
+    xgb_predictions = model.model.predict(features)
     persistence_columns = list(targets.columns)
     persistence = features[persistence_columns].to_numpy()
     observed = targets.to_numpy()
     result = {}
     for index, name in enumerate(persistence_columns):
         xgb_error = observed[:, index] - predictions[:, index]
+        raw_xgb_error = observed[:, index] - xgb_predictions[:, index]
         persistence_error = observed[:, index] - persistence[:, index]
         result[name.removesuffix("__median")] = {
-            "xgboost_mae": float(np.mean(np.abs(xgb_error))),
+            "selected_forecaster": model.forecast_modes.get(name, "xgboost"),
+            "selected_mae": float(np.mean(np.abs(xgb_error))),
+            "xgboost_mae": float(np.mean(np.abs(raw_xgb_error))),
             "persistence_mae": float(np.mean(np.abs(persistence_error))),
-            "xgboost_rmse": float(np.sqrt(np.mean(np.square(xgb_error)))),
+            "selected_rmse": float(np.sqrt(np.mean(np.square(xgb_error)))),
+            "xgboost_rmse": float(np.sqrt(np.mean(np.square(raw_xgb_error)))),
             "persistence_rmse": float(np.sqrt(np.mean(np.square(persistence_error)))),
         }
     return result
@@ -139,6 +210,9 @@ def main() -> None:
     calibration_count = max(1, math.ceil(len(train_dates) * 0.20))
     calibration_dates = set(train_dates[-calibration_count:])
     fit_dates = set(train_dates[:-calibration_count])
+    forecast_modes, model_selection = select_forecast_modes(
+        features, targets, metadata, fit_dates
+    )
     fit_mask = (metadata["split"] == "train") & metadata["recording_date"].isin(
         fit_dates
     )
@@ -147,40 +221,59 @@ def main() -> None:
     )
 
     model = XGBoostForecastAnomalyDetector(
-        target_names=list(targets.columns), threshold_quantile=0.99, random_state=42
+        target_names=list(targets.columns),
+        threshold_quantile=0.99,
+        random_state=42,
+        forecast_modes=forecast_modes,
     )
     model.fit(features.loc[fit_mask], targets.loc[fit_mask])
-    calibration_scores = model.calibrate(
-        features.loc[calibration_mask], targets.loc[calibration_mask]
-    )
-    if model.threshold is None:
-        raise RuntimeError("calibration did not produce a novelty threshold")
-
-    results = {
-        "calibration": summarize(calibration_scores, model.threshold),
-    }
-    for split in ("validation", "test"):
-        mask = metadata["split"] == split
-        if mask.any():
-            results[split] = summarize(
-                model.score(features.loc[mask], targets.loc[mask]), model.threshold
-            )
-            results[split]["forecast_errors"] = forecast_errors(
-                model, features.loc[mask], targets.loc[mask]
-            )
+    aggregation_results = {}
+    for aggregation in ("rms", "max"):
+        model.score_aggregation = aggregation
+        calibration_scores = model.calibrate(
+            features.loc[calibration_mask], targets.loc[calibration_mask]
+        )
+        if model.threshold is None:
+            raise RuntimeError("calibration did not produce a novelty threshold")
+        aggregation_result = {
+            "calibration": summarize(calibration_scores, model.threshold),
+        }
+        for split in ("validation", "test"):
+            mask = metadata["split"] == split
+            if mask.any():
+                split_features = features.loc[mask]
+                split_targets = targets.loc[mask]
+                aggregation_result[split] = summarize(
+                    model.score(split_features, split_targets), model.threshold
+                )
+                aggregation_result[split]["forecast_errors"] = forecast_errors(
+                    model, split_features, split_targets
+                )
+                aggregation_result[split]["synthetic_single_signal_sensitivity"] = (
+                    synthetic_sensitivity(model, split_features, split_targets)
+                )
+        aggregation_results[aggregation] = aggregation_result
+    model.score_aggregation = "max"
+    model.calibrate(features.loc[calibration_mask], targets.loc[calibration_mask])
+    results = aggregation_results["max"]
 
     ARTIFACT_PATH.parent.mkdir(parents=True, exist_ok=True)
     model.save(ARTIFACT_PATH)
     report = {
         "dataset": "KIT Automotive OBD-II",
         "source_doi": "10.35097/1130",
-        "method": "XGBoost next-window forecasting with residual novelty scores",
+        "method": "per-signal XGBoost/persistence forecasting with calibrated RMS or max residual novelty scores",
         "target": "median sensor values in the immediately following 10-second window",
         "input": "current window medians, population standard deviations, and missing fractions",
         "fit_date_count": len(fit_dates),
         "calibration_date_count": len(calibration_dates),
         "fit_dates": sorted(fit_dates),
         "calibration_dates": sorted(calibration_dates),
+        "model_selection": model_selection,
+        "forecast_modes": {
+            name.removesuffix("__median"): mode for name, mode in forecast_modes.items()
+        },
+        "score_aggregation": model.score_aggregation,
         "feature_count": int(features.shape[1]),
         "target_count": int(targets.shape[1]),
         "threshold_quantile": model.threshold_quantile,
@@ -195,15 +288,18 @@ def main() -> None:
             "n_jobs": 4,
         },
         "results": results,
+        "score_aggregation_comparison": aggregation_results,
         "interpretation": (
-            "Novelty flags mark windows whose forecast residual is large relative to the "
-            "calibration dates. KIT has no verified fault labels; these are not fault diagnoses "
-            "or fault-detection metrics."
+            "Each sensor uses the XGBoost or persistence forecast with lower MAE on a held-out "
+            "subset of training dates. Novelty flags mark large scale-normalized residuals "
+            "relative to later training calibration dates. KIT has no verified fault labels; "
+            "these are not fault diagnoses or fault-detection metrics."
         ),
         "limitations": [
             "Recording IDs are not verified vehicle IDs.",
             "Anomalous training/calibration windows may affect fit and threshold.",
             "The threshold is calibrated from a small chronological subset of training dates.",
+            "Per-signal forecaster selection optimizes forecast MAE, a label-free surrogate that does not prove fault-detection quality.",
             "A high novelty score can reflect normal context or operating-regime changes.",
             "No RUL, future-failure, or supervised fault claim is supported.",
         ],
