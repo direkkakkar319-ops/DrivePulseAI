@@ -10,15 +10,15 @@ incremental cache remains local and ignored. See [docs/graphify.md](docs/graphif
 
 ## KIT XGBoost forecast novelty baseline — 2026-11-14
 
-Implemented and ran an exploratory multi-output XGBoost model that predicts the
-next 10-second KIT sensor medians from the current window's 30 summary features.
-It fits on 25 chronological training dates and calibrates residual scales and a
-99th-percentile threshold on the last seven training dates. Novelty rates were
-1.17% on validation (3,839 pairs) and 1.24% on test (3,967 pairs). KIT has no
-verified fault labels, so these are descriptive novelty rates, not fault
-metrics. Compared with last-window persistence, XGBoost had lower per-signal MAE
-on 7/10 signals in both validation and test, with worse MAE on coolant,
-throttle, and ambient temperature. It has no uniform forecast advantage. Details:
+Improved the exploratory model to select XGBoost or persistence per signal using
+training-date holdout, calibrate on later training dates, and score with the max
+normalized per-sensor residual. It flagged 1.48% of validation pairs and 2.29%
+of test pairs. Against XGBoost, the selected forecast improves test MAE on five
+signals, worsens two, and ties three; results remain mixed. Max aggregation
+flagged about 97.6% of severe (10x calibration-scale) synthetic single-signal
+shifts on validation, versus 92.2% with RMS. Synthetic shifts are not real faults.
+KIT still has no verified fault labels, so neither novelty rates nor synthetic
+sensitivity are fault-detection metrics. Details:
 [baseline report](ml/reports/modeling/kit_xgb_forecast_baseline.md)
 and [machine-readable output](ml/reports/modeling/kit_xgb_forecast_baseline.json).
 The model artifact remains local in ignored `ml/artifacts/`.

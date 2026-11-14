@@ -26,11 +26,14 @@ The current model uses unlabeled OBD-II recordings of a Seat Leon. It predicts
 the sensor medians in the next 10-second window from the current window's summary
 features. Large forecast errors are marked as statistically novel.
 
-- It was calibrated on later training dates and evaluated on chronological
-  validation and test dates. The novelty rates were 1.17% and 1.24% respectively.
-- Against a simple last-window forecast, XGBoost had lower mean absolute error on
-  7 of 10 signals in both splits, and higher error on coolant, throttle, and
-  ambient temperature.
+- It selects XGBoost or a last-window persistence forecast per signal using
+  training dates, then calibrates on later training dates. A maximum normalized
+  per-sensor residual is used to give sparse, single-sensor deviations more
+  influence. It flagged 1.48% of validation and 2.29% of test windows.
+- The selected forecast improves test MAE over XGBoost on five signals but is
+  worse on two and ties three; forecast quality is mixed. Synthetic 10x-scale
+  single-sensor shifts were flagged in about 98% of validation cases, but these
+  are artificial sensitivity checks, not real fault examples.
 - KIT has no verified fault labels or independent vehicle IDs. These figures do
   not measure fault-detection accuracy, and a novelty flag is not a fault
   diagnosis. A score is available only after the following 10-second window
