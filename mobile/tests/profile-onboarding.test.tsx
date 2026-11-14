@@ -12,6 +12,10 @@ import type { PickProfilePhoto, ProfileIdentity, ProfilePhoto } from '../src/typ
 const account: AuthUser = { uid: 'account-one', email: 'driver@example.com', displayName: null, emailVerified: true };
 let mockUser: AuthUser | null = account;
 const mockPush = jest.fn(), mockReplace = jest.fn(), mockContinue = jest.fn(), mockSkip = jest.fn();
+const mockSaveProfile = jest.fn();
+jest.mock('../src/store/onboardingStore', () => ({ useOnboarding: () => ({
+  resource: { status: 'ready', data: { full_name: null } }, saving: false, saveProfile: mockSaveProfile,
+}) }));
 jest.mock('../src/store/authStore', () => ({ useAuthStore: () => ({ user: mockUser }) }));
 jest.mock('../src/api/auth', () => ({ authService: { saveUsername: jest.fn(), signUp: jest.fn() } }));
 jest.mock('expo-router', () => {
@@ -28,7 +32,7 @@ function Draft({ identity = account, pickPhoto }: { identity?: ProfileIdentity; 
   return <ProfileOnboardingForm {...form} onContinue={() => mockContinue(form.result())} onSkip={mockSkip} />;
 }
 
-beforeEach(() => { jest.clearAllMocks(); mockUser = account; });
+beforeEach(() => { jest.clearAllMocks(); mockUser = account; mockSaveProfile.mockResolvedValue(undefined); });
 
 it('keeps Welcome Get started and login destinations unchanged', async () => {
   await render(<Welcome />);
@@ -81,7 +85,7 @@ it.each([
 ])('allows Continue with licence answer %s', async (label, value) => {
   await render(<Draft />);
   await fireEvent.press(screen.getByRole('radio', { name: label }));
-  expect(screen.getByRole('radio', { name: label })).toHaveProp('accessibilityState', { checked: true });
+  expect(screen.getByRole('radio', { name: label })).toHaveProp('accessibilityState', expect.objectContaining({ checked: true }));
   expect(screen.getAllByRole('radio').filter(radio => radio.props.accessibilityState.checked)).toHaveLength(1);
   expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
   await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
@@ -92,7 +96,7 @@ it('replaces the selected licence answer without restricting access and allows S
   await render(<Draft />);
   await fireEvent.press(screen.getByRole('radio', { name: 'Yes' }));
   await fireEvent.press(screen.getByRole('radio', { name: 'No' }));
-  expect(screen.getByRole('radio', { name: 'Yes' })).toHaveProp('accessibilityState', { checked: false });
+  expect(screen.getByRole('radio', { name: 'Yes' })).toHaveProp('accessibilityState', expect.objectContaining({ checked: false }));
   await fireEvent.press(screen.getByRole('button', { name: 'Skip for now' }));
   expect(mockSkip).toHaveBeenCalledTimes(1);
   expect(mockContinue).not.toHaveBeenCalled();
@@ -142,11 +146,12 @@ it('prevents duplicate photo selection while the system picker is open', async (
   expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
 });
 
-it.each(['Continue', 'Skip for now'])('returns to the current dashboard with %s and no account writes', async action => {
+it.each(['Continue', 'Skip for now'])('persists profile with %s without writing Firebase identity', async action => {
   await render(<ProfileSetupRoute />);
   await fireEvent.changeText(screen.getByLabelText('Full name'), 'Optional name');
   await fireEvent.press(screen.getByRole('button', { name: action }));
-  expect(mockReplace).toHaveBeenCalledWith('/(main)/dashboard');
+  expect(mockSaveProfile).toHaveBeenCalledWith({ full_name: action === 'Continue' ? 'Optional name' : null, driving_licence: null });
+  expect(mockReplace).not.toHaveBeenCalled();
   expect(mockPush).not.toHaveBeenCalled();
   expect(authService.saveUsername).not.toHaveBeenCalled();
 });

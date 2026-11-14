@@ -6,6 +6,9 @@ import { pickProfilePhoto } from '../src/lib/profile-photo';
 import { authService } from '../src/api/auth';
 
 const mockReplace = jest.fn();
+jest.mock('../src/store/onboardingStore', () => ({ useOnboarding: () => ({
+  resource: { status: 'ready', data: { full_name: null } }, saving: false, saveProfile: jest.fn(),
+}) }));
 let mockUser = { uid: 'photo-account', email: 'driver@example.com', displayName: null as string | null, emailVerified: true };
 jest.mock('../src/store/authStore', () => ({ useAuthStore: () => ({ user: mockUser }) }));
 jest.mock('../src/api/auth', () => ({ authService: { saveUsername: jest.fn(), signUp: jest.fn() } }));

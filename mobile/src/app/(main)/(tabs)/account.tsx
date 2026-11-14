@@ -8,6 +8,8 @@ import { authErrorMessage } from '@/api/auth-errors';
 import { UsernameSaveNotice } from '@/components/username-save-notice';
 import { Button, Copy, Page, Panel, SectionHeader, StatusPill } from '@/components/recorded/ui';
 import { colors, spacing, type } from '@/components/recorded/theme';
+import { useRouter } from 'expo-router';
+import { useOnboarding } from '@/store/onboardingStore';
 export function AccountDetails() {
   const { user, usernameSavePending } = useAuthStore();
   const sync = useProfileSync();
@@ -47,10 +49,14 @@ export function AccountDetails() {
   );
 }
 export default function Account() {
+  const router = useRouter();
+  const { resource } = useOnboarding();
   return (
     <Page title="Account" back accountAction={false}>
       <Copy muted>Manage the Firebase account used to access this recorded telemetry prototype.</Copy>
       <AccountDetails />
+      {resource.status === 'ready' && <Panel><Copy muted>App profile name</Copy><Copy>{resource.data.full_name}</Copy><Copy muted style={type.caption}>Profile photos are temporary; no photo is stored on the server.</Copy></Panel>}
+      <Button title="My Garage" secondary onPress={() => router.push('/(main)/(tabs)/vehicles')} />
       <Copy muted style={type.caption}>DrivePulse AI · Recorded battery telemetry prototype</Copy>
     </Page>
   );

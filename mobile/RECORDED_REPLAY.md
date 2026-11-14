@@ -27,8 +27,10 @@ The old grouped account URL is preserved. No authentication routes were removed.
 
 Firebase login/signup, verification, session restoration and native configuration are
 unchanged. Account retains sign-out, username-save retry and profile-sync retry. The
-existing profile sync may report a backend error, but recorded replay does not require
-PostgreSQL or a network connection. No new dependency or native build configuration was added.
+recorded-data adapter itself does not require PostgreSQL or a network connection.
+Phase 3.4 now requires a reachable backend at the signed-in gate to restore durable
+onboarding state before entering these screens. No replay dependency or replay
+native build configuration was added.
 
 ## Real fixture provenance
 

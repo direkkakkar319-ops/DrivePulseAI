@@ -10,7 +10,13 @@ const account: AuthUser = { uid: 'vehicle-account', email: 'driver@example.com',
 let mockUser: AuthUser | null = account;
 let mockCanGoBack = true;
 const mockReplace = jest.fn(), mockBack = jest.fn();
+const mockSaveVehicle = jest.fn();
+jest.mock('../src/store/onboardingStore', () => ({ useOnboarding: () => ({
+  resource: { status: 'ready', data: { completed_at: '2026-01-01T00:00:00Z' } }, saving: false,
+  saveFirstVehicle: mockSaveVehicle, reload: jest.fn(),
+}) }));
 jest.mock('../src/store/authStore', () => ({ useAuthStore: () => ({ user: mockUser }) }));
+jest.mock('../src/api/auth', () => ({ authService: { signOut: jest.fn() } }));
 jest.mock('expo-router', () => {
   const React = require('react');
   const { Text } = require('react-native');
@@ -20,7 +26,7 @@ jest.mock('expo-router', () => {
   };
 });
 
-beforeEach(() => { jest.clearAllMocks(); mockUser = account; mockCanGoBack = true; });
+beforeEach(() => { jest.clearAllMocks(); mockUser = account; mockCanGoBack = true; mockSaveVehicle.mockResolvedValue(undefined); });
 
 async function enterVehicle() {
   await fireEvent.changeText(screen.getByLabelText('Manufacturer'), ' Any Manufacturer ');
@@ -135,7 +141,7 @@ it('locks inputs during an asynchronous submit, prevents duplicates, and recover
   expect(screen.queryByRole('alert')).toBeNull();
 });
 
-it('keeps the new route opt-in and returns valid submissions to the current dashboard', async () => {
+it('submits valid vehicle metadata to persistent onboarding without navigating before confirmation', async () => {
   await render(<VehicleSetupRoute />);
   expect(mockReplace).not.toHaveBeenCalled();
   expect(screen.getByText('Vehicle setup · Step 1 of 1')).toBeTruthy();
@@ -144,7 +150,8 @@ it('keeps the new route opt-in and returns valid submissions to the current dash
   await enterVehicle();
   await fireEvent.press(screen.getByRole('radio', { name: 'Fully Electric (EV)' }));
   await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  expect(mockReplace).toHaveBeenCalledWith('/(main)/dashboard');
+  expect(mockSaveVehicle).toHaveBeenCalledWith(expect.objectContaining({ powertrain: 'ev', manufacturer: 'Any Manufacturer', fuelType: null }));
+  expect(mockReplace).not.toHaveBeenCalled();
 });
 
 it('preserves the existing verified-account entry redirect', async () => {

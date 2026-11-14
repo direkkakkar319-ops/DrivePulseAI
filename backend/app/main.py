@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.routes.onboarding import router as onboarding_router
 from app.api.routes.users import router
 from app.config import Settings, get_settings
 from app.database import build_engine
@@ -28,10 +29,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         application.add_middleware(
             CORSMiddleware,
             allow_origins=settings.cors_origins,
-            allow_methods=["GET", "PUT"],
-            allow_headers=["Authorization", "Content-Type"],
+            allow_methods=["GET", "PUT", "POST"],
+            allow_headers=["Authorization", "Content-Type", "X-Account-UID"],
         )
     application.include_router(router)
+    application.include_router(onboarding_router)
 
     @application.get("/health")
     def health() -> dict[str, str]:

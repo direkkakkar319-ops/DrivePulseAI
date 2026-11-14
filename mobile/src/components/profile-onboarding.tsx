@@ -25,6 +25,9 @@ export interface ProfileOnboardingProps {
   removePhoto: () => void;
   onContinue: () => void;
   onSkip: () => void;
+  saving?: boolean;
+  submitError?: string;
+  onLogout?: () => void;
 }
 
 const licenceChoices: { value: DrivingLicenceAnswer; label: string }[] = [
@@ -34,7 +37,7 @@ const licenceChoices: { value: DrivingLicenceAnswer; label: string }[] = [
 ];
 
 export function ProfileOnboardingForm({ draft, displayName, initials, selectingPhoto, photoError, canSelectPhoto,
-  setFullName, setDrivingLicence, selectPhoto, removePhoto, onContinue, onSkip }: ProfileOnboardingProps) {
+  setFullName, setDrivingLicence, selectPhoto, removePhoto, onContinue, onSkip, saving = false, submitError = '', onLogout }: ProfileOnboardingProps) {
   return <AppScreen keyboardAvoiding contentContainerStyle={styles.page}>
     <StatusBar style="dark" />
     <AppBrand />
@@ -50,34 +53,36 @@ export function ProfileOnboardingForm({ draft, displayName, initials, selectingP
           </View>}
       <AppText variant="subtitle" accessibilityLabel={`Display name: ${displayName}`}>{displayName}</AppText>
       <AppButton title={draft.photo ? 'Change photo' : 'Choose photo'} variant="secondary" loading={selectingPhoto}
-        disabled={!canSelectPhoto} onPress={selectPhoto} />
-      {draft.photo && <AppButton title="Remove photo" variant="text" disabled={selectingPhoto} onPress={removePhoto} />}
+        disabled={!canSelectPhoto || saving} onPress={selectPhoto} />
+      {draft.photo && <AppButton title="Remove photo" variant="text" disabled={selectingPhoto || saving} onPress={removePhoto} />}
       {!canSelectPhoto && <AppText variant="caption" tone="secondary">Photo selection is unavailable in this build. You can use your initials.</AppText>}
       <AppText variant="caption" tone="secondary">Profile photo · Optional</AppText>
     </AppCard>
     {!!photoError && <AppStatus label={photoError} tone="error" variant="notice" />}
-    <AppTextField label="Full name" value={draft.fullName} onChangeText={setFullName}
+    <AppTextField label="Full name" value={draft.fullName} onChangeText={setFullName} editable={!saving}
       autoComplete="name" autoCapitalize="words" maxLength={120}
-      hint="Optional. Leave blank to use the name before @ in your email." />
+      hint="Optional. Leave blank to keep your account name, or use your email name if none is set." />
     <View style={styles.section}>
       <AppText variant="subtitle">Do you have a driving licence?</AppText>
       <AppText tone="secondary">Optional. Your answer does not affect access to the app.</AppText>
       <View accessibilityRole="radiogroup" accessibilityLabel="Do you have a driving licence?" style={styles.choices}>
         {licenceChoices.map(choice => <LicenceChoice key={choice.value} label={choice.label}
-          selected={draft.drivingLicence === choice.value} onPress={() => setDrivingLicence(choice.value)} />)}
+          selected={draft.drivingLicence === choice.value} disabled={saving} onPress={() => setDrivingLicence(choice.value)} />)}
       </View>
     </View>
-    <AppText variant="caption" tone="secondary">These details are only kept while this screen is open. They are not saved to your account yet.</AppText>
+    <AppText variant="caption" tone="secondary">Your name and licence answer are saved when you continue. Selected photos are temporary previews; your initials will be used after reopening the app.</AppText>
+    {!!submitError && <AppStatus label={submitError} tone="error" variant="notice" />}
     <View style={styles.section}>
-      <AppButton title="Continue" disabled={selectingPhoto} onPress={onContinue} />
-      <AppButton title="Skip for now" variant="text" disabled={selectingPhoto} onPress={onSkip} />
+      <AppButton title="Continue" disabled={selectingPhoto} loading={saving} onPress={onContinue} />
+      <AppButton title="Skip for now" variant="text" disabled={selectingPhoto || saving} onPress={onSkip} />
+      {onLogout && <AppButton title="Log out" variant="text" disabled={selectingPhoto || saving} onPress={onLogout} />}
     </View>
   </AppScreen>;
 }
 
-function LicenceChoice({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+function LicenceChoice({ label, selected, onPress, disabled }: { label: string; selected: boolean; onPress: () => void; disabled: boolean }) {
   const [focused, setFocused] = useState(false);
-  return <Pressable accessibilityRole="radio" accessibilityLabel={label} accessibilityState={{ checked: selected }}
+  return <Pressable accessibilityRole="radio" accessibilityLabel={label} accessibilityState={{ checked: selected, disabled }} disabled={disabled}
     onPress={onPress} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
     style={({ pressed }) => [styles.choice, {
       backgroundColor: selected || pressed ? colors.accentSoft : colors.background,

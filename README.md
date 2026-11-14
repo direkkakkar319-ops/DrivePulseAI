@@ -17,12 +17,15 @@ The intended platform would ingest high-frequency time-series telemetry and buil
 ## Current implementation status
 
 DrivePulse AI is a development prototype. Android Firebase authentication and
-FastAPI/PostgreSQL account-profile synchronization are implemented. The mobile UI
+FastAPI/PostgreSQL account-profile synchronization, persistent onboarding, and
+account-owned vehicle metadata are implemented. Saved vehicles and their active
+selection survive restarts; the backend must be reachable to restore account state.
+Profile photo selection remains a temporary local preview. The mobile UI
 provides a clearly labelled, session-only demo garage, sensor history, illustrative
 assessments, observations, and report previews. These are deterministic fixtures.
 
-ML data preparation exists, but trained models, live telemetry ingestion, vehicle
-persistence, production predictions, and report generation are not implemented.
+ML data preparation exists, but live telemetry ingestion, production predictions,
+and report generation are not implemented in the app.
 The capabilities, integrations, performance targets, and commercial tiers below
 describe the intended product, not currently available or validated functionality.
 See [future mobile integration](docs/future-mobile-integration.md) for implementation

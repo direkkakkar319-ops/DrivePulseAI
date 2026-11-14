@@ -169,11 +169,32 @@ email delivery, native compilation, or Android back-stack/deep-link behavior.
 
 ## Recorded frontend and integration boundary
 
+Phase 3.4 adds a server-backed onboarding gate before signed-in screens. Apply the
+backend Alembic migration and run FastAPI first; configure `EXPO_PUBLIC_API_URL` to
+a URL reachable from the phone. See the [onboarding API](../backend/README.md#persistent-onboarding-and-garage-phase-34).
+
+Verified users resume Profile Setup or First Vehicle Setup using PostgreSQL
+milestones. Saving the first vehicle activates it and opens Home. Completed
+accounts enter Home directly. Backend failures offer Retry/Logout and never
+fabricate completion. Firebase login, verification, and identity synchronization
+are unchanged. The chosen app name is separate from Firebase's display name.
+
+Account → My Garage shows owned vehicles and the persisted active selection above
+the separate session-only Demo garage. Demo selection never changes the active
+owned vehicle. Add demo vehicle remains available. Owned records have no connected
+telemetry and are never assigned bundled Nissan Leaf recordings.
+
+Profile photos are temporary local previews only. They are not uploaded, referenced
+in PostgreSQL, or restored across sessions; initials remain the fallback. Profile
+and vehicle steps advance only after server confirmation. There is no local
+completion flag or in-memory substitute for durable storage.
+
 The primary MVP uses a light, restrained battery telemetry interface with genuine saved
 Nissan Leaf measurements and experimental anomaly scores. See [RECORDED_REPLAY.md](RECORDED_REPLAY.md)
 for navigation, provenance, playback semantics, data contracts and Step 3 requirements.
 
-The local replay is functional without PostgreSQL. Existing profile synchronization and
-account retry remain separate. No FastAPI replay endpoints or live inference were added.
+The replay data adapter is local, but the onboarding gate now requires backend
+connectivity to restore account state. Existing profile synchronization and account
+retry remain separate. No FastAPI replay endpoints or live inference were added.
 Legacy simulated vehicle, sensor and report routes remain labelled and are not mixed
 into recorded screens. Physical Android verification is still required after this change.

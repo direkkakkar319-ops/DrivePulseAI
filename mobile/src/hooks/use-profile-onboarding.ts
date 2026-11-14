@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ProfilePhotoSelectionError, type DrivingLicenceAnswer, type PickProfilePhoto, type ProfileIdentity, type ProfileOnboardingDraft, type ProfileOnboardingResult } from '@/types/profile-onboarding';
 
 export function profileDisplayName(identity: ProfileIdentity, fullName: string) {
-  return fullName.trim() || identity.email?.split('@')[0]?.trim() || identity.displayName?.trim() || 'Your profile';
+  return fullName.trim() || identity.displayName?.trim() || identity.email?.split('@')[0]?.trim() || 'Your profile';
 }
 
 export function profileInitials(name: string) {
