@@ -1,6 +1,6 @@
 # Dataset inventory and audit
 
-Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Audited 2026-10-04; no datasets downloaded, models trained, or preprocessing performed.
+Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Dataset audits refreshed 2026-11-14. KIT and Oxford exploratory preprocessing artifacts have been generated locally; no models were trained. Raw data remain unchanged.
 
 **AI4I is an industrial-machine benchmark and must not be interpreted as automotive telemetry.**
 
@@ -18,6 +18,8 @@ Documents the local dataset inventory, immutable raw locations, validation findi
 | DieselOBD candidate | UNVERIFIED | `automotive_obd/dieselobd/raw/`: two OBD/DTC Excel workbooks; no source documentation |
 | VED | REMOVED 2026-10-06: static metadata only, no telemetry; unused by any loader | `automotive_obd/ved/raw/` (deleted) |
 | KIT Automotive OBD-II | COMPLETE | `automotive_obd/kit_obd/raw/`: 81 actual CSV recordings plus original RADAR metadata/BagIt payload |
+| Oxford Battery Degradation Dataset 1 | COMPLETE source; limited SOH/RUL research only | `automotive_prognostics/oxford_battery_degradation/v1/raw/`; local processed cycle features are gitignored |
+| Zenodo 515-EV fault dataset | COMPLETE archives; fault-label joins BLOCKED | `automotive_prognostics/ev_fault_515/v1/raw/`; seven original archives, kept local and gitignored |
 | Scania APS Failure | COMPLETE | `automotive_failure/scania_aps/raw/`: official-named training/test CSVs and description |
 | SCANIA Component X | REMOVED 2026-10-06: citation only, data never downloaded; RUL blocked until the official release arrives | `automotive_prognostics/scania_component_x/` (deleted) |
 | AI4I derivative | REMOVED 2026-10-06: industrial benchmark, superseded by Scania APS; loaders deleted | `benchmarks/ai4i/raw/` (deleted) |
@@ -27,7 +29,7 @@ No additional NASA battery dataset was found. No exact duplicate standalone raw 
 
 ## Raw-data rules
 
-Raw contents are unchanged, including malformed rows, missing cells, duplicate rows, original encodings, column names and official split files. Do not train directly through the existing cross-domain mapping loaders. Corrections, filtering, unit conversions, deduplication and features belong in a separately reviewed future preprocessing step. No processed datasets were created.
+Raw contents are unchanged, including malformed rows, missing cells, duplicate rows, original encodings, column names and official split files. Do not train directly through the existing cross-domain mapping loaders. KIT and Oxford have reproducible, dataset-specific exploratory preprocessing scripts; generated artifacts stay local and gitignored. Zenodo preprocessing remains blocked on authoritative sample/vehicle/label joins. Model training has not been performed.
 
 Directory grouping is organizational: placing a candidate under `dieselobd` or `carobd` does not verify its origin. Never infer vehicle class from AI4I H/L/M, vehicle telemetry from make/model, or mechanical diagnoses from unlabeled recordings.
 
@@ -70,6 +72,7 @@ Directory grouping is organizational: placing a candidate under `dieselobd` or `
 - No repeated full rows found within individual files; no official train/test split or verified mechanical-failure labels. Road-condition names are not fault labels. Intended use: automotive telemetry/anomaly methods, not supervised component diagnosis.
 - Original BagIt structure remains under `raw/10.35097-1130/`. All six listed payload/tag MD5 checks pass. Its nested `data/dataset/OBD-II-Dataset.zip` is intentionally retained because it is the original payload referenced by the BagIt manifest. Training code should read only `raw/recordings/`, not recursively ingest archive and extracted data twice.
 - The separately downloaded `RADAR_DATASET_DESCRIPTIVE_METADATA` differs byte-for-byte from the embedded XML; both are retained as provenance records, not collapsed by filename. Both identify the same dataset; no version superiority is assumed.
+- `ml/scripts/preprocess_oxford_battery.py` creates a local-only cell-cycle feature table, relative SOH, and explicitly threshold-derived/censored RUL under the 75% convention. The generated output is ignored by Git. It does not train a model. It is suitable for small cell-disjoint SOH experiments and a limited RUL method-development exercise, not robust RUL model claims or failure classification.
 - Reproducible exploratory preprocessing: from `ml/`, run `python scripts/preprocess_kit_obd.py`. The script writes a local-only `processed/windows_10s.csv.gz` and `processed/preprocessing_summary.json`; generated output is gitignored. It aggregates each signal into median, population standard deviation, and missing fraction per 10-second window. It performs no imputation, drops windows with a signal entirely absent, retains source acquisition order, and starts a new segment at each backward timestamp jump. The chronological split groups every recording from the same filename date into one split (70% train, 15% validation, 15% test). This is a temporal exploratory split, not an official split or evidence of independent vehicles. Windows remain unlabeled; no supervised fault or RUL claim is supported.
 
 ## Scania APS Failure
