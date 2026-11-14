@@ -2,6 +2,23 @@
 
 This log records the ordered work and verification. Status labels distinguish verified results from open work. Before Step 0, repository source code, configuration and notebooks were not edited during the audit; Step 0 added only the shared seed helper. Acquired source archives are unchanged downloads under `data/automotive_prognostics/scania_component_x/v3/raw/`, `data/automotive_prognostics/onroad_ev_capacity/source_release/`, and `data/automotive_prognostics/ev_fault_347/v1/raw/`.
 
+## KIT XGBoost forecast novelty baseline — 2026-11-14
+
+- Added `XGBoostForecastAnomalyDetector` and `ml/scripts/train_kit_xgb_forecast.py`.
+- Trained on KIT's current-window summary features to predict the next consecutive
+  10-second window's ten sensor medians. Pairs stay within recording, segment,
+  and date partitions; 25 training dates fit the model and seven later training
+  dates calibrate residual scales and the p99 novelty threshold.
+- Scored 3,839 validation pairs (45 above threshold; 1.17%) and 3,967 test pairs
+  (49 above threshold; 1.24%). These are unlabeled novelty rates, not fault
+  metrics. No RUL or failure classification was trained.
+- Compared forecast errors with last-window persistence: XGBoost had lower
+  per-signal MAE for 7/10 medians on both validation and test, and worse MAE for
+  coolant, throttle, and ambient temperature on both. No uniform advantage.
+- Added a human-readable report and JSON output under
+  `ml/reports/modeling/kit_xgb_forecast_baseline.*`. The trained joblib artifact
+  remains ignored under `ml/artifacts/`.
+
 ## Step 0 — Setup and baseline
 
 **Status: ✅ Done and verified in the existing local environment.**

@@ -8,6 +8,21 @@ ML, simulator, tests, and project records; its inferred links require source
 verification. The generated snapshots and manifests are retained, while the
 incremental cache remains local and ignored. See [docs/graphify.md](docs/graphify.md).
 
+## KIT XGBoost forecast novelty baseline — 2026-11-14
+
+Implemented and ran an exploratory multi-output XGBoost model that predicts the
+next 10-second KIT sensor medians from the current window's 30 summary features.
+It fits on 25 chronological training dates and calibrates residual scales and a
+99th-percentile threshold on the last seven training dates. Novelty rates were
+1.17% on validation (3,839 pairs) and 1.24% on test (3,967 pairs). KIT has no
+verified fault labels, so these are descriptive novelty rates, not fault
+metrics. Compared with last-window persistence, XGBoost had lower per-signal MAE
+on 7/10 signals in both validation and test, with worse MAE on coolant,
+throttle, and ambient temperature. It has no uniform forecast advantage. Details:
+[baseline report](ml/reports/modeling/kit_xgb_forecast_baseline.md)
+and [machine-readable output](ml/reports/modeling/kit_xgb_forecast_baseline.json).
+The model artifact remains local in ignored `ml/artifacts/`.
+
 **Baseline:** local checkout `main` at `9d79a59` (commit subject “Audit and organize datasets…”), as of 2026-11-13. The workspace already had extensive modifications before this report; they were preserved. Audit reports and `tasks_done.md` are documentation additions; Component X v3 publisher files were acquired under `data/automotive_prognostics/scania_component_x/v3/raw/` and retained unchanged. **User scope decision: passenger cars and passenger EVs only.** Truck datasets are excluded from car performance claims.
 
 ## Step 0 — environment and baseline (2026-11-13)
