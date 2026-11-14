@@ -33,9 +33,13 @@ crossing cells; 403 rows have no RUL target. Cell2 first drops below threshold
 at cycle 7,400, then rebounds above it at cycles 7,500 and 7,600; its 7,400
 source discharge curve is also shorter than neighboring records. Cell5 crosses
 only at its final cycle 5,000. No cell has two consecutive below-threshold
-records from its first crossing. No RUL model was trained. The first-crossing
-target and event persistence must be decided before modeling; eight cells and
-two nominal crossings do not support a meaningful cell-disjoint RUL evaluation.
+records from its first crossing. An exploratory Theil–Sen per-cell capacity
+trend baseline was subsequently evaluated; it had pooled rolling-origin MAE
+1,419 cycles and RMSE 2,406 cycles, with poor and cell-dependent results. It is
+not a validated or transferable RUL model. The first-crossing target remains
+ambiguous, and eight cells/two nominal crossings do not support meaningful
+cell-disjoint evaluation. See
+[`ml/reports/modeling/oxford_rul_trend_baseline.md`](ml/reports/modeling/oxford_rul_trend_baseline.md).
 
 **Baseline:** local checkout `main` at `9d79a59` (commit subject “Audit and organize datasets…”), as of 2026-11-13. The workspace already had extensive modifications before this report; they were preserved. Audit reports and `tasks_done.md` are documentation additions; Component X v3 publisher files were acquired under `data/automotive_prognostics/scania_component_x/v3/raw/` and retained unchanged. **User scope decision: passenger cars and passenger EVs only.** Truck datasets are excluded from car performance claims.
 

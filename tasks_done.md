@@ -31,9 +31,28 @@ This log records the ordered work and verification. Status labels distinguish ve
   7,400 recovers above threshold at 7,500 and 7,600; the source curve is shorter
   than its neighbors. Cell5's crossing occurs only at its last record.
 - No cell has two consecutive below-threshold observations from its first
-  crossing. This is a diagnostic, not an official EOL rule. RUL modeling has not
-  started; first-crossing target validity needs a decision. A meaningful
-  cell-disjoint RUL evaluation is unsupported with only two nominal event cells.
+  crossing. This is a diagnostic, not an official EOL rule. The target remains
+  ambiguous and meaningful cell-disjoint RUL evaluation is unsupported with
+  only two nominal event cells.
+
+## Oxford Theil–Sen RUL trend prototype — 2026-11-14
+
+- Chose a per-cell Theil–Sen capacity-trend extrapolator instead of XGBoost or a
+  pooled learned regressor because there are only two nominal event cells and
+  the target crossings are questionable. Theil–Sen gives an interpretable local
+  slope and is less sensitive to single noisy capacity points.
+- Implemented `TheilSenCapacityTrendRUL` in `ml/src/models/rul_regressor.py`. At
+  each cutoff it uses only that cell's prior 1,000 drive-cycle history (minimum
+  four observations) and projects the capacity slope to the exploratory 75%
+  threshold. It is a per-cell rule, not a transferable global model.
+- Added `ml/scripts/evaluate_oxford_rul_trend.py` and modeling reports. A
+  rolling-origin backtest over 107 correlated origins produced pooled MAE
+  1,419 cycles and RMSE 2,406 cycles. Cell2 MAE was 1,426 cycles; Cell5 MAE was
+  1,408 cycles, with opposite bias directions. These results are poor and do
+  not establish generalization to new cells.
+- No target smoothing, SMOTE, or random row split was used. No production model
+  or passenger-EV claim is supported. The baseline is being included with the
+  Oxford EDA PR for review; do not merge without user approval.
 
 ## Step 0 — Setup and baseline
 

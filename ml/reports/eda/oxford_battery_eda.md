@@ -76,8 +76,8 @@ claim. SMOTE would not fix the event count, censoring, or cell-level dependence.
 
 Before fitting an RUL regressor, decide whether to:
 
-1. retain the **first observed 75% crossing** as a clearly exploratory proxy and
-   build a demonstration with no generalization claim; or
+1. retain the **first observed 75% crossing** as a clearly exploratory proxy;
+   any model then requires an explicit no-generalization disclaimer; or
 2. define a defensible persistent EOL rule and confirm that the source records
    support it; if no events remain, stop RUL training on this release and use it
    for capacity/SOH experiments instead.
@@ -85,3 +85,9 @@ Before fitting an RUL regressor, decide whether to:
 Use cycle-level features available at the prediction cutoff only. Keep all rows
 from a cell together, and report the two event cells separately. Do not claim
 passenger-EV fleet RUL performance from this eight-cell laboratory dataset.
+
+An exploratory Theil–Sen capacity-trend baseline was subsequently evaluated.
+Its rolling-origin errors were large and differed by cell; details and the
+reason for selecting this simple baseline are in
+[`ml/reports/modeling/oxford_rul_trend_baseline.md`](../modeling/oxford_rul_trend_baseline.md).
+This did not resolve the target ambiguity or establish a usable RUL model.

@@ -25,12 +25,12 @@ The 2026-11-14 EDA found a further target issue: Cell2's first observed crossing
 
 ## Use decision
 
-- **RUL:** not ready for supervised model fitting until the EOL rule and Cell2's transient crossing are resolved. Under the current first-observed 75% rule, only two cells have target rows, and neither has persistent crossing confirmation; meaningful cell-disjoint RUL evaluation is unsupported.
+- **RUL:** an exploratory per-cell Theil–Sen capacity-trend prototype has been run against the first-observed 75% target. Rolling-origin errors are large, the target remains ambiguous, and meaningful cell-disjoint RUL evaluation is unsupported. This is not a validated or production RUL model.
 - **SOH/health:** measured capacity trajectories can support a separate laboratory regression benchmark.
 - **Failure classification / future failure:** no fault-class or future-event labels are provided in the released files.
-- Reproducible local preprocessing and EDA: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py`, then `python3 ml/scripts/eda_oxford_battery.py`, after installing `ml/requirements.txt`. Outputs stay local and ignored by Git; checked-in EDA reports are in `ml/reports/eda/`. The features table has one row per cell characterization. Keep cells disjoint and do not use measured capacity to predict SOH derived from that same capacity.
+- Reproducible local preprocessing, EDA, and trend evaluation: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py`, `python3 ml/scripts/eda_oxford_battery.py`, then `python3 -m ml.scripts.evaluate_oxford_rul_trend`, after installing `ml/requirements.txt`. Preprocessed data stay local and ignored by Git; checked-in reports are in `ml/reports/eda/` and `ml/reports/modeling/`. The trend evaluation uses first-crossing labels for exploration only. Keep cells disjoint and do not use measured capacity to predict SOH derived from that same capacity.
 
-Raw source files are retained unchanged and ignored by Git. Preprocessing and EDA do not train a model. Resolve the target definition and threshold-crossing quality before fitting an RUL regressor.
+Raw source files are retained unchanged and ignored by Git. The per-cell trend prototype is an exploratory rule-based regression baseline, not a trained transferable model. It produced large errors in the rolling-origin evaluation; see `ml/reports/modeling/oxford_rul_trend_baseline.md`. Resolve the target definition and threshold-crossing quality before further RUL modeling.
 
 ## Citation
 
