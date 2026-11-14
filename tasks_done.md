@@ -233,3 +233,13 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
 - Downloaded all seven Zenodo `10.5281/zenodo.10656500` archives (38,063,456,304 bytes) to Git-ignored `data/automotive_prognostics/ev_fault_515/v1/raw/`. All file sizes and source MD5 values match Zenodo. The Zenodo API reports CC BY 4.0.
 - Audited ZIP directory structures: 514 numbered folders (DTI 80, GIS 41, QAS 393), one fewer than the record's 515 claim. DTI and QAS spreadsheets contain 80 and 393 binary labels respectively; their meaning is not documented in the sheets. Paper-reported 1,135 four-fault event labels are not yet joined to folder/tensor records. `.pkl` files were not unpickled.
 - RUL/health/fault findings and explicit blockers are recorded in the two dataset READMEs and `ml/reports/data_validation/step2_oxford_515_battery.json`. No raw archive is tracked.
+
+## Graphify repository map — 2026-11-14
+
+- Generated and reviewed Graphify's root and dated repository maps, manifests,
+  and analysis metadata under `graphify-out/`.
+- Added `docs/graphify.md` and linked it from the README. Documented that inferred
+  edges are leads to verify in source and that dataset/product decisions remain
+  governed by audited records.
+- Kept the generated graph snapshots; excluded the incremental cache through
+  `.gitignore`.

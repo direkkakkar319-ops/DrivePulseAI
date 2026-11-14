@@ -35,6 +35,11 @@ ml/artifacts/*
 !ml/artifacts/.gitkeep
 mlruns/
 
+# Graphify's incremental cache is machine-local; tracked snapshots live in graphify-out/.
+graphify-out/cache/
+graphify-out/**/cost.json
+graphify-out/.cloud-cta-shown
+
 # Node & Frontend
 node_modules/
 frontend/.next/
