@@ -23,10 +23,12 @@ The source readme says tests ran until end of life, but does not define the EOL 
 
 ## Use decision
 
-- **RUL:** suitable only for a small, cell-disjoint method-development benchmark after explicitly choosing and documenting an EOL capacity threshold; weak support for training a robust model because there are only eight cells and most do not cross the exploratory threshold.
+- **RUL:** suitable only for a small method-development exercise after explicitly choosing and documenting an EOL capacity threshold; weak support for training a robust model because there are only eight cells, only two cross the exploratory threshold, and a meaningful cell-disjoint train/validation/test evaluation is not supported.
 - **SOH/health:** measured capacity trajectories can support a separate laboratory regression benchmark.
 - **Failure classification / future failure:** no fault-class or future-event labels are provided in the released files.
-- No training or preprocessing has been performed. The raw source files are retained unchanged and ignored by Git.
+- Reproducible local preprocessing: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py` after installing `ml/requirements.txt`. It writes `processed/cell_cycle_features.csv` and `processed/preprocessing_summary.json`; generated files remain local and ignored by Git. One row is produced per cell characterization with discharge-curve summaries, measured capacity, relative SOH, and a threshold-derived RUL only for cells observed to cross the 75% convention. Censored cells have blank RUL. This is a small SOH/method-development table, not robust RUL or fault-classification training data. Keep cells disjoint in any later evaluation and exclude measured capacity from SOH predictors.
+
+Raw source files are retained unchanged and ignored by Git. Preprocessing does not train a model.
 
 ## Citation
 

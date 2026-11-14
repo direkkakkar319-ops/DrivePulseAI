@@ -29,14 +29,16 @@ The archives contain three `.pkl` tensor files named `vin_1.pkl`, `vin_2.pkl`, a
 
 The paper reports 1,135 abnormal-moment samples with four-bit labels for internal short circuit, excessive aging, thermal runaway, and electrolyte leakage; it says fault labels were assigned retrospectively by product engineers after pack disassembly. The delivered vehicle archives do not provide a verified join from those four-class event labels to the numbered folders and tensor rows. The paper's 3:1 split is sample-level and does not establish vehicle-disjoint evaluation.
 
-The `.pkl` files use PyTorch tensor serialization. They were not unpickled. The paper's released code refers to `Name_list.xls`, which is not in the code repository or the inspected DTI/GIS/QAS_1 archives; the ZIPs instead contain the two generic `Labels.xls` files described above. A safe loader and authoritative label/vehicle/sample mapping remain outstanding.
+The `.pkl` files use PyTorch tensor serialization. They were not unpickled. The paper's released code refers to `Name_list.xls`, which is not in the inspected [public code repository](https://github.com/crcaorui/Model-Constrained-Deep-Learning-for-Online-Fault-Diagnosis) or the inspected DTI/GIS/QAS_1 archives; the ZIPs instead contain the two generic `Labels.xls` files described above. A safe loader and authoritative label/vehicle/sample mapping remain outstanding.
 
 ## Use decision
 
 - **Current fault classification:** promising real-EV candidate; not ready for training until the label semantics, sample-level 4-class labels, and joins are recovered and audited. Any eventual evaluation must split by vehicle.
 - **Future-failure prediction:** not established. Retrospective labels for already abnormal moments do not define a future prediction horizon or censoring rule.
 - **RUL:** unsupported; no end-of-life target or per-vehicle run-to-EOL time is documented.
-- No training or preprocessing has been performed. Keep all originals local and ignored by Git.
+- **Preprocessing remains blocked.** Do not deserialize the tensor `.pkl` files or manufacture labels/joins from archive folder numbers. The local record is missing the referenced `Name_list.xls`, a verified mapping from tensor rows/samples to vehicle IDs and the paper's four fault labels, and semantics for the two binary `Labels.xls` files. The paper's released code references `Name_list.xls`, but its public repository does not include that workbook. Obtain the missing mapping/label documentation from the authors or an authoritative supplement before building a fault-classification loader. Keep the 38 GB originals local and ignored by Git.
+
+No training or preprocessing has been performed. The dataset remains a promising candidate, but it is **not ready for project fault-classification, future-failure, or RUL training** until those join and target issues are resolved.
 
 ## Citation
 
