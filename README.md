@@ -1,247 +1,120 @@
-# DrivePulse AI
-### Enterprise Explainable Vehicle Health Digital Twin & Predictive Maintenance Platform
+# DrivePulseAI
 
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014-black?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Python](https://img.shields.io/badge/ML-Python%203.11+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![XGBoost](https://img.shields.io/badge/Models-XGBoost%20%7C%20IsolationForest-eb5e28?style=flat)](https://xgboost.readthedocs.io/)
-[![SHAP](https://img.shields.io/badge/XAI-SHAP-brightgreen?style=flat)](https://shap.readthedocs.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**A research prototype for passenger-car and passenger-EV health monitoring.**
 
-**DrivePulse AI** is a prototype for an explainable vehicle health **Digital Twin and Predictive Maintenance platform** designed for commercial fleets, telematics operators, and automotive service networks.
+DrivePulseAI explores how vehicle telemetry could support understandable
+maintenance decisions. The repository contains an Android application, a small
+FastAPI account service, dataset preparation tools, and exploratory ML work. The
+product is not connected to live vehicle telemetry and does not provide
+production diagnostics or maintenance predictions.
 
-The intended platform would ingest high-frequency time-series telemetry and build an active digital twin for every vehicle in a fleet—detecting multivariate anomalies, predicting component failures before roadside breakdowns occur, and **explaining every alert with clear, interpretable sensor evidence (XAI)**.
+## Current status
 
----
+| Area | Implemented | Not implemented |
+| --- | --- | --- |
+| Android app | Firebase sign-in and a clearly labelled demo garage with illustrative vehicle, sensor, insight, and report screens | Live vehicle data, backend-backed vehicle records, and production assessments |
+| Backend | FastAPI health route and authenticated Firebase user-profile synchronization with PostgreSQL | Telemetry ingestion, vehicle APIs, prediction services, and report generation |
+| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost forecast-based novelty baseline | Validated fault detection, passenger-car RUL, future-failure prediction, or app/API model integration |
 
-## Current implementation status
+The mobile demo uses deterministic, session-only fixtures. Its assessments are
+illustrations, not measurements from a real vehicle. See [mobile setup](mobile/README.md)
+and [backend setup](backend/README.md) for details on the implemented app and API.
 
-DrivePulse AI is a development prototype. Android Firebase authentication and
-FastAPI/PostgreSQL account-profile synchronization are implemented. The mobile UI
-provides a clearly labelled, session-only demo garage, sensor history, illustrative
-assessments, observations, and report previews. These are deterministic fixtures.
+## Current ML experiment: KIT OBD-II
 
-ML data preparation exists, and an exploratory KIT XGBoost novelty baseline has
-been trained locally. It has no verified fault labels and is not used for
-production predictions. Live telemetry ingestion, vehicle persistence,
-production model serving, and report generation are not implemented.
-The capabilities, integrations, performance targets, and commercial tiers below
-describe the intended product, not currently available or validated functionality.
-See [future mobile integration](docs/future-mobile-integration.md) for implementation
-boundaries and remaining decisions; see [mobile setup](mobile/README.md) for the app.
+The current model uses unlabeled OBD-II recordings of a Seat Leon. It predicts
+the sensor medians in the next 10-second window from the current window's summary
+features. Large forecast errors are marked as statistically novel.
 
-## Codebase graph
+- It was calibrated on later training dates and evaluated on chronological
+  validation and test dates. The novelty rates were 1.17% and 1.24% respectively.
+- Against a simple last-window forecast, XGBoost had lower mean absolute error on
+  7 of 10 signals in both splits, and higher error on coolant, throttle, and
+  ambient temperature.
+- KIT has no verified fault labels or independent vehicle IDs. These figures do
+  not measure fault-detection accuracy, and a novelty flag is not a fault
+  diagnosis. A score is available only after the following 10-second window
+  arrives.
 
-The repository's Graphify snapshot is checked in under [`graphify-out/`](graphify-out/),
-with a dated snapshot and machine-readable graph, manifest, and analysis metadata.
-It provides a navigable map of code relationships; inferred edges are hypotheses,
-so verify them against the source before relying on them. See
-[`docs/graphify.md`](docs/graphify.md) for the snapshot contents and interpretation.
+The report is in
+[`ml/reports/modeling/kit_xgb_forecast_baseline.md`](ml/reports/modeling/kit_xgb_forecast_baseline.md),
+with per-signal results in
+[`ml/reports/modeling/kit_xgb_forecast_baseline.json`](ml/reports/modeling/kit_xgb_forecast_baseline.json).
+The trained model artifact and raw/processed KIT data are local-only and
+gitignored.
 
-## 🚀 The Problem & SaaS Value Proposition
+### Reproduce the KIT experiment
 
-| The Industry Pain Point | The DrivePulse AI Solution |
-| :--- | :--- |
-| **Costly Unplanned Downtime:** Commercial vehicles out of service cost between $500–$1,000+ per vehicle/day in delayed deliveries and emergency repairs. | **Predictive Failure Detection:** Identifies degrading components (battery, cooling systems, mechanical wear) days before catastrophic failure. |
-| **The "Black-Box" AI Dilemma:** Generic models output opaque risk percentages (e.g., *"78% Risk"*), leading technicians to disregard alerts due to lack of diagnostic context. | **First-Class Explainability (XAI):** Powered by SHAP and baseline z-score deviation, every alert pinpoints exact root causes (e.g., *“−0.42V ignition voltage drop”*). |
-| **Fragmented Fleet Visibility:** Fleet dispatchers see GPS; technicians see OBD fault codes only after a warning light illuminates. | **Unified Digital Twin Cockpit:** Real-time health scoring (0–100), automated technician work orders, and streaming telemetry in one dashboard. |
+Obtain the KIT source files and place the recordings at the path documented in
+[`data/README.md`](data/README.md). From the repository root:
 
----
-
-## 🌟 Planned Capabilities
-
-### 1. Real-Time Digital Twin Engine
-* **High-Frequency Ingestion:** Streams speed, engine RPM, coolant temperature, battery voltage, engine load, and vibration via high-performance WebSocket & REST channels.
-* **Transparent 0–100 Vehicle Health Score:** Continuous single-index health rating with visible per-sensor point deductions (e.g., `battery_voltage: -1.8 pts`).
-
-### 2. Three-Tier Predictive Machine Learning
-* **Unsupervised Anomaly Detection:** Scikit-learn **Isolation Forest** trained to detect unexpected multivariate deviations without requiring historical failure tags.
-* **Component Failure Risk Classifier:** **XGBoost** classifier calibrated for imbalanced predictive maintenance data to forecast failure probabilities.
-* **Remaining Useful Life (RUL) Regressor:** Degradation model predicting operating hours/cycles remaining before required servicing.
-
-### 3. First-Class Explainability (Never a Bare Number)
-Every prediction surfaces its underlying evidence:
-* **SHAP (Shapley Additive Explanations):** Feature-importance waterfall and bar contributions quantifying which sensors drove the failure probability upward.
-* **Z-Score Deviation Explainer:** Calculates standard deviations away from normal vehicle operating baselines for clear, plain-language diagnostics.
-
-```
-Vehicle Health: 73/100
-Battery Failure Risk: 68% (High)
-Detected Behaviour: Abnormal voltage drop during engine start
-Likely Root Causes: Ageing cell, alternator instability, or loose terminal
-Recommended Action: Inspect charging voltage within 7 days
-Model Confidence: 86%
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r ml/requirements.txt
+python3 ml/scripts/preprocess_kit_obd.py
+python3 -m ml.scripts.train_kit_xgb_forecast
 ```
 
----
+Dataset sources, terms, audit findings, and local file paths are documented in
+[`data/README.md`](data/README.md). Dataset rights and terms are separate from
+the repository's software license.
 
-## 👥 Planned Multi-Persona Workflows
+## Data and evaluation boundaries
 
-* **Fleet Dispatcher Portal:** High-level fleet health index, live vehicle map, operational readiness, and high-priority maintenance alerts.
-* **Technician Diagnostics Workbench:** In-depth sensor time-series charts, SHAP root-cause breakdown, threshold violation history, and printable maintenance reports.
-* **Driver Cockpit:** Streamlined mobile-friendly health status (0–100), urgent warnings, and safety advisories.
-* **MLOps & Engineering Hub:** Drift monitoring, model accuracy/recall tracking, and scenario fault injection.
+- **KIT OBD-II:** supports exploratory automotive telemetry novelty scoring; it
+  has no verified mechanical fault labels, RUL target, or verified vehicle IDs.
+- **Oxford battery data:** small laboratory-cell data for limited SOH/RUL method
+  exploration; not evidence of passenger-EV fleet performance.
+- **Tongji EV data:** candidate for vehicle-disjoint SOH experiments; SOH is not
+  observed RUL or a future-failure label.
+- **Scania APS and Component X:** heavy-truck datasets. They must not support
+  passenger-car or passenger-EV performance claims.
+- **Other EV fault and capacity sources:** have unresolved access, label, join,
+  vehicle-class, or data-rights questions documented in `data/`.
 
----
+There is not yet a validated passenger-car/EV run-to-failure source or an
+acquired, audited forward-failure dataset. The full anomaly → RUL/health → failure
+chain is therefore not trained or validated. Keep each dataset as a separate
+benchmark; do not combine results across different vehicles and targets into an
+end-to-end claim.
 
-## 🏗️ System Architecture
+## Technology and repository map
 
-DrivePulse AI is architected in four strictly decoupled layers following a clean build order (**`ml/` $\rightarrow$ `simulator/` $\rightarrow$ `backend/` $\rightarrow$ `frontend/`**):
-
-```
-                                    +-----------------------------+
-                                    |    Data Sources / Telemetry |
-                                    | AI4I | C-MAPSS | Simulator  |
-                                    +--------------+--------------+
-                                                   |
-                                                   v
-+------------------------+          +--------------+--------------+
-|  Frontend Application  |  REST /  |     FastAPI Backend API     |
-|   (Next.js 14 + TS)    |<-------->|   WebSockets & REST Layer   |
-| Dark Luxury Automotive |  WS      +--------------+--------------+
-+------------------------+                         |
-                                                   v
-                                    +--------------+--------------+
-                                    |  Predictor Inference Engine |
-                                    |  (Isolation Forest, XGBoost)|
-                                    |  (SHAP & Deviation XAI)     |
-                                    +--------------+--------------+
-                                                   |
-                                                   v
-                                    +-----------------------------+
-                                    |    PostgreSQL Persistence   |
-                                    | Telemetry, Predictions, DB  |
-                                    +-----------------------------+
-```
-
-### Intended Five Data Flows
-1. **Offline Training Pipeline:** Automated data ingestion, leakage-guarded preprocessing, time-ordered train/val splits, and artifact logging via MLflow.
-2. **Live Telemetry WebSocket Stream:** High-throughput streaming from edge simulators/OBD devices to the backend with a proposed sub-100ms inference target (not measured or implemented).
-3. **REST Telemetry Ingest:** Synchronous batch ingestion for historical uploads and mobile integrations.
-4. **Dashboard State Reads:** REST endpoints for vehicle catalogs and prediction histories coupled with live WebSocket state updates.
-5. **Maintenance Report Generation:** Aggregated fleet health summaries, alert resolution workflows, and printable maintenance briefs.
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technologies |
-| :--- | :--- |
-| **Backend API** | Python 3.11+, FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, Native WebSockets |
-| **Database** | PostgreSQL 15+ (Time-series telemetry, vehicle registry, alerts) |
-| **Machine Learning & XAI** | Scikit-learn, XGBoost, SHAP, Pandas, NumPy, Joblib, MLflow |
-| **Frontend Web App** | Next.js 14 (App Router), TypeScript, Tailwind CSS, Recharts / Lucide Icons |
-| **Simulator & Telematics** | Python AsyncIO Telemetry Streamer (with optional Go high-concurrency client) |
-| **DevOps & Infrastructure** | Docker, Docker Compose, GitHub Actions CI, Ruff linter, Pytest |
-
----
-
-## 🔒 Data Honesty, Safety & Benchmark Integrity
-
-> **Important Disclosure:**
-> DrivePulse AI is an engineering and predictive maintenance demonstration prototype. It is independent and is not affiliated with, sponsored by, or deploying proprietary data from any automotive manufacturer.
->
-> * All simulated telematics payloads generated by the platform carry an explicit `"source": "simulated"` tag.
-> * Planned training uses public predictive maintenance benchmarks ([UCI AI4I 2020](https://archive.ics.uci.edu/dataset/601/ai4i) for classification and [NASA C-MAPSS](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data) for degradation curves) mapped to automotive equivalents for validation.
-> * The platform serves as decision-support guidance for drivers and technicians; it does not issue vehicle-control or override commands.
-
----
-
-## 📁 Repository Structure
+- **Android:** Expo, React Native, TypeScript, Firebase Authentication
+- **Backend:** FastAPI, PostgreSQL, Firebase token validation
+- **ML:** Python, pandas, scikit-learn, XGBoost
+- **Web frontend:** Next.js and TypeScript
 
 ```text
-DrivePulseAI/
-├── backend/                 # FastAPI service: schemas, WebSocket routes, DB services
-│   ├── app/                 # Core application logic, routers, and database models
-│   └── tests/               # Backend API and WebSocket integration tests
-├── frontend/                # Next.js 14 web dashboard: dark luxury UI, real-time gauges
-│   └── src/                 # React components, hooks, Tailwind styling, and API clients
-├── ml/                      # Standalone machine learning package
-│   ├── src/data/            # Unified data loaders and leakage-free preprocessing
-│   ├── src/models/          # Isolation Forest, XGBoost classifier, RUL regressor
-│   ├── src/explainability/  # SHAP TreeExplainer and baseline deviation explainers
-│   ├── src/inference/       # Unified Predictor gateway
-│   └── artifacts/           # Serialized model binaries (.joblib)
-├── simulator/               # Vehicle telemetry generator with fault injection profiles
-├── data/                    # Dataset loaders, schemas, and mapping documentation
-├── docs/                    # Architecture diagrams and system flow specifications
-├── docker-compose.yml       # Production/local multi-container orchestration
-└── requirements.txt         # Root Python dependencies
+backend/       FastAPI service; user-profile endpoints are implemented
+data/          Dataset provenance, audits, and local-data rules
+docs/          Product and integration notes, including Graphify documentation
+frontend/      Next.js web application
+ml/            Dataset preprocessing, models, training scripts, and reports
+mobile/        Expo/React Native Android application
+simulator/     Synthetic telemetry tools; not a source of vehicle evidence
 ```
 
----
+The generated code relationship map is under [`graphify-out/`](graphify-out/).
+Its inferred links are navigation hints and should be checked against source.
+See [`docs/graphify.md`](docs/graphify.md).
 
-## 💼 Commercial SaaS Model & Go-To-Market (GTM)
+## Safety and scope
 
-DrivePulse AI is positioned as a **B2B Vertical Telematics & AI SaaS** platform.
+DrivePulseAI is an independent research and software prototype. It is not
+affiliated with an automotive manufacturer, does not control vehicles, and
+does not replace professional diagnosis. Simulated data, demo fixtures, and
+statistical novelty scores must be identified as such; they are not proof of a
+real vehicle fault or condition.
 
-### 1. Target Customers (Ideal Customer Profile — ICP)
-* **Mid-Market Commercial Fleets (20–250 Vehicles):** Last-mile delivery, field service contractors, and regional freight operators where an unscheduled breakdown disrupts delivery commitments and triggers customer SLA penalties.
-* **Car Rental & Carsharing Fleets:** High-turnover operations requiring real-time mechanical health tracking to protect residual vehicle value and prevent roadside breakdowns.
-* **Commercial EV Fleets:** Specialized operators requiring proactive monitoring of battery cell degradation, charging thermals, and regenerative braking health.
-* **Automotive Dealership & Service Networks:** Service centers offering proactive remote diagnostics and recurring maintenance subscription tiers to commercial customers.
+## Contributors
 
-### 2. Proposed Telemetry Integrations (Not Implemented)
-* **Plug-and-Play OBD-II Telematics (BYOD):** Standard cellular telematics hardware (e.g., Teltonika, CalAmp, Geotab GO) plug into standard J1962 / CAN ports and forward time-series data to the DrivePulse REST/WebSocket endpoints.
-* **OEM Cloud-to-Cloud Integrations:** Ingest directly from connected-vehicle manufacturer APIs (e.g., Ford Pro, Mercedes-Benz Developers, Smartcar, Tesla Fleet API).
-* **Enterprise Webhook Gateway:** Direct HTTP ingestion for third-party telematics service providers (TSPs).
+- Direk Kakkar — [GitHub](https://github.com/direkkakkar319-ops)
+- Rudraksh Gupta — [GitHub](https://github.com/rudraksh6)
 
-### 3. Subscription & Pricing Architecture (Per Vehicle / Month)
+## License
 
-| Tier | Price | Ideal For | Features Included |
-| :--- | :--- | :--- | :--- |
-| **Starter** | **$12** / veh / mo | Small fleets (10–30 vehicles) | Real-time telemetry ingestion, deterministic threshold alerts, 0–100 health score, driver mobile cockpit. |
-| **Pro** | **$25** / veh / mo | Mid-market logistics (30–150 vehicles) | **Everything in Starter +** Isolation Forest Anomaly Detection, XGBoost Component Failure Classifier, SHAP root-cause diagnostic panels, automated technician work-order reports. |
-| **Enterprise** | **$40+** / veh / mo | Large fleets & OEM networks (150+ vehicles) | **Everything in Pro +** Remaining Useful Life (RUL) regression, ERP/CMMS maintenance dispatch webhooks, custom feature engineering, dedicated SLAs, multi-tenant sub-fleet isolation. |
-
-### 4. Quantified Downtime ROI
-> **The Financial Case for Fleet Directors:**
-> Unscheduled roadside breakdowns cost commercial fleet operators an average of **$500 to $1,200 per day** in emergency towing, expedited labor, and missed delivery SLA fines.
->
-> For a typical fleet of **50 delivery vans**, preventing just **2 catastrophic roadside failures per year** yields approximately **$10,000–$15,000 in net savings**—more than paying for the entire annual DrivePulse AI Pro subscription.
-
----
-
-## 🚦 Getting Started
-
-### 1. Prerequisites
-* **Python 3.11+**
-* **Node.js 20+**
-* **PostgreSQL 15+** (or Docker)
-
-### 2. Clone and Setup Environment
-
-```bash
-# Clone the repository
-git clone https://github.com/direkkakkar319-ops/DrivePulseAI.git
-cd DrivePulseAI
-
-# Set up Python virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
-
-# Set up Frontend dependencies
-cd frontend
-npm install
-cd ..
-```
-
-### 3. Running with Docker Compose (Planned for full integration)
-```bash
-docker compose up --build
-```
-
----
-
-## 👨‍💻 Authors & Core Contributors
-
-* **Direk Kakkar** — [GitHub](https://github.com/direkkakkar319-ops)
-* **Rudraksh Gupta** — [GitHub](https://github.com/rudraksh6)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+The repository software is licensed under MIT; see [LICENSE](LICENSE). Dataset
+licenses and reuse restrictions are recorded separately in the dataset
+documentation.
