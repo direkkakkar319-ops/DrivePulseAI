@@ -19,6 +19,22 @@ This log records the ordered work and verification. Status labels distinguish ve
   `ml/reports/modeling/kit_xgb_forecast_baseline.*`. The trained joblib artifact
   remains ignored under `ml/artifacts/`.
 
+## Oxford preprocessing and RUL-target EDA — 2026-11-14
+
+- Reran `ml/scripts/preprocess_oxford_battery.py` from the retained original MAT
+  file. It reproduced 519 characterization rows across eight cells; no raw
+  source files changed.
+- Added reproducible `ml/scripts/eda_oxford_battery.py`, JSON audit output, and
+  [`ml/reports/eda/oxford_battery_eda.md`](ml/reports/eda/oxford_battery_eda.md).
+- Under the exploratory 75%-of-first-capacity rule, 116 rows have derived RUL and
+  403 rows are unlabeled/censored/post-crossing. Cell2's first crossing at cycle
+  7,400 recovers above threshold at 7,500 and 7,600; the source curve is shorter
+  than its neighbors. Cell5's crossing occurs only at its last record.
+- No cell has two consecutive below-threshold observations from its first
+  crossing. This is a diagnostic, not an official EOL rule. RUL modeling has not
+  started; first-crossing target validity needs a decision. A meaningful
+  cell-disjoint RUL evaluation is unsupported with only two nominal event cells.
+
 ## Step 0 — Setup and baseline
 
 **Status: ✅ Done and verified in the existing local environment.**

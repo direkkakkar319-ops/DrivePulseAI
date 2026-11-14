@@ -21,14 +21,16 @@ The source readme describes eight 740 mAh Kokam pouch cells, tested at 40°C usi
 
 The source readme says tests ran until end of life, but does not define the EOL cutoff or provide an explicit per-record RUL target. Any RUL target therefore needs a stated capacity threshold and must account for cells that do not cross it. As an exploratory calculation only, a 75%-of-first-measured-1C-discharge-capacity cutoff is crossed in the released records for 2 of 8 cells; the other six are right-censored at their last record under that convention. This is a small laboratory benchmark, not a real-world EV fleet target. Do not claim passenger-EV field performance from it.
 
+The 2026-11-14 EDA found a further target issue: Cell2's first observed crossing at cycle 7,400 rebounds above the threshold in the next two records. The 7,400 discharge curve is shorter than neighboring records. Cell5's first crossing is at its final record, with no post-crossing follow-up. See [`ml/reports/eda/oxford_battery_eda.md`](../../../../ml/reports/eda/oxford_battery_eda.md).
+
 ## Use decision
 
-- **RUL:** suitable only for a small method-development exercise after explicitly choosing and documenting an EOL capacity threshold; weak support for training a robust model because there are only eight cells, only two cross the exploratory threshold, and a meaningful cell-disjoint train/validation/test evaluation is not supported.
+- **RUL:** not ready for supervised model fitting until the EOL rule and Cell2's transient crossing are resolved. Under the current first-observed 75% rule, only two cells have target rows, and neither has persistent crossing confirmation; meaningful cell-disjoint RUL evaluation is unsupported.
 - **SOH/health:** measured capacity trajectories can support a separate laboratory regression benchmark.
 - **Failure classification / future failure:** no fault-class or future-event labels are provided in the released files.
-- Reproducible local preprocessing: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py` after installing `ml/requirements.txt`. It writes `processed/cell_cycle_features.csv` and `processed/preprocessing_summary.json`; generated files remain local and ignored by Git. One row is produced per cell characterization with discharge-curve summaries, measured capacity, relative SOH, and a threshold-derived RUL only for cells observed to cross the 75% convention. Censored cells have blank RUL. This is a small SOH/method-development table, not robust RUL or fault-classification training data. Keep cells disjoint in any later evaluation and exclude measured capacity from SOH predictors.
+- Reproducible local preprocessing and EDA: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py`, then `python3 ml/scripts/eda_oxford_battery.py`, after installing `ml/requirements.txt`. Outputs stay local and ignored by Git; checked-in EDA reports are in `ml/reports/eda/`. The features table has one row per cell characterization. Keep cells disjoint and do not use measured capacity to predict SOH derived from that same capacity.
 
-Raw source files are retained unchanged and ignored by Git. Preprocessing does not train a model.
+Raw source files are retained unchanged and ignored by Git. Preprocessing and EDA do not train a model. Resolve the target definition and threshold-crossing quality before fitting an RUL regressor.
 
 ## Citation
 

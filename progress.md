@@ -23,6 +23,20 @@ throttle, and ambient temperature. It has no uniform forecast advantage. Details
 and [machine-readable output](ml/reports/modeling/kit_xgb_forecast_baseline.json).
 The model artifact remains local in ignored `ml/artifacts/`.
 
+## Oxford preprocessing verification and RUL-target EDA — 2026-11-14
+
+Reran `ml/scripts/preprocess_oxford_battery.py` from the retained original MAT
+file: it reproduced 519 characterization rows across 8 cells. Added
+`ml/scripts/eda_oxford_battery.py` and EDA reports in `ml/reports/eda/`. The
+existing 75%-of-first-capacity convention labels 116 rows across two nominal
+crossing cells; 403 rows have no RUL target. Cell2 first drops below threshold
+at cycle 7,400, then rebounds above it at cycles 7,500 and 7,600; its 7,400
+source discharge curve is also shorter than neighboring records. Cell5 crosses
+only at its final cycle 5,000. No cell has two consecutive below-threshold
+records from its first crossing. No RUL model was trained. The first-crossing
+target and event persistence must be decided before modeling; eight cells and
+two nominal crossings do not support a meaningful cell-disjoint RUL evaluation.
+
 **Baseline:** local checkout `main` at `9d79a59` (commit subject “Audit and organize datasets…”), as of 2026-11-13. The workspace already had extensive modifications before this report; they were preserved. Audit reports and `tasks_done.md` are documentation additions; Component X v3 publisher files were acquired under `data/automotive_prognostics/scania_component_x/v3/raw/` and retained unchanged. **User scope decision: passenger cars and passenger EVs only.** Truck datasets are excluded from car performance claims.
 
 ## Step 0 — environment and baseline (2026-11-13)
@@ -66,6 +80,10 @@ Top-level directories: `.agents/`, `.aws/`, `.codex/`, `.github/`, `backend/`, `
 Data tree summary: current data folders include `data/automotive_failure/scania_aps/raw/`, `data/automotive_obd/carobd/raw/`, `data/automotive_obd/dieselobd/raw/`, `data/automotive_obd/kit_obd/raw/`, plus acquired Component X truck data, the 20-car on-road EV capacity archives, and the 347-EV Figshare archives under `data/automotive_prognostics/`. The inventory records 129 carOBD CSVs and 81 KIT CSV recordings plus original KIT metadata/archive; Scania APS train/test CSVs; and two DieselOBD-named XLSX workbooks (`data/README.md`, sections “Status and canonical locations” and dataset-specific sections). Many raw files are individual recordings, so they are grouped here rather than enumerated one per line. No `.pt`/`.onnx` models or MLflow run directory were found. Three `.joblib` classifier bundles are present in `ml/src/models/failure_classification/`.
 
 ## Overall completion estimate
+
+The estimate and milestone table below are the 2026-11-13 audit snapshot. Current
+KIT and Oxford updates are recorded at the top of this file; do not interpret
+the older milestone percentages as incorporating those later experiments.
 
 **22% complete for the passenger-car/EV target.** This is an audit estimate, not a measurement of product quality. Rubric: data 25% × 15% = 3.75 points; models 35% × average 6.7% (anomaly 0%, RUL 0%, failure-classification code 20%) = 2.33; backend 15% × 35% = 5.25; Android 15% × 65% = 9.75; tests/docs/deploy 10% × 16.5% = 1.65. Total = 3.75 + 2.33 + 5.25 + 9.75 + 1.65 = **22.73%** (rounded to 22%). The data score reflects reproducible acquisition, validation, and loader-contract work; no model-training or car metric credit is claimed.
 
@@ -194,7 +212,7 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 
 ## Discrepancies and red flags
 
-- **README claims vs code/data:** README describes Isolation Forest, XGBoost, RUL, SHAP and automotive mappings (`README.md`, lines 48–54, 135). Only APS failure model is executable/trained in current source; anomaly/RUL/XAI are comments. Data audit says AI4I is industrial/synthetic and C-MAPSS is aircraft, and records both as removed from current canonical folders (`data/README.md`). Do not say these datasets validate passenger-car health.
+- **Historical README claims vs code/data (2026-11-13 audit):** the old README described Isolation Forest, XGBoost, RUL, SHAP and automotive mappings. That README was rewritten on 2026-11-14. The KIT XGBoost forecasting novelty baseline is now executable and trained, but it is unlabeled and does not validate fault detection; Oxford RUL target EDA is complete, with no RUL model trained. AI4I and C-MAPSS remain industrial/aircraft benchmarks and do not validate passenger-car health.
 - **Data audit contradiction:** `data/README.md` says no dataset-specific KIT/carOBD loaders were found, but current `ml/src/data/loaders.py` contains `load_kit_obd` and `load_carobd`. Treat the loader source as current; the audit document is stale on this point. Conversely, source attribution and label limitations remain unresolved.
 - **Model-target mismatch:** APS `neg` is failure of another component, not a healthy vehicle. Classifier is independent and has no RUL/anomaly inputs. It cannot be directly represented as generic 0=no failure.
 - **Split/leakage:** APS has no vehicle IDs/time; sample independence cannot be verified. Training script imputes on train and keeps official test split. For DieselOBD, local data audit records 173 exact identical rows shared train/test, a direct evaluation contamination concern; the alleged dataset source, label semantics, and unit identities are unverified. Existing loader/preprocessing warnings in `data/README.md` identify whole-input scaling and inappropriate random/time splitting in older loader paths. APS `n_missing` is a strong failure-correlated feature; investigate source/collection mechanism and report ablation before interpreting deployment performance (`ml/src/data/feature_engineering.py`, APS EDA report).
