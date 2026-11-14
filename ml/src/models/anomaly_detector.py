@@ -22,13 +22,26 @@ class XGBoostForecastAnomalyDetector:
         target_names: list[str],
         threshold_quantile: float = 0.99,
         random_state: int = 42,
+        forecast_modes: dict[str, str] | None = None,
+        score_aggregation: str = "rms",
     ) -> None:
         """Set XGBoost options, target signals, and the novelty threshold percentile."""
         if not target_names:
             raise ValueError("target_names must contain at least one signal")
         if not 0 < threshold_quantile < 1:
             raise ValueError("threshold_quantile must be between 0 and 1")
+        if score_aggregation not in {"rms", "max"}:
+            raise ValueError("score_aggregation must be 'rms' or 'max'")
         self.target_names = list(target_names)
+        self.forecast_modes = forecast_modes or {}
+        self.score_aggregation = score_aggregation
+        invalid_modes = {
+            name: mode
+            for name, mode in self.forecast_modes.items()
+            if name not in self.target_names or mode not in {"xgboost", "persistence"}
+        }
+        if invalid_modes:
+            raise ValueError(f"invalid per-target forecast modes: {invalid_modes}")
         self.threshold_quantile = threshold_quantile
         self.random_state = random_state
         base = XGBRegressor(
@@ -77,9 +90,32 @@ class XGBoostForecastAnomalyDetector:
             )
         if list(y.columns) != self.target_names:
             raise ValueError("target columns must match target_names in the same order")
+        missing_persistence_features = [
+            name
+            for name, mode in self.forecast_modes.items()
+            if mode == "persistence" and name not in x.columns
+        ]
+        if missing_persistence_features:
+            raise ValueError(
+                "persistence targets must be present among feature columns: "
+                f"{missing_persistence_features}"
+            )
         self.feature_names = [str(name) for name in x.columns]
         self.model.fit(x, y)
         return self
+
+    def forecast(self, features: pd.DataFrame) -> np.ndarray:
+        """Forecast targets using the selected per-signal model or persistence."""
+        if self.feature_names is None:
+            raise RuntimeError("fit must be called before forecasting")
+        x = self._features(features)
+        if [str(name) for name in x.columns] != self.feature_names:
+            raise ValueError("feature columns and order must match the fitted model")
+        predictions = self.model.predict(x)
+        for index, name in enumerate(self.target_names):
+            if self.forecast_modes.get(name, "xgboost") == "persistence":
+                predictions[:, index] = x[name].to_numpy()
+        return predictions
 
     def _residuals(self, features: pd.DataFrame, targets: pd.DataFrame) -> np.ndarray:
         """Calculate per-signal differences between observed and forecast values."""
@@ -93,22 +129,27 @@ class XGBoostForecastAnomalyDetector:
             raise ValueError("target columns must match target_names in the same order")
         if len(x) != len(y):
             raise ValueError("features and targets need matching lengths")
-        return y.to_numpy() - self.model.predict(x)
+        return y.to_numpy() - self.forecast(x)
 
     def score(self, features: pd.DataFrame, targets: pd.DataFrame) -> np.ndarray:
-        """Return one scale-normalized forecast-error novelty score per row."""
+        """Return a scale-normalized forecast-error score for each row."""
         if self.residual_scale is None:
             raise RuntimeError("fit must be called before scoring")
         residuals = self._residuals(features, targets)
         scaled = residuals / self.residual_scale
-        return np.sqrt(np.mean(np.square(scaled), axis=1))
+        return self._aggregate_scores(scaled)
+
+    def _aggregate_scores(self, scaled_residuals: np.ndarray) -> np.ndarray:
+        if self.score_aggregation == "max":
+            return np.max(np.abs(scaled_residuals), axis=1)
+        return np.sqrt(np.mean(np.square(scaled_residuals), axis=1))
 
     def calibrate(self, features: pd.DataFrame, targets: pd.DataFrame) -> np.ndarray:
         """Learn per-signal error scales and set the threshold from calibration rows."""
         residuals = self._residuals(features, targets)
         scale = np.sqrt(np.mean(np.square(residuals), axis=0))
         self.residual_scale = np.where(scale > 1e-12, scale, 1.0)
-        scores = np.sqrt(np.mean(np.square(residuals / self.residual_scale), axis=1))
+        scores = self._aggregate_scores(residuals / self.residual_scale)
         self.threshold = float(np.quantile(scores, self.threshold_quantile))
         return scores
 

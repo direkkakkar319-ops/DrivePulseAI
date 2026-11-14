@@ -2,22 +2,19 @@
 
 This log records the ordered work and verification. Status labels distinguish verified results from open work. Before Step 0, repository source code, configuration and notebooks were not edited during the audit; Step 0 added only the shared seed helper. Acquired source archives are unchanged downloads under `data/automotive_prognostics/scania_component_x/v3/raw/`, `data/automotive_prognostics/onroad_ev_capacity/source_release/`, and `data/automotive_prognostics/ev_fault_347/v1/raw/`.
 
-## KIT XGBoost forecast novelty baseline — 2026-11-14
+## KIT forecast-based novelty model — 2026-11-14
 
-- Added `XGBoostForecastAnomalyDetector` and `ml/scripts/train_kit_xgb_forecast.py`.
-- Trained on KIT's current-window summary features to predict the next consecutive
-  10-second window's ten sensor medians. Pairs stay within recording, segment,
-  and date partitions; 25 training dates fit the model and seven later training
-  dates calibrate residual scales and the p99 novelty threshold.
-- Scored 3,839 validation pairs (45 above threshold; 1.17%) and 3,967 test pairs
-  (49 above threshold; 1.24%). These are unlabeled novelty rates, not fault
-  metrics. No RUL or failure classification was trained.
-- Compared forecast errors with last-window persistence: XGBoost had lower
-  per-signal MAE for 7/10 medians on both validation and test, and worse MAE for
-  coolant, throttle, and ambient temperature on both. No uniform advantage.
-- Added a human-readable report and JSON output under
-  `ml/reports/modeling/kit_xgb_forecast_baseline.*`. The trained joblib artifact
-  remains ignored under `ml/artifacts/`.
+- Trains next-window forecasting on KIT sensor summaries. Pairs stay within
+  recording/segment/date. Model choices use a training-date holdout; later
+  training dates calibrate the residual scales and threshold.
+- The selected hybrid forecasts improve test MAE vs XGBoost on five signals,
+  worsen two, and tie three. Max aggregation, selected using validation synthetic
+  sensitivity, gives 1.48% validation and 2.29% test novelty rates.
+- Max scores flagged 97.6% of 10x-scale synthetic sensor shifts on validation
+  (RMS: 92.2%). This is artificial perturbation sensitivity only; KIT lacks fault
+  labels, so no real fault metrics or diagnostic claim is supported.
+- Detailed split, per-signal results, RMS comparison, and limitations are in
+  `ml/reports/modeling/kit_xgb_forecast_baseline.*`. Artifact remains ignored.
 
 ## Step 0 — Setup and baseline
 
@@ -272,3 +269,61 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
   outside this cleanup's evidence-based removal scope.
 - Verified Python-source references before deletion. No model, dataset,
   evaluation behavior, or runtime dependency was changed.
+## KIT anomaly improvement — baseline audit and method choice
+
+- Audited `ml/reports/modeling/kit_xgb_forecast_baseline.json`: XGBoost's
+  next-window MAE was worse than persistence for coolant temperature, throttle,
+  and ambient temperature on both chronological validation and test dates.
+- Research supports prediction error as one surrogate for selecting among
+  unlabeled time-series anomaly methods ([Goswami et al., ICLR 2023](https://openreview.net/forum?id=gA5W0mOjWvk)); it does not make that surrogate a fault metric.
+- Planned improvement: choose XGBoost or last-window persistence independently
+  per target signal on a validation slice of training dates, refit XGBoost on all
+  designated fit dates, then calibrate the anomaly threshold on the existing
+  later training dates. This addresses known weak forecast channels without
+  looking at final test outcomes.
+- Scope: improve the next-window prediction residual as a novelty signal only.
+  KIT has no verified fault labels, so no accuracy/precision/recall claim will
+  be possible from this experiment.
+
+### KIT anomaly improvement — Step 2: per-signal forecast selection
+
+- Implemented chronological inner selection on the last five model-fit training
+  dates: choose XGBoost or persistence per sensor by lower MAE, refit on all 25
+  fit dates, and keep the separate last seven training dates for calibration.
+  Validation/test dates were not used for selection or threshold setting.
+- Updated `XGBoostForecastAnomalyDetector` to apply/save forecast modes and the
+  training script to report selection dates, per-signal mode, and XGBoost / hybrid
+  / persistence forecast errors.
+- Ran the experiment. On test dates, hybrid selection improves forecast MAE over
+  raw XGBoost on coolant, throttle, ambient temperature, and two pedal channels;
+  it is worse on MAP and intake temperature and ties on the remaining three.
+  It beats persistence only on RPM, speed, and MAF. This is mixed, not a uniform
+  forecasting improvement.
+- Novelty flag rates changed from 1.17% to 1.48% on validation and from 1.24% to
+  2.07% on test. With no fault labels, this cannot be interpreted as improved
+  detection or as false alarms. The revised model-selection report documents
+  this limitation and the five-date selection sample.
+- This step is complete with a mixed result; next evaluate whether sensor-level
+  score aggregation better surfaces sparse injected anomalies. Injected cases
+  will be labeled synthetic sensitivity checks only, never real fault accuracy.
+
+### KIT anomaly improvement — Step 3: sparse-residual scoring
+
+- Added two calibrated score aggregations: existing RMS across normalized sensor
+  residuals and max normalized residual across sensors. Both thresholds are
+  calibrated at the same nominal 99th percentile using the reserved training
+  calibration dates.
+- Compared them with synthetic single-sensor shifts, injected at 2x, 5x, 10x,
+  and 20x each channel's calibration residual scale. Aggregation was selected
+  using validation only: at 10x shift, max flagged 97.6% on average across sensor
+  channels versus 92.2% for RMS. Test sensitivity was 97.7% vs 92.0% after that
+  choice. These are artificial stress checks, not real-world fault detection.
+- Max aggregation's held-out novelty rates were 1.48% validation and 2.29% test;
+  the original RMS baseline rates were 1.17% and 1.24%. The increased test rate
+  may reflect context shift and is not evidence of better/poorer fault recall.
+- The final saved detector uses max aggregation because the intended novelty
+  score should retain a severe one-sensor deviation instead of averaging it
+  away. Keep the score and forecast comparison in the report; no fault claim is
+  supported without verified labels.
+- Updated README, progress, tasks log, model report/JSON, and `agent_context.md`
+  after this step with the method choice and reasons.
