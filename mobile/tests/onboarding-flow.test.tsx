@@ -79,6 +79,24 @@ it('walks first-time users through profile, vehicle and Home using only confirme
   expect(screen.getByText(/^Home:/)).toHaveTextContent(/000000000001/);
 });
 
+describe.each(['home', 'vehicles', 'insights', 'history', 'account', 'telemetry', 'replay', 'recorded-insight', 'vehicle'])('%s protected destination', route => {
+  it.each(['profile', 'vehicle'] as const)('resumes incomplete %s onboarding before exposing the destination', async step => {
+    mockRoute = route;
+    const { api } = makeApi(step);
+    await render(<Session api={api} />);
+    expect(await screen.findByText(`redirect:/(main)/${step}-setup`)).toBeTruthy();
+    expect(screen.queryByText(/^Home:/)).toBeNull();
+  });
+
+  it('allows completed accounts without an onboarding redirect', async () => {
+    mockRoute = route;
+    const { api } = makeApi('home');
+    await render(<Session api={api} />);
+    await screen.findByText(route === 'vehicles' ? 'Personal car' : /^Home:/);
+    expect(screen.queryByText(/^redirect:/)).toBeNull();
+  });
+});
+
 it.each(['profile', 'vehicle', 'home'] as const)('restores %s server state after a restart', async step => {
   const { api } = makeApi(step);
   const first = await render(<Session api={api} />);

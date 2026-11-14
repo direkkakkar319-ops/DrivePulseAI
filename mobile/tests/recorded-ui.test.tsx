@@ -6,18 +6,23 @@ import { localRecordedProvider, type RecordedTelemetryProvider } from '../src/ap
 import { OverviewScreen, ReplayScreen, InsightsScreen, InsightDetailScreen } from '../src/components/recorded/screens';
 import { DataGate } from '../src/components/recorded/ui';
 const mockPush = jest.fn();
+const mockBack = jest.fn();
+const mockReplace = jest.fn();
+let mockCanGoBack = true;
 let mockParams: Record<string, string> = {};
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: mockPush, replace: jest.fn(), back: jest.fn(), canGoBack: () => true }),
+  useRouter: () => ({ push: mockPush, replace: mockReplace, back: mockBack, canGoBack: () => mockCanGoBack }),
   useLocalSearchParams: () => mockParams,
 }));
-beforeEach(() => { jest.clearAllMocks(); mockParams = {}; });
+beforeEach(() => { jest.clearAllMocks(); mockParams = {}; mockCanGoBack = true; });
 afterEach(() => jest.useRealTimers());
 it('shows recorded units and navigates without the conventional-vehicle demo', async () => {
   await render(<RecordedReplayProvider><OverviewScreen /></RecordedReplayProvider>);
   expect(await screen.findByText('Recorded data')).toBeTruthy();
   expect(screen.getByText('High-voltage battery')).toBeTruthy();
   expect(screen.queryByText('Illustrative assessment')).toBeNull();
+  await fireEvent.press(screen.getByText('View telemetry'));
+  expect(mockPush).toHaveBeenCalledWith('/(main)/(tabs)/telemetry');
   await fireEvent.press(screen.getByText('Open recorded replay'));
   expect(mockPush).toHaveBeenCalledWith('/(main)/replay');
   await fireEvent.press(screen.getByLabelText('Account'));
@@ -37,6 +42,8 @@ it('selects clips, plays actual sample steps, pauses and restarts', async () => 
   expect(screen.getByText(/Sample 2 of 205/)).toBeTruthy();
   await fireEvent.press(screen.getByText('Restart'));
   expect(screen.getByText(/Sample 1 of 205/)).toBeTruthy();
+  await fireEvent.press(screen.getByText('Telemetry history'));
+  expect(mockPush).toHaveBeenCalledWith('/(main)/(tabs)/telemetry');
   await fireEvent.press(screen.getByText('Typical telemetry · Trip 153'));
   expect(await screen.findByText(/Sample 1 of 211/)).toBeTruthy();
 });
@@ -54,6 +61,20 @@ it('loads detail directly without changing the selected replay', async () => {
   await render(<RecordedReplayProvider><InsightDetailScreen /></RecordedReplayProvider>);
   expect(await screen.findByText('109')).toBeTruthy();
   expect(screen.getByText(/does not establish a cause/)).toBeTruthy();
+});
+it.each([true, false])('preserves recorded detail Back navigation (existing history: %s)', async canGoBack => {
+  mockCanGoBack = canGoBack;
+  mockParams = { clipId: 'leaf-unusual', id: 'leaf-unusual-1759328' };
+  await render(<RecordedReplayProvider><InsightDetailScreen /></RecordedReplayProvider>);
+  await screen.findByText('109');
+  await fireEvent.press(screen.getByRole('button', { name: 'Go back' }));
+  if (canGoBack) {
+    expect(mockBack).toHaveBeenCalledTimes(1);
+    expect(mockReplace).not.toHaveBeenCalled();
+  } else {
+    expect(mockReplace).toHaveBeenCalledWith('/(main)/(tabs)/home');
+    expect(mockBack).not.toHaveBeenCalled();
+  }
 });
 it('handles loading, empty and failed data without fabricated values', async () => {
   const provider: RecordedTelemetryProvider = { listClips: () => new Promise(() => {}), getClip: localRecordedProvider.getClip };
