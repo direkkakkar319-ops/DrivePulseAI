@@ -260,3 +260,15 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
   governed by audited records.
 - Kept the generated graph snapshots; excluded the incremental cache through
   `.gitignore`.
+
+## Remove unused ML reproducibility helper — 2026-11-14
+
+- Removed `ml/src/reproducibility.py`: its only public function,
+  `set_global_seed`, had no Python callers or imports in the repository. Current
+  training/evaluation scripts set their own random states where needed, so this
+  orphan helper was not part of an active workflow.
+- Kept the comment-only training placeholders, API placeholders, and scratch
+  notebooks; they contain no superseded executable implementation and were
+  outside this cleanup's evidence-based removal scope.
+- Verified Python-source references before deletion. No model, dataset,
+  evaluation behavior, or runtime dependency was changed.
