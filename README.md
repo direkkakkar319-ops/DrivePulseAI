@@ -21,8 +21,10 @@ FastAPI/PostgreSQL account-profile synchronization are implemented. The mobile U
 provides a clearly labelled, session-only demo garage, sensor history, illustrative
 assessments, observations, and report previews. These are deterministic fixtures.
 
-ML data preparation exists, but trained models, live telemetry ingestion, vehicle
-persistence, production predictions, and report generation are not implemented.
+ML data preparation exists, and an exploratory KIT XGBoost novelty baseline has
+been trained locally. It has no verified fault labels and is not used for
+production predictions. Live telemetry ingestion, vehicle persistence,
+production model serving, and report generation are not implemented.
 The capabilities, integrations, performance targets, and commercial tiers below
 describe the intended product, not currently available or validated functionality.
 See [future mobile integration](docs/future-mobile-integration.md) for implementation

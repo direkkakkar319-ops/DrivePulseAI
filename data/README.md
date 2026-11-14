@@ -1,6 +1,6 @@
 # Dataset inventory and audit
 
-Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Dataset audits refreshed 2026-11-14. KIT and Oxford exploratory preprocessing artifacts have been generated locally; no models were trained. Raw data remain unchanged.
+Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Dataset audits refreshed 2026-11-14. KIT and Oxford exploratory preprocessing artifacts have been generated locally. A KIT XGBoost forecast-novelty baseline has been run; it does not establish fault detection. Raw data remain unchanged.
 
 **AI4I is an industrial-machine benchmark and must not be interpreted as automotive telemetry.**
 
@@ -29,7 +29,7 @@ No additional NASA battery dataset was found. No exact duplicate standalone raw 
 
 ## Raw-data rules
 
-Raw contents are unchanged, including malformed rows, missing cells, duplicate rows, original encodings, column names and official split files. Do not train directly through the existing cross-domain mapping loaders. KIT and Oxford have reproducible, dataset-specific exploratory preprocessing scripts; generated artifacts stay local and gitignored. Zenodo preprocessing remains blocked on authoritative sample/vehicle/label joins. Model training has not been performed.
+Raw contents are unchanged, including malformed rows, missing cells, duplicate rows, original encodings, column names and official split files. Do not train directly through the existing cross-domain mapping loaders. KIT and Oxford have reproducible, dataset-specific exploratory preprocessing scripts; generated preprocessing artifacts stay local and gitignored. KIT also has an exploratory XGBoost next-window forecasting novelty baseline; its model artifact stays local and gitignored, and KIT's lack of verified fault labels prevents fault-detection claims. Zenodo preprocessing remains blocked on authoritative sample/vehicle/label joins.
 
 Directory grouping is organizational: placing a candidate under `dieselobd` or `carobd` does not verify its origin. Never infer vehicle class from AI4I H/L/M, vehicle telemetry from make/model, or mechanical diagnoses from unlabeled recordings.
 
@@ -75,6 +75,7 @@ Directory grouping is organizational: placing a candidate under `dieselobd` or `
 - `ml/scripts/preprocess_oxford_battery.py` creates a local-only cell-cycle feature table, relative SOH, and explicitly threshold-derived/censored RUL under the 75% convention. The generated output is ignored by Git. It does not train a model. It is suitable for small cell-disjoint SOH experiments and a limited RUL method-development exercise, not robust RUL model claims or failure classification.
 - Reproducible exploratory preprocessing: from `ml/`, run `python scripts/preprocess_kit_obd.py`. The script writes a local-only `processed/windows_10s.csv.gz` and `processed/preprocessing_summary.json`; generated output is gitignored. It aggregates each signal into median, population standard deviation, and missing fraction per 10-second window. It performs no imputation, drops windows with a signal entirely absent, retains source acquisition order, and starts a new segment at each backward timestamp jump. The chronological split groups every recording from the same filename date into one split (70% train, 15% validation, 15% test). This is a temporal exploratory split, not an official split or evidence of independent vehicles. Windows remain unlabeled; no supervised fault or RUL claim is supported.
 - EDA findings and balancing decision are recorded in [`ml/reports/eda/kit_obd_eda.md`](../ml/reports/eda/kit_obd_eda.md): the dataset has no verified fault classes, so SMOTE/class balancing is not applicable. Road-condition filename contexts are descriptive metadata only.
+- An exploratory XGBoost model forecasts the next 10-second window and scores forecast residual novelty; the method and descriptive split rates are in [`ml/reports/modeling/kit_xgb_forecast_baseline.md`](../ml/reports/modeling/kit_xgb_forecast_baseline.md). It is not supervised fault classification and has no verified fault evaluation.
 
 ## Scania APS Failure
 

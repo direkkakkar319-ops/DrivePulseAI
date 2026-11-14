@@ -1,0 +1,226 @@
+{
+  "dataset": "KIT Automotive OBD-II",
+  "source_doi": "10.35097/1130",
+  "method": "XGBoost next-window forecasting with residual novelty scores",
+  "target": "median sensor values in the immediately following 10-second window",
+  "input": "current window medians, population standard deviations, and missing fractions",
+  "fit_date_count": 25,
+  "calibration_date_count": 7,
+  "fit_dates": [
+    "2017-07-05",
+    "2017-07-06",
+    "2017-07-07",
+    "2017-07-10",
+    "2017-07-11",
+    "2017-07-12",
+    "2017-07-13",
+    "2017-07-14",
+    "2017-07-24",
+    "2017-07-26",
+    "2017-07-27",
+    "2017-07-28",
+    "2017-07-31",
+    "2017-08-01",
+    "2017-08-02",
+    "2017-08-03",
+    "2017-08-04",
+    "2017-08-05",
+    "2017-08-07",
+    "2017-08-08",
+    "2017-08-09",
+    "2017-08-10",
+    "2018-02-14",
+    "2018-02-16",
+    "2018-02-17"
+  ],
+  "calibration_dates": [
+    "2018-02-18",
+    "2018-02-20",
+    "2018-02-21",
+    "2018-02-22",
+    "2018-02-23",
+    "2018-02-26",
+    "2018-02-27"
+  ],
+  "feature_count": 30,
+  "target_count": 10,
+  "threshold_quantile": 0.99,
+  "threshold": 3.011242551246845,
+  "model_parameters": {
+    "n_estimators": 200,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "random_state": 42,
+    "n_jobs": 4
+  },
+  "results": {
+    "calibration": {
+      "rows": 3601,
+      "novel_rows": 36,
+      "novel_rate": 0.009997222993612885,
+      "score_quantiles": {
+        "p50": 0.6784423691201728,
+        "p90": 1.383199383355718,
+        "p95": 1.7617168129235599,
+        "p99": 3.011242551246845
+      }
+    },
+    "validation": {
+      "rows": 3839,
+      "novel_rows": 45,
+      "novel_rate": 0.011721802552748111,
+      "score_quantiles": {
+        "p50": 0.6516415546190063,
+        "p90": 1.5016504040079277,
+        "p95": 1.768291516746085,
+        "p99": 3.2537957761286274
+      },
+      "forecast_errors": {
+        "coolant_temp_c": {
+          "xgboost_mae": 0.6080325010637033,
+          "persistence_mae": 0.4105235738473561,
+          "xgboost_rmse": 0.9145500658389384,
+          "persistence_rmse": 0.7210596815379929
+        },
+        "map_kpa": {
+          "xgboost_mae": 11.003760639656704,
+          "persistence_mae": 11.175175827038291,
+          "xgboost_rmse": 16.651840920121156,
+          "persistence_rmse": 18.985813722045208
+        },
+        "engine_rpm": {
+          "xgboost_mae": 147.39917857971747,
+          "persistence_mae": 158.1226882000521,
+          "xgboost_rmse": 220.899866786633,
+          "persistence_rmse": 280.0187521629704
+        },
+        "speed_kmph": {
+          "xgboost_mae": 5.9046496304470635,
+          "persistence_mae": 7.210471476947122,
+          "xgboost_rmse": 8.763572864504631,
+          "persistence_rmse": 11.985507224693736
+        },
+        "intake_air_temp_c": {
+          "xgboost_mae": 2.6734353167831646,
+          "persistence_mae": 3.008856473039854,
+          "xgboost_rmse": 7.3397736008216325,
+          "persistence_rmse": 12.043184430277249
+        },
+        "maf_gs": {
+          "xgboost_mae": 5.412313422138227,
+          "persistence_mae": 5.59803334201615,
+          "xgboost_rmse": 7.927883850241864,
+          "persistence_rmse": 9.006451836372994
+        },
+        "throttle_pct": {
+          "xgboost_mae": 0.5802261660576613,
+          "persistence_mae": 0.36858556915863505,
+          "xgboost_rmse": 3.2727408025166866,
+          "persistence_rmse": 3.244810311367919
+        },
+        "ambient_air_temp_c": {
+          "xgboost_mae": 0.9356912926610755,
+          "persistence_mae": 0.07085178431883303,
+          "xgboost_rmse": 1.7332027181849952,
+          "persistence_rmse": 0.2678870658933269
+        },
+        "pedal_d_pct": {
+          "xgboost_mae": 5.5076789104246044,
+          "persistence_mae": 5.384032300078145,
+          "xgboost_rmse": 8.57002969568161,
+          "persistence_rmse": 10.483545635714988
+        },
+        "pedal_e_pct": {
+          "xgboost_mae": 5.511604091319358,
+          "persistence_mae": 5.406876790830945,
+          "xgboost_rmse": 8.611699520952229,
+          "persistence_rmse": 10.544495396779366
+        }
+      }
+    },
+    "test": {
+      "rows": 3967,
+      "novel_rows": 49,
+      "novel_rate": 0.012351903201411647,
+      "score_quantiles": {
+        "p50": 0.6061130195915374,
+        "p90": 1.291732850533144,
+        "p95": 1.655454310360779,
+        "p99": 3.4219482073727403
+      },
+      "forecast_errors": {
+        "coolant_temp_c": {
+          "xgboost_mae": 0.49260222908829693,
+          "persistence_mae": 0.32896395260902445,
+          "xgboost_rmse": 0.8453841356053616,
+          "persistence_rmse": 0.631398430325092
+        },
+        "map_kpa": {
+          "xgboost_mae": 10.517019211750112,
+          "persistence_mae": 10.848500126039829,
+          "xgboost_rmse": 16.5877164779068,
+          "persistence_rmse": 18.931589790851557
+        },
+        "engine_rpm": {
+          "xgboost_mae": 158.77686274667695,
+          "persistence_mae": 174.10007562389714,
+          "xgboost_rmse": 232.80178683032943,
+          "persistence_rmse": 297.6579166028681
+        },
+        "speed_kmph": {
+          "xgboost_mae": 6.012166664468227,
+          "persistence_mae": 7.12856062515755,
+          "xgboost_rmse": 8.737238812522735,
+          "persistence_rmse": 11.421408658739823
+        },
+        "intake_air_temp_c": {
+          "xgboost_mae": 3.2271242321311067,
+          "persistence_mae": 4.525586085202924,
+          "xgboost_rmse": 9.109999673629426,
+          "persistence_rmse": 16.013456970126917
+        },
+        "maf_gs": {
+          "xgboost_mae": 5.361942924806504,
+          "persistence_mae": 5.762601462062012,
+          "xgboost_rmse": 8.068384118386335,
+          "persistence_rmse": 9.344670562564719
+        },
+        "throttle_pct": {
+          "xgboost_mae": 0.34736499791185016,
+          "persistence_mae": 0.16392740105873466,
+          "xgboost_rmse": 1.0104355220645889,
+          "persistence_rmse": 0.9263208570599882
+        },
+        "ambient_air_temp_c": {
+          "xgboost_mae": 0.49087032920699486,
+          "persistence_mae": 0.05369296697756491,
+          "xgboost_rmse": 0.7673131170006197,
+          "persistence_rmse": 0.23280276263805
+        },
+        "pedal_d_pct": {
+          "xgboost_mae": 5.648314350667636,
+          "persistence_mae": 5.546054953365263,
+          "xgboost_rmse": 8.731517936978813,
+          "persistence_rmse": 10.612604099257757
+        },
+        "pedal_e_pct": {
+          "xgboost_mae": 5.677236230589143,
+          "persistence_mae": 5.568490042853542,
+          "xgboost_rmse": 8.788839358501624,
+          "persistence_rmse": 10.711258033087143
+        }
+      }
+    }
+  },
+  "interpretation": "Novelty flags mark windows whose forecast residual is large relative to the calibration dates. KIT has no verified fault labels; these are not fault diagnoses or fault-detection metrics.",
+  "limitations": [
+    "Recording IDs are not verified vehicle IDs.",
+    "Anomalous training/calibration windows may affect fit and threshold.",
+    "The threshold is calibrated from a small chronological subset of training dates.",
+    "A high novelty score can reflect normal context or operating-regime changes.",
+    "No RUL, future-failure, or supervised fault claim is supported."
+  ],
+  "artifact": "ml/artifacts/kit_xgb_forecast.joblib"
+}
