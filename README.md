@@ -28,6 +28,14 @@ describe the intended product, not currently available or validated functionalit
 See [future mobile integration](docs/future-mobile-integration.md) for implementation
 boundaries and remaining decisions; see [mobile setup](mobile/README.md) for the app.
 
+## Codebase graph
+
+The repository's Graphify snapshot is checked in under [`graphify-out/`](graphify-out/),
+with a dated snapshot and machine-readable graph, manifest, and analysis metadata.
+It provides a navigable map of code relationships; inferred edges are hypotheses,
+so verify them against the source before relying on them. See
+[`docs/graphify.md`](docs/graphify.md) for the snapshot contents and interpretation.
+
 ## 🚀 The Problem & SaaS Value Proposition
 
 | The Industry Pain Point | The DrivePulse AI Solution |

@@ -1,5 +1,13 @@
 # DrivePulseAI: implementation progress audit
 
+## Graphify codebase map — 2026-11-14
+
+Graphify generated a repository relationship map in `graphify-out/`, including a
+dated snapshot. The graph provides navigation across backend, frontend, mobile,
+ML, simulator, tests, and project records; its inferred links require source
+verification. The generated snapshots and manifests are retained, while the
+incremental cache remains local and ignored. See [docs/graphify.md](docs/graphify.md).
+
 **Baseline:** local checkout `main` at `9d79a59` (commit subject “Audit and organize datasets…”), as of 2026-11-13. The workspace already had extensive modifications before this report; they were preserved. Audit reports and `tasks_done.md` are documentation additions; Component X v3 publisher files were acquired under `data/automotive_prognostics/scania_component_x/v3/raw/` and retained unchanged. **User scope decision: passenger cars and passenger EVs only.** Truck datasets are excluded from car performance claims.
 
 ## Step 0 — environment and baseline (2026-11-13)
