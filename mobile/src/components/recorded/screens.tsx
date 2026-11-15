@@ -25,7 +25,7 @@ export function OverviewScreen() {
     <Button title="Open recorded replay" onPress={() => router.push('/(main)/replay')} />
     <View style={styles.actionRow}>
       <Button title="View telemetry" secondary style={styles.actionButton} onPress={() => router.push('/(main)/(tabs)/telemetry')} />
-      <Button title="View insights" secondary style={styles.actionButton} onPress={() => router.push('/(main)/(tabs)/insights')} />
+      <Button title="View insights" secondary style={styles.actionButton} onPress={() => router.push('/(main)/recorded-insights')} />
     </View>
     <Copy muted style={type.caption}>Recorded research telemetry with saved experimental ML results. No live vehicle connection.</Copy>
   </>}</DataGate></Page>;
@@ -98,7 +98,7 @@ export function ReplayScreen() {
           <Copy muted style={type.caption}>Sample {replay.index + 1} of {clip.sample_count} · Source row {sample.source_row} · Elapsed replay time follows the recorded offsets.</Copy>
         </Panel><Measurements sample={sample} /><Score clip={clip} sample={sample} />
         {interval && <Button title="Open active interval" onPress={() => router.push(detailRoute(clip.clip_id, interval.interval_id))} />}
-        <Button title="Telemetry history" secondary onPress={() => router.push('/(main)/(tabs)/telemetry')} /><Button title="All saved insights" secondary onPress={() => router.push('/(main)/(tabs)/insights')} />
+        <Button title="Telemetry history" secondary onPress={() => router.push('/(main)/(tabs)/telemetry')} /><Button title="All saved insights" secondary onPress={() => router.push('/(main)/recorded-insights')} />
       </>;
     }}</DataGate>
   </Page>;

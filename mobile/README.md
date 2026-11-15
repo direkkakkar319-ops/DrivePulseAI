@@ -7,6 +7,36 @@ See [demo coverage, sources and one-time onboarding](VEHICLE_CATALOG.md).
 
 React Native + Expo frontend with Firebase email/password and Android Google authentication.
 
+## AI Insights demonstration (Phase 4.4)
+
+AI Insights uses the shared light UI with Choose Data Source, Analysis Results,
+and Telemetry Data sections. The switch starts off; Home's **Explore Demo Data**
+opens it in demo mode. Results are visibly tagged Demo, include illustrative
+explanations, and never enter account analysis history. Fixed typed fixtures in
+`src/config/demo-insights.ts` are UI samples, unrelated to saved vehicles,
+recordings, training datasets, or actual model output. No charts or inference run.
+
+This build has no compatible CSV picker: selection/upload is explicitly unavailable
+and the select-file button is disabled. No dependency was added. An optional
+metadata-only picker contract is provided for a future integration; its component
+tests inject a picker to verify filename/size/type, cancellation, replacement,
+errors, and source switching. This does not enable native selection in the app.
+Even with that adapter, selecting a file shows **Analysis not available yet**;
+the UI does not read its contents, upload it, parse telemetry, or run ML.
+
+Home retains saved Garage vehicles and empty genuine-history state. Its separate
+recorded telemetry/replay links still work. Recorded experimental results now live
+at `/(main)/recorded-insights`, including links from recorded replay/overview;
+recorded detail routes and source labels remain intact. The five-tab layout,
+authentication, onboarding, and backend APIs are unchanged.
+
+On Android, reload the development app and check both the Insights switch and the
+Home demo entry (including returning to it after turning demo off), large font
+sizes, safe areas, scrolling, recorded replay/details, and Android Back. No new
+APK is required for these JS-only changes. The earlier intermittent Garage
+maximum-depth crash still needs physical-device tracing; these changes do not
+claim to fix it.
+
 ## Implemented
 
 - Signup with exactly Username, Email, and Password; email/password login.

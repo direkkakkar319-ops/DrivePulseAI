@@ -157,12 +157,17 @@ it('shows honest connection and analysis empty states, and navigates to History'
   expect(mockNavigate).toHaveBeenCalledWith('/(main)/(tabs)/history');
 });
 
-it('keeps recorded Nissan Leaf data explicitly separate and preserves Telemetry and Replay destinations', async () => {
+it('opens generic demo Insights without fabricating history and preserves separate recorded tools', async () => {
   const { api } = service();
   await render(<Session api={api} />);
   await screen.findByText('Personal car');
-  expect(screen.getByRole('header', { name: 'Recorded Nissan Leaf data' })).toBeTruthy();
-  expect(screen.getByText(/separate from your saved vehicles/)).toHaveTextContent(/not live data or analyses of your active vehicle/);
+  expect(screen.getByRole('header', { name: 'Explore Demo Data' })).toBeTruthy();
+  expect(screen.queryByText(/Nissan Leaf/i)).toBeNull();
+  expect(screen.getByText('No saved analyses yet')).toBeTruthy();
+  expect(screen.queryByText('94.2%')).toBeNull();
+  await fireEvent.press(screen.getByRole('button', { name: 'Explore Demo Data' }));
+  expect(mockNavigate).toHaveBeenCalledWith({ pathname: '/(main)/(tabs)/insights', params: { demo: expect.any(String) } });
+  expect(api.selectActive).not.toHaveBeenCalled();
   await fireEvent.press(screen.getByRole('button', { name: 'View recorded telemetry' }));
   expect(mockNavigate).toHaveBeenCalledWith('/(main)/(tabs)/telemetry');
   await fireEvent.press(screen.getByRole('button', { name: 'Open recorded replay' }));

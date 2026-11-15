@@ -25,6 +25,8 @@ it('shows recorded units and navigates without the conventional-vehicle demo', a
   expect(mockPush).toHaveBeenCalledWith('/(main)/(tabs)/telemetry');
   await fireEvent.press(screen.getByText('Open recorded replay'));
   expect(mockPush).toHaveBeenCalledWith('/(main)/replay');
+  await fireEvent.press(screen.getByText('View insights'));
+  expect(mockPush).toHaveBeenCalledWith('/(main)/recorded-insights');
   await fireEvent.press(screen.getByLabelText('Account'));
   expect(mockPush).toHaveBeenCalledWith('/(main)/account');
 });
@@ -44,6 +46,8 @@ it('selects clips, plays actual sample steps, pauses and restarts', async () => 
   expect(screen.getByText(/Sample 1 of 205/)).toBeTruthy();
   await fireEvent.press(screen.getByText('Telemetry history'));
   expect(mockPush).toHaveBeenCalledWith('/(main)/(tabs)/telemetry');
+  await fireEvent.press(screen.getByText('All saved insights'));
+  expect(mockPush).toHaveBeenCalledWith('/(main)/recorded-insights');
   await fireEvent.press(screen.getByText('Typical telemetry · Trip 153'));
   expect(await screen.findByText(/Sample 1 of 211/)).toBeTruthy();
 });
