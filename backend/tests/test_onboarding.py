@@ -111,6 +111,42 @@ def test_blank_profile_uses_existing_identity_and_skip_is_complete(
     assert result["profile_completed_at"] and not result["completed_at"]
 
 
+def test_edit_completed_profile_preserves_milestones_identity_and_vehicles(
+    client: TestClient,
+) -> None:
+    original = first(client)
+    updated = client.put(
+        "/api/v1/onboarding/profile",
+        headers=headers(),
+        json={"full_name": "  Edited profile name  ", "driving_licence": "no"},
+    )
+    assert updated.status_code == 200
+    saved = updated.json()
+    assert saved["full_name"] == "Edited profile name"
+    for field in (
+        "firebase_uid",
+        "driving_licence",
+        "profile_completed_at",
+        "completed_at",
+        "first_vehicle_id",
+        "active_vehicle_id",
+        "vehicles",
+    ):
+        assert saved[field] == original[field]
+    assert client.get("/api/v1/onboarding", headers=headers()).json() == saved
+    assert (
+        client.get("/api/v1/users/me", headers=headers()).json()["username"]
+        == "Account alice"
+    )
+    invalid = client.put(
+        "/api/v1/onboarding/profile",
+        headers=headers(),
+        json={"full_name": "x" * 121, "driving_licence": "no"},
+    )
+    assert invalid.status_code == 422
+    assert client.get("/api/v1/onboarding", headers=headers()).json() == saved
+
+
 def test_email_fallback_when_firebase_has_no_name(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:

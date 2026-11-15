@@ -39,6 +39,11 @@ claim to fix it.
 
 ## Implemented
 
+Profile and Settings use the shared light UI and existing account/Firebase state.
+Profile name edits persist through the existing backend profile endpoint;
+Security offers provider-aware Firebase actions, and normal Logout lives in
+Settings. See [Profile, Settings, privacy and verification](PROFILE_SETTINGS.md).
+
 History uses the shared light UI and an honest empty state with an Explore AI
 Insights action. Reusable typed cards and an unrouted details screen are ready
 for future genuine records; no history API or persistence exists yet. See
