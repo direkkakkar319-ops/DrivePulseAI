@@ -85,7 +85,7 @@ Milestone M1 remains 🟡 Partial at **50%**: the validation run is reproducible
 
 ## Repository map
 
-Top-level directories: `.agents/`, `.aws/`, `.codex/`, `.github/`, `backend/`, `data/`, `docs/`, `frontend/`, `ml/`, `mobile/`, `scripts/`, `simulator/`; root configs include `.env.example`, `requirements.txt`, `docker-compose.yml`, `docker-compose.dev.yml`, `.pre-commit-config.yaml`, and `LICENSE`. Generated/local directories also present: `.venv`, `.pytest_cache`, `.ruff_cache`, `backend/.venv`, `backend/node_modules`, `frontend/node_modules`, `frontend/.next*`, `mobile/node_modules`, and `mobile/.expo` (environment/runtime, not source components). No Dockerfile found in the current file inventory; compose files exist.
+Top-level directories: `.agents/`, `.aws/`, `.codex/`, `.github/`, `backend/`, `data/`, `docs/`, `frontend/`, `ml/`, `mobile/`, `scripts/`, `simulator/`; root configs include `.env.example`, `requirements.txt`, `docker-compose.yml`, `.pre-commit-config.yaml`, and `LICENSE`. The Compose file provides local PostgreSQL for backend development and tests. Generated/local directories also present: `.venv`, `.pytest_cache`, `.ruff_cache`, `backend/.venv`, `backend/node_modules`, `frontend/node_modules`, `frontend/.next*`, `mobile/node_modules`, and `mobile/.expo` (environment/runtime, not source components). No Dockerfile found in the current file inventory.
 
 | Area | Language/framework/package manager | Entry points and evidence |
 |---|---|---|
@@ -161,7 +161,7 @@ No raw-sample-to-all-stages implementation: predictor and backend `inference_ser
 
 - **Tests:** test source exists in `ml/tests`, `backend/tests`, `mobile/tests`, and `simulator/tests`. `data/README.md` claims prior `pytest ml/tests -q` passed 37 tests and Ruff checks, but says this did not validate scientific mappings. No tests were run for this read-only audit (per task guardrail).
 - **CI:** `.github/workflows/{ml,backend,frontend,mobile}-ci.yml` and Vercel/deploy workflows exist. Workflow definitions install dependencies and run lint/test/type-check. Presence is verified; latest run state not checked beyond GitHub PR body claims for #50.
-- **Containers:** root `docker-compose.yml` and `docker-compose.dev.yml`; no Dockerfile located. Runtime readiness not verified.
+- **Containers:** root `docker-compose.yml` provides local PostgreSQL only; no Dockerfile or containerized FastAPI/model service is present. The empty, unused `docker-compose.dev.yml` override was removed.
 - **Docs:** root README is not treated as truth. `data/README.md` is a detailed current inventory/audit but contains stale statements about loader absence relative to current loader source. `backend/README.md`, `mobile/README.md`, diagrams and website exist.
 - **Tracking/versioning:** `mlflow` is listed in `ml/requirements.txt`, but `ml/src/training/mlflow_utils.py` is one comment and no MLflow runs found. No artifact registry/model version policy.
 
