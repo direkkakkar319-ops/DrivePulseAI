@@ -14,7 +14,7 @@ at the repository root for compatibility with existing links.
 | [`progress.md`](../progress.md) | Completed work and current implementation state |
 | [`remaining.md`](../remaining.md) | Blockers and recommended next work |
 | [`tasks_done.md`](../tasks_done.md) | Historical implementation log and rationale |
-| [`agent_context.md`](../agent_context.md) | Local agent handoff context; may be untracked |
+| `agent_context.md` | Local agent handoff context; intentionally not part of the shared project records |
 
 ## Code and data
 
