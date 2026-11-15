@@ -23,6 +23,19 @@ sensitivity are fault-detection metrics. Details:
 and [machine-readable output](ml/reports/modeling/kit_xgb_forecast_baseline.json).
 The model artifact remains local in ignored `ml/artifacts/`.
 
+## Oxford RUL method comparison — 2026-11-15
+
+Compared linear OLS, Theil–Sen, recency-weighted linear and exponential
+capacity-trend estimates across fixed lookbacks. Earlier cutoffs selected an
+exponential 2,000-cycle trend. On later cutoffs within the same two proxy-event
+cells, it scored 1,368 cycles macro-cell MAE versus 1,590 for the current
+Theil–Sen/1,000-cycle baseline. Cell2 improved (1,012 to 561 cycles MAE), while
+Cell5 stayed poor (2,168 to 2,175). Keep exponential trend experimental; retain
+the existing default because the crossing labels are unconfirmed and the
+cutoffs are not independent cells. See
+[method comparison](ml/reports/modeling/oxford_rul_method_comparison.md) and
+[full candidate metrics](ml/reports/modeling/oxford_rul_method_comparison.json).
+
 ## Oxford preprocessing verification and RUL-target EDA — 2026-11-14
 
 Reran `ml/scripts/preprocess_oxford_battery.py` from the retained original MAT

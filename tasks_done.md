@@ -468,3 +468,42 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
 - Updated this log's historical introduction to note the helper was later
   removed. The resolved head passed all six PR checks and PR #59 was squash-
   merged to `main` as `a910e0b7895fdff18a52dc0fb47116cdf286dbcc`.
+
+## Oxford RUL improvement — Step 1: research and comparison protocol
+
+- Reviewed battery capacity-trajectory prediction literature. Linear, polynomial,
+  and exponential functions are used as trajectory models; model choice should
+  be tested against the observed task rather than assuming one family wins
+  ([battery degradation prediction study](https://www.sciencedirect.com/science/article/pii/S2405829722002446)).
+- Because Oxford has no confirmed EOL events under the two-reading rule, planned
+  comparisons use only the explicitly unconfirmed first-crossing proxy. Results
+  will be labeled proxy fit, not validated RUL accuracy.
+- Planned fixed candidates: local OLS linear, Theil–Sen linear, recency-weighted
+  linear, and exponential trend, over preset lookbacks. For each cell, earlier
+  cutoffs select a candidate and later cutoffs are held out temporally. All
+  estimation uses history available by the cutoff; cells and outcomes are never
+  pooled as independent sample rows.
+- Reason: compare model forms and simple hyperparameters without an XGBoost
+  regressor that cannot be trained credibly from only two event cells. Keep the
+  existing Theil–Sen result as a reference.
+
+### Step 2: compare methods and retain an experimental candidate
+
+- Added `ml/scripts/compare_oxford_rul_methods.py` to compare OLS, Theil–Sen,
+  recency-weighted OLS and exponential capacity trends at fixed lookbacks. The
+  split uses earlier cutoffs for selection and later cutoffs for a temporal
+  check; each estimate sees only observations available at that cutoff.
+- Development selection chose an exponential trend with a 2,000-cycle window.
+  On later within-cell cutoffs, macro-cell MAE was 1,368 cycles versus 1,590
+  for the existing Theil–Sen/1,000-cycle baseline. Cell2 MAE fell from 1,012 to
+  561 cycles; Cell5 remained about 2,175 cycles for both methods.
+- Added `ExponentialCapacityTrendRUL` as an experimental candidate. Kept
+  Theil–Sen as the default because the candidate's score is based on two cells
+  with unconfirmed first-crossing labels, temporal origins are correlated, and
+  Cell5 remains poor. This does not establish dependable or new-cell RUL
+  performance.
+- Added a report and full JSON metrics, updated the baseline report, project
+  progress, remaining-work notes and this context with the result and rationale.
+- Checks: the comparison script ran successfully on the locally available
+  processed Oxford table; Ruff lint and formatting checks passed. No broader
+  test suite was run.

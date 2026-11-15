@@ -37,6 +37,16 @@ The strategy decision is complete: use separate passenger-car/EV sources with ex
 2. **Close the candidate gates.** Obtain written 347-EV body/join/horizon confirmation, explicit 20-car data rights, and either the Shenzhen archive or a documented rejection because the official asset remains inaccessible. Done when each candidate has keep/reject status and provenance. (M, 2–5 days plus external response.)
 3. **Finish loader/data-contract work—no model training in this PR.** Add schema tests for each acquired/approved dataset; keep unverified carOBD, 20-car rights-blocked data, and unacquired Shenzhen data quarantined. Tongji split enforcement is complete and tested. (M, 2–4 days.)
 
+### Oxford RUL follow-up
+
+The separate Oxford comparison found a modest improvement against the
+unconfirmed first-crossing proxy using an experimental exponential trend, but
+Cell5 errors remain large and there are no confirmed EOL events or independent
+event cells. Do not promote the candidate to the default or use its score as a
+dependable RUL claim. Revisit model selection when an approved dataset provides
+confirmed EOL targets and enough independent cells for cell-disjoint evaluation.
+See [comparison report](ml/reports/modeling/oxford_rul_method_comparison.md).
+
 ## Phased plan
 
 ### Phase A — scope and data contract

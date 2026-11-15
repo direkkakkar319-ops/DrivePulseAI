@@ -77,3 +77,9 @@ the Oxford preprocessing script.
   censoring.
 - The model is a reproducible method-development baseline only; it is not
   integrated into the app or API and should not be used for vehicle advice.
+
+An expanded comparison of linear, robust, weighted and exponential trend rules
+is recorded in the [Oxford RUL method comparison](oxford_rul_method_comparison.md).
+That experiment keeps Theil–Sen as the default and records an exponential trend
+as an experimental candidate; neither is validated against confirmed EOL
+labels.
