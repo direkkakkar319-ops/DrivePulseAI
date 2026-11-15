@@ -39,6 +39,11 @@ claim to fix it.
 
 ## Implemented
 
+History uses the shared light UI and an honest empty state with an Explore AI
+Insights action. Reusable typed cards and an unrouted details screen are ready
+for future genuine records; no history API or persistence exists yet. See
+[History behavior and missing API contract](HISTORY.md).
+
 - Signup with exactly Username, Email, and Password; email/password login.
 - Google sign-in through Android Credential Manager, exchanged for a Firebase session.
 - Show/hide password controls on signup and login.

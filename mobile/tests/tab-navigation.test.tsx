@@ -12,7 +12,7 @@ import { colors } from '../src/theme/tokens';
 jest.mock('expo-router', () => {
   const Tabs = ({ children }: { children: ReactNode }) => children;
   Tabs.Screen = () => null;
-  return { Tabs };
+  return { Tabs, useRouter: () => ({ navigate: jest.fn() }) };
 });
 
 const destinations = [
@@ -85,10 +85,11 @@ it('lets the navigator manage safe-area height and keeps touch targets and scala
   expect(screenOptions.headerShown).toBe(false);
 });
 
-it('explains future history without fabricated records or actions', async () => {
+it('explains empty history with an explicit Insights action and no fabricated records', async () => {
   await render(<HistoryScreen />);
   expect(screen.getByRole('header')).toHaveTextContent('History');
-  expect(screen.getByText('Saved analysis history will be implemented in a future update.')).toBeTruthy();
-  expect(screen.queryAllByRole('button')).toHaveLength(0);
+  expect(screen.getByText('Your completed vehicle analyses will appear here once real analysis is available.')).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Explore AI Insights' })).toBeTruthy();
+  expect(screen.queryAllByTestId(/^history-record-/)).toHaveLength(0);
   expect(screen.queryByText(/Trip|Nissan|score/i)).toBeNull();
 });
