@@ -516,3 +516,17 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
   documented local backend setup and PostgreSQL integration-test workflow.
 - Updated the repository inventory to describe the remaining Compose use
   accurately. No backend/mobile files or runtime behavior changed.
+
+## Publish KIT prepared windows and Oxford source data — 2026-11-15
+
+- Added the prepared KIT 10-second window table with KIT's CC BY 4.0 attribution.
+  The publisher's complete raw KIT archive was not present locally, so this PR
+  identifies the committed file as the prepared model-input dataset, not as the
+  complete raw release.
+- Added Oxford's source README and small example MAT file. Split the 266 MB main
+  MAT source into 64 parts below the repository's 5 MB file check; the
+  reconstruction script validates the original SHA-256 before accepting it.
+- Recorded Oxford ODbL/DbCL terms and dataset/thesis citations separately from
+  the repository MIT software license.
+- No model or application code changed. Reassembly and SHA-256 verification
+  passed; CI and PR review remain before any merge.

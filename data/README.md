@@ -22,8 +22,8 @@ Documents the local dataset inventory, immutable raw locations, validation findi
 | carOBD candidate | INCOMPLETE; provenance UNVERIFIED | `automotive_obd/carobd/raw/`: 129 CSV recordings, 304,299 rows; malformed/short records described below |
 | DieselOBD candidate | UNVERIFIED | `automotive_obd/dieselobd/raw/`: two OBD/DTC Excel workbooks; no source documentation |
 | VED | REMOVED 2026-10-06: static metadata only, no telemetry; unused by any loader | `automotive_obd/ved/raw/` (deleted) |
-| KIT Automotive OBD-II | COMPLETE | `automotive_obd/kit_obd/raw/`: 81 actual CSV recordings plus original RADAR metadata/BagIt payload |
-| Oxford Battery Degradation Dataset 1 | COMPLETE source; limited SOH/RUL research only | `automotive_prognostics/oxford_battery_degradation/v1/raw/`; local processed cycle features are gitignored |
+| KIT Automotive OBD-II | COMPLETE source; prepared training windows published | Original raw archive is documented at `automotive_obd/kit_obd/raw/`; the tracked model-input windows and preprocessing summary are in `automotive_obd/kit_obd/processed/` |
+| Oxford Battery Degradation Dataset 1 | Source published in chunks; limited SOH/RUL research only | `automotive_prognostics/oxford_battery_degradation/v1/raw_chunks/`; reconstructed MAT and derived cycle features remain local/ignored |
 | Zenodo 515-EV fault dataset | COMPLETE archives; fault-label joins BLOCKED | `automotive_prognostics/ev_fault_515/v1/raw/`; seven original archives, kept local and gitignored |
 | Scania APS Failure | COMPLETE | `automotive_failure/scania_aps/raw/`: official-named training/test CSVs and description |
 | SCANIA Component X | REMOVED 2026-10-06: citation only, data never downloaded; RUL blocked until the official release arrives | `automotive_prognostics/scania_component_x/` (deleted) |
@@ -35,6 +35,13 @@ No additional NASA battery dataset was found. No exact duplicate standalone raw 
 ## Raw-data rules
 
 Raw contents are unchanged, including malformed rows, missing cells, duplicate rows, original encodings, column names and official split files. Do not train directly through the existing cross-domain mapping loaders. KIT and Oxford have reproducible, dataset-specific exploratory preprocessing scripts; generated preprocessing artifacts stay local and gitignored. KIT also has an exploratory XGBoost next-window forecasting novelty baseline; its model artifact stays local and gitignored, and KIT's lack of verified fault labels prevents fault-detection claims. Zenodo preprocessing remains blocked on authoritative sample/vehicle/label joins.
+
+Selected prepared KIT windows and the Oxford source MAT data are published with
+separate dataset attribution in [`DATASET_ATTRIBUTION.md`](DATASET_ATTRIBUTION.md).
+The Oxford MAT source is stored in 4 MiB chunks and can be reassembled with its
+dataset-specific script; individual chunks stay below the repository's size
+check. These data remain governed by their own licenses, not the software MIT
+license.
 
 Directory grouping is organizational: placing a candidate under `dieselobd` or `carobd` does not verify its origin. Never infer vehicle class from AI4I H/L/M, vehicle telemetry from make/model, or mechanical diagnoses from unlabeled recordings.
 
