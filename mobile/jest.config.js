@@ -7,4 +7,5 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   clearMocks: true,
+  setupFilesAfterEnv: ['<rootDir>/tests/setup-safe-area.ts'],
 };

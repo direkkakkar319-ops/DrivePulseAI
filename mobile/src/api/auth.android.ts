@@ -8,7 +8,9 @@ import { getGoogleIdToken } from '@/auth/google';
 import type { AuthService, AuthUser } from './auth.types';
 
 function snapshot(user: User | null): AuthUser | null {
-  return user ? { uid: user.uid, email: user.email, emailVerified: user.emailVerified, displayName: user.displayName } : null;
+  return user ? { uid: user.uid, email: user.email, emailVerified: user.emailVerified, displayName: user.displayName,
+    ...(Array.isArray(user.providerData) ? { providerIds: user.providerData.map(provider => provider.providerId) } : {}),
+  } : null;
 }
 
 function requireUser(): User {

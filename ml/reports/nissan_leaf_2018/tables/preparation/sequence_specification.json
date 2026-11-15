@@ -1,0 +1,27 @@
+{
+  "across_split_overlap": "Forbidden and checked",
+  "horizon_seconds": 60.0,
+  "input_features": [
+    "Speed",
+    "Torque",
+    "Motor_Temp",
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "inputs": "All observed eligible rows from input_start_row through anchor_row inclusive; never include target_row in input",
+  "lookback_seconds": 30.0,
+  "raw_lookup": "row_ledger.parquet indexed by source_row",
+  "review_horizons_seconds": [
+    30.0,
+    60.0,
+    120.0
+  ],
+  "sampling": "Variable-length observed sequences; no regular grid or interpolation",
+  "scaled_lookup": "features_<split>.parquet keyed by source_row; only transformer.output_features are model inputs",
+  "sensor_refresh": "Unknown; forecast is a logged reading, not guaranteed fresh sensor truth",
+  "stride_seconds": 10.0,
+  "target": "Actual future recorded Pack_1_C_Temp at [horizon,horizon+tolerance], Celsius; not imputed",
+  "tolerance_seconds": 0.5,
+  "within_split_overlap": "Permitted; evaluation must account for dependent windows"
+}

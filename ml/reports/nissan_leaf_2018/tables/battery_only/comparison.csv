@@ -1,0 +1,4 @@
+split,original_features,battery_features,original_sequences,battery_sequences,original_retained_trips,battery_retained_trips,original_dates,battery_dates
+train,1540563,1623891,35632,37753,138,139,73,74
+validation,351161,351087,6753,6595,34,34,19,19
+test,158578,340986,2809,4514,26,50,13,25

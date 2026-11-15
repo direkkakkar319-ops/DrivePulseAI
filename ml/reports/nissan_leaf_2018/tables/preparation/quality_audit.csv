@@ -1,0 +1,18 @@
+flag,bit,category,meaning,raw_rows,processed_rows
+missing_candidate,1,Missing,Candidate NaN; no silent fill,0,0
+nonfinite_candidate,2,Invalid based on verified rules,Infinite measurement cannot be a finite physical reading,0,0
+soc_domain,4,Invalid based on verified rules,"SOC outside documented percentage domain [0,100]; may encode unavailable state, not a fault",2040,0
+speed_negative,8,Suspicious,Negative speed magnitude/unavailable code unresolved,266235,0
+voltage_review,16,Suspicious,Nonpositive or above review threshold; not a fault,2141,3
+pack_sentinel,32,Unresolved,Pack reading near -1 may be unavailable or real; no conversion,3850,0
+physical_temperature,64,Invalid based on verified rules,Temperature below absolute zero in documented Celsius channel,0,0
+tire_zero_or_negative,128,Suspicious,Pressure code needs interpretation; excluded feature,457168,222905
+odometer_decrease,256,Suspicious,Decrease within trip; not corrected,202,321
+odometer_jump,512,Suspicious,Large short-interval jump; not corrected,190,304
+soh_zero,1024,Unresolved,Reported zero health not treated as battery failure,2853,0
+power_formula,2048,Suspicious,Stored power differs from V*I/1000; no replacement,0,30057
+temperature_formula,4096,Suspicious,Stored mean differs from components; no replacement,0,1395
+duplicate_timestamp,8192,Invalid based on verified rules,"Ambiguous ordering for sequence use, not an invalid sensor reading",0,0
+long_gap,16384,Suspicious,Start of new continuity segment,15825,7984
+soh_missing,32768,Missing,SOH NaN retained; not a selected input,2247,0
+irregular_interval,65536,Unresolved,Row interval outside 0.2–0.3s descriptive band; no resampling,187435,130358

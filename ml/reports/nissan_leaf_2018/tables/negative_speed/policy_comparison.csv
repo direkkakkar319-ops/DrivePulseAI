@@ -1,0 +1,10 @@
+policy,split,features,feature_rows,temperature_windows,trips_with_rows,recorded_days,negative_speed_rows_retained,repeat_excluded
+existing_six_features,train,6,1540563,35632,138,73,0,0
+existing_six_features,validation,6,351161,6753,34,19,0,0
+existing_six_features,test,6,158578,2809,26,13,0,0
+omit_speed_only_diagnostic,train,5,1623891,37753,139,74,83328,0
+omit_speed_only_diagnostic,validation,5,351161,6753,34,19,0,0
+omit_speed_only_diagnostic,test,5,341075,4624,50,25,182497,0
+battery_only_conditional,train,3,1623891,37753,139,74,83328,0
+battery_only_conditional,validation,3,351087,6595,34,19,0,74
+battery_only_conditional,test,3,340986,4514,50,25,182484,89

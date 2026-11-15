@@ -1,0 +1,22 @@
+speed_group,Gear,rows,documented_meaning
+negative,-1,83355,Undocumented
+negative,1,9159,Park
+negative,2,1093,Reverse
+negative,3,341,Neutral
+negative,4,146035,Drive
+negative,7,26252,B/Eco
+positive,-1,27,Undocumented
+positive,0,116,Not read yet
+positive,1,14022,Park
+positive,2,7463,Reverse
+positive,3,724,Neutral
+positive,4,1370859,Drive
+positive,7,74633,B/Eco
+zero,-1,6,Undocumented
+zero,0,284,Not read yet
+zero,1,307640,Park
+zero,2,8088,Reverse
+zero,3,745,Neutral
+zero,4,256885,Drive
+zero,7,13994,B/Eco
+zero,176,384,Undocumented

@@ -1,0 +1,101 @@
+excel_row,variable,unit,description,ecu,sampling
+1,Variable,Units,Info,ECU,250ms: 250ms; 1s: 1s; 10s: 10s; 100s: 100s
+2,Power_SW,0/1,This field will be True if Power Switch is ON otherwise it will be False,"0x797 Vehicle 
+Control 
+Module (VCM)",100s: x
+3,Gear,see Info,"Gear position (0=not read yet, 1=Park, 2=Reverse, 3=Neutral, 4=Drive, 7=B/Eco)",0x797 (VCM),100s: x
+4,Bat_12V_Voltage,V,The voltage of the 12 volt battery as read by the Leaf's Vehicle Control Module ECU,0x797 (VCM),Unknown
+5,Bat_12V_Current,A,12 volt battery current. Minus is drain and positive is charging.,0x797 (VCM),10s: x
+6,Odometer,km,Km total,"0x743 Body 
+Control 
+Module (BCM)",10s: x
+7,Quick_Charge,---,Number of Quick Charges. Each time a Quick Charge occurs this number increments by 1,0x797 (VCM),Unknown
+8,L1_L2_Charge,---,"Number of L1/L2 connections and charges.
+This number increases each time the J1772 charge cord is plugged into the Leaf.
+It also increases by one for each delayed charge that takes place. If the Leaf charge timer is not active, so charging starts immediately when the charge cord is plugged in, then the count will increase by only one.
+But if the timer is active then the count will increase by two. Once when the charge cord is initially plugged in and a second time when the timer starts the delayed charge.",0x797 (VCM),Unknown
+9,Ambient_C_Temp,°C,Ambient temperature comes from the Leaf's outside temperature sensor and is saved in degrees Fahrenheit. This value is only valid when the Leaf is ON (not ACC mode and not when charging),0x797 (VCM),10s: x
+10,EstPwr_AC_50W,W,Estimated Air Conditioning System power (COOL),0x797 (VCM),10s: x
+11,EstPwr_Htr_250W,W,Estimated Cabin PTC Heater power (HEAT),0x797 (VCM),10s: x
+12,Aux_Pwr_100W,W,"Power used by the auxiliary equipment (Lights, Radio, Navigation system, rear defroster...)",0x797 (VCM),10s: x
+13,"AC_Pwr_250W
++
+AC_Compressor_Air_pressure",W and Mpa,"A/C system Power (250W): Power used by the Air Conditioning System power. This includes the power used by the cabin PTC Heater.
+A/C Compressure Air Pressure(0.1MPa): A/C Compressor high side pressure in Mpa. Multiply by 14.50377 to get PSI.
+",0x797 (VCM),10s: x
+14,PlugState,see Info,"Plug state of J1772 (L1/L2) charge port ( 0=Not plugged, 1=Partial Plugged, 2=Plugged )",0x797 (VCM),100s: x
+15,Charge_Mode,see Info,"Charging mode. ( 0=Not charging, 1=Level 1 charging (100-120 volts), 2=Level 2 charging (200-240 volts),  3=Level 3 Quick Charging )",0x797 (VCM),100s: x
+16,RPM,rev/min,Motor revolutions per minute,0x797 (VCM),1s: x
+17,SWA,° (360°),Steering Wheel angle The angle ranges from -720 to 720 degrees with negative being left turn.,0x740 (ABS),Unknown
+18,Group1,Unknown,See below,"0x79B Li-ion 
+Battery 
+Controller (LBC)",250ms: x
+19,Group2,Unknown,See below,0x79B (LBC),250ms: Manual
+20,Group4,Unknown,See below,0x79B (LBC),100s: x
+21,Group6,Unknown,See below,0x79B (LBC),250ms: Manual
+22,VIN (one time at boot),---,The vehicle identification number indicates which vehicle the data came from. (Calculated only at first scan),0x797 (VCM),Unknown
+23,SOH,%,State of Health is another indication of the battery's ability to hold and release energy and is reported as a percentage. When the battery is new SOH=100%,0x79B (LBC),Unknown
+24,Torque,Nm,Motor Torque. https://www.carwow.co.uk/guides/glossary/what-is-torque (Nm).  Minimum unit step is 0.25 Nm,"0x784 Traction 
+motor 
+Inverter (Inv/MC)",1s: x
+25,Motor_Temp,°C,This field is the drive motor temperature,0x784 (Inv/MC),10s: x
+26,OBC_Out_Pwr,W,Charging power coming into the Leaf in watts (W),0x797 (VCM),10s: x
+27,Motor_Pwr,W,Drive motor power in watt units,0x797 (VCM),1s: x
+28,TP_FR,kPA,Front right tire pressure (in kPa),0x743 (BCM),Unknown
+29,TP_FL,kPA,Front left tire pressure (in kPa),0x743 (BCM),Unknown
+30,TP_RR,kPA,Rear right tire pressure (in kPa),0x743 (BCM),Unknown
+31,TP_RL,kPA,Rear left tire pressure (in kPa),0x743 (BCM),Unknown
+32,Left_Arrow,see Info,-1: Off; 1: Active,0x745 (METER),Unknown
+33,Right_Arrow,see Info,-1: Off; 1: Active,0x745 (METER),Unknown
+34,Rain_level,see Info,"Rain sensitivity level for front wiper (automatic mode) (1: low, 4: high)",0x745 (METER),Unknown
+35,Front_wiper_level,see Info,-1: Off; 0: Automatic; 1: Continous slow speed; 2: Continous high speed,0x745 (METER),Unknown
+36,Front_washer,see Info,-1: Not active; 1: Active,0x745 (METER),Unknown
+37,Rear_washer,see Info,-1: Not active; 1: Active,0x745 (METER),Unknown
+38,Rear_wiper_level,see Info,-1: Off; 1: Intermittent; 2: Continous low speed,0x745 (METER),Unknown
+39,Position_lights,see Info,-1: Off; 0: Automatic mode; 1: On,0x745 (METER),100s: x
+40,Headlights,see Info,-1: Off; 0: Automatic mode; 1: On,0x745 (METER),100s: x
+41,Anti_fog_lights,see Info,-1: Off; 1: On,0x745 (METER),100s: x
+42,HighBeam,see Info,-1: Off; 0: Automatic mode; 1: On; 2: Manual,0x745 (METER),100s: x
+43,Battery_Serial,---,Battery serial number (Calculated only at first scan),0x79B (LBC),Unknown
+44,Speed,km/h,Speed (km/h) from the Leaf ECU,0x797 (VCM),1s: x
+45,RangeKm,km,Remaining km to turtle mode,0x743 (BCM),10s: x
+46,AC,0/1,Unknown,0x797 (VCM),10s: x
+47,RearHeater,0/1,Unknown,0x797 (VCM),100s: x
+48,HeaterTemp,°C,Heater temperature from 16.5°C to 30°C set by the driver,0x744 (HVAC),100s: x
+49,FanSpeed,0-8,Fan speed from 0 (off) to 8 (max),0x744 (HVAC),100s: x
+50,Brake,0 – 369 ?,Brake pression measured from 0 (not pressed) to 369 (max). Unit??,0x740 (ABS),1s: x
+51,Acc_Pedal,0 – 200 ?,Acceleration pedal pression measured from 0 (not pressed) to 200 (max). Unit??,0x740 (ABS),1s: x
+52,ECO,0/1,ECO mode ON/OFF,0x797 (VCM),10s: x
+53,ePedal,0/1,ePedal mode ON/OFF https://statics.quattroruote.it/content/dam/quattroruote/it/news/novita/2017/07/20/nuova_nissan_leaf_debutta_il_nuovo_e_pedal/gallery/rsmall/2017-epedal.jpg,0x797 (VCM),10s: x
+55,Total:,Unknown,Unknown,Unknown,Unknown
+61,Group 1,Unknown,Unknown,Unknown,Unknown
+62,Hx,%,"This is an indication of the HV Battery's health. A value of 100 would be a battery in factory new condition.
+The number is thought to be an indication of battery internal resistance with 100 indicating a new battery with lowest resistance.
+As the value decreases the internal resistance is increasing. As the internal resistance increases more energy is wasted as heat inside the battery instead of powering the Leaf",Unknown,Unknown
+63,SOC,%,State of Charge (SOC) of the HV Battery,Unknown,Unknown
+64,Ahr,Ah,"Capacity of HV Battery. This is how much energy the battery could hold when fully charged.
+You can get an estimate of energy currently in the battery by multiplying SOC% times AHr times 360 volts (nominal HV battery voltage) = WHr",Unknown,Unknown
+65,GIDs,---,Gids which indicates the energy in the Leaf battery. Nissan multiplies this value by 80 Wh to get current capacity of the HV Battery,Unknown,Unknown
+66,HV_Bat_Current_1,A,"High Voltage Battery Amperage (positive=from battery (driving), negative when regeneration or charging)",Unknown,Unknown
+67,HV_Bat_Current_2,A,"High Voltage Battery Amperage (positive=from battery (driving), negative when regeneration or charging)",Unknown,Unknown
+68,HV_Bat_Voltage,V,High Voltage Battery Voltage (in V),Unknown,Unknown
+69,Insulation,?,Unknown,Unknown,Unknown
+73,Group 2,Unknown,Unknown,Unknown,Unknown
+74,Cells voltage,mV,"These are the 96 cell pair voltages measured in millivolts.
+Negative values indicate that the corresponding shunt is active. During pack balancing the shunts are used to drain a small amount of energy from the cell pair.",Unknown,Unknown
+76,Group 4,Unknown,Unknown,Unknown,Unknown
+77,Packs Temperature,°C,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",Unknown,Unknown
+79,Group 6,Unknown,Unknown,Unknown,Unknown
+80,Shunts,---,"Shunts are small resistors that can be switched in to drain a small amount of energy from one or more of the 96 cells that make up the high voltage battery pack.
+This is the method used by Nissan to balance the pack by draining energy from the high energy cells.
+This works because charging stops to prevent overcharging the highest energy cell. So by reducing the energy in the highest energy cell all the other cells are able to be charged to a higher level.",Unknown,Unknown
+82,Indirect variables,Formula,Unknown,Unknown,Unknown
+83,Wh remaining,((Ahr * Nominal_Voltage) * SOC) / 100.0,Unknown,Unknown,Unknown
+84,Wh remaining SpyLeaf,GIDS * 77.5 / 1000,Unknown,Unknown,Unknown
+85,Nominal Voltage,360.0,Unknown,Unknown,Unknown
+86,GIDS,4.425 * (SOC * 0.01) * AHR,Unknown,Unknown,Unknown
+87,Horse power,1.341*(( HV_Bat_Voltage * HV_Bat_Current )/1000,Unknown,Unknown,Unknown
+88,"Current kW/Charging 
+Or
+Power/Battery Power (kW)",( HV_Bat_Voltage * HV_Bat_Current_2 ) / 1000,Unknown,Unknown,250ms: (kW going into the battery pack)
+89,Judgement,Cell_Voltage_Avg - ( (Cell_Voltage_Max – Cell_Voltage_Avg) * 1.5),Unknown,Unknown,Unknown

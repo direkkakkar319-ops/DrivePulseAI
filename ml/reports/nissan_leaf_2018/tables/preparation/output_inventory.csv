@@ -1,0 +1,16 @@
+artifact,bytes,rows
+configuration.json,2321,metadata
+features_test.parquet,1819680,158578
+features_train.parquet,17504744,1540563
+features_validation.parquet,3862381,351161
+processed_flagged_rows.parquet,4142587,369507
+quality_flag_dictionary.json,2524,metadata
+row_ledger.parquet,72885353,2322105
+segments.csv,836884,metadata
+temperature_test.parquet,97237,2809
+temperature_train.parquet,1269799,35632
+temperature_validation.parquet,241140,6753
+training_horizon_feasibility.csv,67,metadata
+transformer.json,873,metadata
+trip_splits.csv,15519,metadata
+window_accounting.csv,5810,metadata

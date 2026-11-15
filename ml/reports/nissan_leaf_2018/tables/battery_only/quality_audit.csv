@@ -1,0 +1,18 @@
+flag,bit,category,blocks_battery_view,rows,meaning
+missing_candidate,1,Missing,True,0,Candidate NaN; no silent fill
+nonfinite_candidate,2,Invalid based on verified rules,True,0,Infinite measurement cannot be a finite physical reading
+soc_domain,4,Invalid based on verified rules,True,2040,"SOC outside documented percentage domain [0,100]; may encode unavailable state, not a fault"
+speed_negative,8,Suspicious,False,266235,Negative speed magnitude/unavailable code unresolved
+voltage_review,16,Suspicious,True,2141,Nonpositive or above review threshold; not a fault
+pack_sentinel,32,Unresolved,True,3850,Pack reading near -1 may be unavailable or real; no conversion
+physical_temperature,64,Invalid based on verified rules,True,0,Pack sensors 1/2/4 below absolute zero; motor temperature does not participate
+tire_zero_or_negative,128,Suspicious,False,457168,Pressure code needs interpretation; excluded feature
+odometer_decrease,256,Suspicious,False,202,Decrease within trip; not corrected
+odometer_jump,512,Suspicious,False,190,Large short-interval jump; not corrected
+soh_zero,1024,Unresolved,False,2853,Reported zero health not treated as battery failure
+power_formula,2048,Suspicious,False,0,Stored power differs from V*I/1000; no replacement
+temperature_formula,4096,Suspicious,False,0,Stored mean differs from components; no replacement
+duplicate_timestamp,8192,Invalid based on verified rules,True,0,"Ambiguous ordering for sequence use, not an invalid sensor reading"
+long_gap,16384,Suspicious,False,15825,Start of new continuity segment
+soh_missing,32768,Missing,False,2247,SOH NaN retained; not a selected input
+irregular_interval,65536,Unresolved,False,187435,Row interval outside 0.2–0.3s descriptive band; no resampling

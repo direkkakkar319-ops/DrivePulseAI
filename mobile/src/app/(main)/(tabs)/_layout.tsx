@@ -1,56 +1,39 @@
-// Four primary tabs; vehicle, history, insight and report details stay in the parent stack.
-import { Tabs, TabList, TabTrigger, TabSlot } from 'expo-router/ui';
-import { Pressable, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon } from '@/components/vehicle-health/ui';
-import { colors as c } from '@/theme/colors';
-import type { TabTriggerSlotProps } from 'expo-router/ui';
-function TabButton({
-  children,
-  isFocused,
-  icon,
-  ...props
-}: TabTriggerSlotProps & { icon: string }) {
-  return (
-    <Pressable
-      {...props}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: isFocused }}
-      style={{ flex: 1, minHeight: 58, alignItems: 'center', justifyContent: 'center', gap: 5 }}
-    >
-      <Icon name={icon} color={isFocused ? c.primary : c.textMuted} />
-      <Text style={{ fontSize: 11, color: isFocused ? c.primary : c.textMuted }}>{children}</Text>
-    </Pressable>
-  );
+// Five main destinations; recorded Telemetry keeps its existing URL without a tab button.
+import { Tabs } from 'expo-router';
+import { StyleSheet, View, type ColorValue } from 'react-native';
+import { AppIcon, type AppIconName } from '@/components/ui/app-icon';
+import { colors, layout, typography } from '@/theme/tokens';
+
+function TabIcon({ name, color, focused }: { name: AppIconName; color: ColorValue; focused: boolean }) {
+  return <View style={[styles.icon, { borderTopColor: focused ? colors.accent : 'transparent' }]}>
+    <AppIcon name={name} color={color} />
+  </View>;
 }
+
 export default function ProductTabs() {
-  const insets = useSafeAreaInsets();
-  return (
-    <Tabs style={{ flex: 1, backgroundColor: c.background }}>
-      <View style={{ flex: 1 }}>
-        <TabSlot />
-      </View>
-      <TabList
-        style={{
-          borderTopWidth: 1,
-          borderColor: c.border,
-          backgroundColor: c.card,
-          paddingBottom: insets.bottom,
-        }}
-      >
-        <TabTrigger name="home" href="/(main)/(tabs)/home" asChild>
-          <TabButton icon="home">Home</TabButton>
-        </TabTrigger>
-        <TabTrigger name="vehicles" href="/(main)/(tabs)/vehicles" asChild>
-          <TabButton icon="car">Vehicles</TabButton>
-        </TabTrigger>
-        <TabTrigger name="insights" href="/(main)/(tabs)/insights" asChild>
-          <TabButton icon="pulse">Insights</TabButton>
-        </TabTrigger>
-        <TabTrigger name="account" href="/(main)/(tabs)/account" asChild>
-          <TabButton icon="account">Account</TabButton>
-        </TabTrigger>
-      </TabList>
-    </Tabs>
-  );
+  return <Tabs initialRouteName="home" backBehavior="initialRoute" screenOptions={{
+    headerShown: false,
+    tabBarHideOnKeyboard: true,
+    tabBarActiveTintColor: colors.accent,
+    tabBarInactiveTintColor: colors.textSecondary,
+    tabBarLabelPosition: 'below-icon',
+    tabBarAllowFontScaling: true,
+    tabBarLabelStyle: { ...typography.caption, fontWeight: '600' },
+    tabBarItemStyle: { minHeight: layout.minimumTouchTarget },
+    // The navigator supplies the bottom safe-area inset; do not fix the bar height.
+    tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.border, borderTopWidth: 1,
+      elevation: 0, shadowOpacity: 0 },
+    sceneStyle: { backgroundColor: colors.background },
+  }}>
+    <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: props => <TabIcon name="home" {...props} /> }} />
+    <Tabs.Screen name="vehicles" options={{ title: 'Garage', tabBarIcon: props => <TabIcon name="car" {...props} /> }} />
+    <Tabs.Screen name="insights" options={{ title: 'AI Insights', tabBarIcon: props => <TabIcon name="insights" {...props} /> }} />
+    <Tabs.Screen name="history" options={{ title: 'History', tabBarIcon: props => <TabIcon name="history" {...props} /> }} />
+    <Tabs.Screen name="account" options={{ title: 'Profile', tabBarIcon: props => <TabIcon name="profile" {...props} /> }} />
+    <Tabs.Screen name="telemetry" options={{ href: null }} />
+  </Tabs>;
 }
+
+const styles = StyleSheet.create({
+  icon: { width: 40, height: 26, alignItems: 'center', justifyContent: 'center', borderTopWidth: 2 },
+});

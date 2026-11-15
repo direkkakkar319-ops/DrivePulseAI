@@ -1,0 +1,4 @@
+column,description,unit,documented_polling
+HV_Bat_Voltage,High Voltage Battery Voltage (in V),V,Unknown
+Pack_1_C_Temp,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Unknown
+SOC,State of Charge (SOC) of the HV Battery,%,Unknown

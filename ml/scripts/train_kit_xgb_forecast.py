@@ -14,6 +14,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 from ml.src.models.anomaly_detector import XGBoostForecastAnomalyDetector
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -1,0 +1,14 @@
+{
+  "matched_processed_rows": 107,
+  "matched_processed_speed_counts": {
+    "0.0": 101,
+    "110.0": 1,
+    "116.0": 1,
+    "121.0": 1,
+    "123.0": 1,
+    "124.0": 1,
+    "127.0": 1
+  },
+  "not_present_in_processed": 266128,
+  "raw_negative_rows": 266235
+}

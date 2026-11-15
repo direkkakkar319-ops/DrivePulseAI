@@ -1,0 +1,137 @@
+{
+  "processed": {
+    "rows": 1918299,
+    "trip_ids": 127,
+    "timestamp_missing": 0,
+    "timestamp_parse_failures": 0,
+    "global_reversals": 0,
+    "duplicate_adjacent_times": 0,
+    "trip_blocks": 127,
+    "reused_noncontiguous_trip_ids": 0,
+    "within_trip_reversals": 0,
+    "within_trip_gaps_gt_1s": 7984,
+    "within_trip_gaps_gt_5s": 2142,
+    "within_trip_gaps_gt_60s": 184,
+    "median_within_trip_positive_interval_s": 0.25,
+    "columns": 32,
+    "soh_min": 92.63,
+    "soh_max": 96.46,
+    "soh_unique": 56,
+    "soh_missing": 0,
+    "soh_zero": 0,
+    "soh_outside_0_100": 0,
+    "soh_first": 96.46,
+    "soh_last": 92.63,
+    "soh_on_0_01_grid_fraction": 1.0,
+    "soh_increases_all_adjacent": 184,
+    "soh_decreases_all_adjacent": 239,
+    "soh_increases_within_trip": 183,
+    "soh_decreases_within_trip": 186,
+    "soh_equal_within_trip_pct": 99.98076293471075,
+    "trips_with_soh_changes": 2,
+    "recorded_days": 82,
+    "daily_median_soh_increases": 0,
+    "daily_odometer_time_pearson": 0.9905940675398889,
+    "row_odometer_time_pearson": 0.9908798876576153,
+    "start_utc": "2020-11-12 13:01:08.757376+00:00",
+    "end_utc": "2022-07-08 17:55:20.001000+00:00",
+    "derived_checks": [
+      {
+        "relationship": "Instant_kW_from_VI",
+        "compared_rows": 1918299,
+        "mismatches": 30057,
+        "max_abs_error": 121.06625572265624
+      },
+      {
+        "relationship": "Horsepower_from_Instant_kW",
+        "compared_rows": 1918299,
+        "mismatches": 0,
+        "max_abs_error": 4.263256414560601e-14
+      },
+      {
+        "relationship": "Pack_Avg_from_1_2_4",
+        "compared_rows": 1918299,
+        "mismatches": 1395,
+        "max_abs_error": 4.733333333333331
+      }
+    ]
+  },
+  "raw": {
+    "rows": 2322105,
+    "trip_ids": 227,
+    "timestamp_missing": 0,
+    "timestamp_parse_failures": 0,
+    "global_reversals": 0,
+    "duplicate_adjacent_times": 0,
+    "trip_blocks": 227,
+    "reused_noncontiguous_trip_ids": 0,
+    "within_trip_reversals": 0,
+    "within_trip_gaps_gt_1s": 15825,
+    "within_trip_gaps_gt_5s": 2973,
+    "within_trip_gaps_gt_60s": 358,
+    "median_within_trip_positive_interval_s": 0.25,
+    "columns": 92,
+    "soh_min": 0.0,
+    "soh_max": 96.46,
+    "soh_unique": 84,
+    "soh_missing": 2247,
+    "soh_zero": 2853,
+    "soh_outside_0_100": 0,
+    "soh_first": 96.46,
+    "soh_last": 92.12,
+    "soh_on_0_01_grid_fraction": 1.0,
+    "soh_increases_all_adjacent": 147,
+    "soh_decreases_all_adjacent": 227,
+    "soh_increases_within_trip": 142,
+    "soh_decreases_within_trip": 151,
+    "soh_equal_within_trip_pct": 99.98736866428582,
+    "trips_with_soh_changes": 8,
+    "recorded_days": 121,
+    "daily_median_soh_increases": 2,
+    "daily_odometer_time_pearson": 0.94787408021281,
+    "row_odometer_time_pearson": 0.0631648371894161,
+    "start_utc": "2020-11-12 13:01:08.257560+00:00",
+    "end_utc": "2022-08-03 17:19:57.501000+00:00",
+    "derived_checks": [
+      {
+        "relationship": "Instant_kW_from_VI",
+        "compared_rows": 2322105,
+        "mismatches": 0,
+        "max_abs_error": 2.842170943040401e-14
+      },
+      {
+        "relationship": "Horsepower_from_Instant_kW",
+        "compared_rows": 2322105,
+        "mismatches": 0,
+        "max_abs_error": 5.684341886080802e-14
+      },
+      {
+        "relationship": "Pack_Avg_from_1_2_4",
+        "compared_rows": 2322105,
+        "mismatches": 0,
+        "max_abs_error": 7.105427357601002e-15
+      }
+    ],
+    "remaining_energy_formula": {
+      "compared_rows": 2322105,
+      "mismatches_atol_rtol_1e_8": 0
+    }
+  },
+  "trip_overlap": {
+    "shared_ids": 127,
+    "raw_only_ids": 100,
+    "processed_only_ids": 0
+  },
+  "inventory": {
+    "processed": {
+      "entries": 32,
+      "conditional_input_columns": 28,
+      "potential_target_columns": 10
+    },
+    "raw": {
+      "entries": 92,
+      "conditional_input_columns": 78,
+      "potential_target_columns": 10
+    }
+  }
+}

@@ -1,0 +1,407 @@
+{
+  "artifact_directory": "ml/artifacts/nissan_leaf_2018/preparation/1d6fc5b045ee25d0",
+  "audit": {
+    "raw": {
+      "flag_counts_overlapping": {
+        "duplicate_timestamp": 0,
+        "irregular_interval": 187435,
+        "long_gap": 15825,
+        "missing_candidate": 0,
+        "nonfinite_candidate": 0,
+        "odometer_decrease": 202,
+        "odometer_jump": 190,
+        "pack_sentinel": 3850,
+        "physical_temperature": 0,
+        "power_formula": 0,
+        "soc_domain": 2040,
+        "soh_missing": 2247,
+        "soh_zero": 2853,
+        "speed_negative": 266235,
+        "temperature_formula": 0,
+        "tire_zero_or_negative": 457168,
+        "voltage_review": 2141
+      },
+      "flagged_rows_any_flag": 675310,
+      "missing_counts": {
+        "Acc_Pedal": 0,
+        "Ambient_C_Temp": 0,
+        "Brake": 0,
+        "ECO": 0,
+        "HV_Bat_Current_2": 0,
+        "HV_Bat_Voltage": 0,
+        "Instant_kW": 0,
+        "Motor_Temp": 0,
+        "Odometer": 0,
+        "Pack_1_C_Temp": 0,
+        "Pack_2_C_Temp": 0,
+        "Pack_4_C_Temp": 0,
+        "Pack_Avg_C_Temp": 0,
+        "RPM": 0,
+        "SOC": 0,
+        "SOH": 2247,
+        "Speed": 0,
+        "TP_FL": 0,
+        "TP_FR": 0,
+        "TP_RL": 0,
+        "TP_RR": 0,
+        "Timestamp": 0,
+        "Torque": 0,
+        "Trip": 0,
+        "ePedal": 0,
+        "index": 0
+      },
+      "no_row_flags": 1646795,
+      "quality_eligible_rows": 2316127,
+      "quality_excluded_rows": 5978,
+      "rows": 2322105
+    }
+  },
+  "code_hashes": {
+    "ml/src/nissan_leaf_preparation/__init__.py": "3e2048eb139f18a0f2cfd66933974c7bf8b39d21f73dbcc8820bd2cc730d658c",
+    "ml/src/nissan_leaf_preparation/battery.py": "1514afe333fc54cba2652d2f0ceab5df4815ac097d03c9dd135bd8dc9a862433",
+    "ml/src/nissan_leaf_preparation/battery_report.py": "79c64158a54c0cd70de1a282bf15efd0b82a9ece898c85d7a65d34b9463b2cb8",
+    "ml/src/nissan_leaf_preparation/core.py": "1e8c211a6af9c9d912ea1c63d421f59c45eae751229822ed0aefebf930838dda",
+    "ml/src/nissan_leaf_preparation/pipeline.py": "eabea868d759f14e6d24083678f4bbb3c5ff35ad4c2f8959b2fbb8580d40fa9e",
+    "ml/src/nissan_leaf_preparation/report.py": "85f0a96ebfb7fc59b06356168e46fd2acb284142c0b4fbe256172e600a21cbba",
+    "ml/src/nissan_leaf_preparation/validation.py": "dd6852e6bfe0810992b3e59e7ab2b549ad3b0507737656309705adaafb09ea80"
+  },
+  "config": {
+    "battery_peer_temperature_review": "Preserve existing battery-pack sentinel/absolute-zero checks on sensors 1/2/4; motor temperature never blocks this view.",
+    "chunk_rows": 75000,
+    "duplicate_reason": "Conservative cross-split rounded-vector screen; later matches to any earlier split are withheld. It is not proof of independent states or an exhaustive near-neighbor search.",
+    "duplicate_round_decimals": {
+      "HV_Bat_Voltage": 2,
+      "Pack_1_C_Temp": 2,
+      "SOC": 2
+    },
+    "energy": {
+      "reason": "Current polarity, charging/regeneration identification and independently verified energy accounting remain unresolved; no energy labels exported.",
+      "status": "blocked"
+    },
+    "features": [
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "formula_atol": 1e-08,
+    "formula_rtol": 1e-08,
+    "gap_reason": "Median row interval is 0.25s, p99 about 0.75s; break at >1s conservatively. This is row continuity, not sensor refresh frequency.",
+    "gap_seconds": 1.0,
+    "missing_policy": "exclude",
+    "odometer_jump_interval_seconds": 1.0,
+    "odometer_jump_km": 1.0,
+    "original_config_sha256": "e9824fde7363000a1734626351fbf682bf38c05aea109cf28ddac30fe766a95e",
+    "parent_manifest_sha256": "9a61285afe5e6caf596fbab278dd7c5194c81f3f542c88894657bc7dcd6bf6a8",
+    "parent_run_id": "d7e9e32e1ff2981a",
+    "purpose": "Phase 1.1 battery-only view; frozen original trips, battery eligibility, separate metadata and feature matrices.",
+    "scaling": "robust",
+    "source_version": "raw",
+    "split_embargo_seconds": 90.5,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "split_policy": "reuse_parent_membership",
+    "split_reason": "Closest cumulative-row boundaries between whole trips on different UTC dates with at least lookback+horizon+tolerance separation; same-vehicle temporal evaluation only.",
+    "temperature": {
+      "horizon_seconds": 60.0,
+      "lookback_seconds": 30.0,
+      "review_horizons_seconds": [
+        30.0,
+        60.0,
+        120.0
+      ],
+      "stride_seconds": 10.0,
+      "target": "Pack_1_C_Temp",
+      "tolerance_seconds": 0.5
+    },
+    "temperature_reason": "Raw pack fields cluster at -1 while other channels use unavailable codes. Treat this narrow band as unresolved, not physically impossible; retain in audit and exclude from conditional experiments.",
+    "temperature_sentinel_band": [
+      -1.01,
+      -0.99
+    ],
+    "typical_interval_band_seconds": [
+      0.2,
+      0.3
+    ],
+    "typical_interval_reason": "Descriptive \u00b10.05s band around observed 0.25s median; flagged only, not excluded.",
+    "view": "battery_only_v1",
+    "voltage_reason": "Existing EDA review threshold against nominal 360V documentation, not a manufacturer validity limit.",
+    "voltage_review_max": 500.0
+  },
+  "configuration_sha256": "13c5e055965ccb196fa1bb5ef5aba8a5914acb75ef34b51a999452f9b474e502",
+  "cross_split_repeat_screen": {
+    "test": 89,
+    "train": 0,
+    "validation": 74
+  },
+  "immutable_parent_hashes": {
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/configuration.json": "5d1238066d07b0f08c69769801f7bd3fc7549d15cea284f3fd5839e5f09a3cbb",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/features_test.parquet": "a12defa74d50c82286767aa3a050d8755342dbb098a5c819cfbf25a5eb18b02b",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/features_train.parquet": "6538b04b60a416dec5d5dd91d5450eb79d28456a578381d4c43b258d734d99ef",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/features_validation.parquet": "22fd4297800a7eed76bb7a13a5a8c812ebe0f4a6c676f6a9069d52ac2777e0fb",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/manifest.json": "9a61285afe5e6caf596fbab278dd7c5194c81f3f542c88894657bc7dcd6bf6a8",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/processed_flagged_rows.parquet": "706e322adc7537fbd9f6b31b0970f7f6eb3993702c5e5db58b6df723126f87e8",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/quality_flag_dictionary.json": "04592404600c74501d5d3606b85eb5b0f4efe0cb2933d1458f858f572ceab464",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/row_ledger.parquet": "95d87905208b5d3dd2c23bb9fc582a6689955f965778935621ae8770bf7b2bbc",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/segments.csv": "df0307b000ebfe19a7cb74694d643db765f9875385cf5b6996a0a14b619a98f4",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/temperature_test.parquet": "5dda1bdd1e1b486e8322a8cb9523aa8cfd5bf710385faaf6f76bd5b330a6400f",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/temperature_train.parquet": "e416ee6e5dceef013efcdde46142d9aaac44ce352c1fcad719dc115ba356ad1a",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/temperature_validation.parquet": "4d2da0a1340e77cae30fd62d090f525b17c661965eb8725e10e82c3df955782d",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/training_horizon_feasibility.csv": "60d46eb40acb8c2f8138ab5202efa5d37dd3ea6699ea891a99e9ad2c7391d386",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/transformer.json": "6b667ad1f0c50e1f652a6fb4d7c16291963f475ae2308ffcdb38cb8c0d653a54",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/trip_splits.csv": "1a34d1ca71e2f7eaa02a29f364bfc36c57244d57d4434cf42d44fa47bbedf6a5",
+    "ml/artifacts/nissan_leaf_2018/preparation/d7e9e32e1ff2981a/window_accounting.csv": "9f1c364c7c8c975d509f474bb9f40cb532d6a29a49d715ab6fefeb9ae3f61386",
+    "ml/notebooks/nissan_leaf_2018/config/preparation.json": "e9824fde7363000a1734626351fbf682bf38c05aea109cf28ddac30fe766a95e"
+  },
+  "leakage_checks": {
+    "chronological_trip_overlap": 0,
+    "cross_split_window_overlap": 0,
+    "source_versions_in_features": [
+      "raw"
+    ],
+    "training_only_transformer": true,
+    "trip_overlap": 0
+  },
+  "libraries": {
+    "numpy": "2.5.1",
+    "pandas": "2.3.3",
+    "pyarrow": "25.0.0"
+  },
+  "original_artifacts_verified": 16,
+  "outputs": {
+    "configuration.json": {
+      "bytes": 2711,
+      "rows": null,
+      "schema": null,
+      "sha256": "925943f41b130835a6a4691984585b0212373c941cd3d5e1e2242e22528fa1c1"
+    },
+    "features_test.parquet": {
+      "bytes": 2441829,
+      "rows": 340986,
+      "schema": "HV_Bat_Voltage: float\nPack_1_C_Temp: float\nSOC: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 456",
+      "sha256": "4ee8903296570c2e1db2af015b837a34d31ea76459c99062ae5f63d7ac4b8071"
+    },
+    "features_train.parquet": {
+      "bytes": 11031307,
+      "rows": 1623891,
+      "schema": "HV_Bat_Voltage: float\nPack_1_C_Temp: float\nSOC: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 456",
+      "sha256": "b62fc8cd04f1ec2f97900f3b6c817c64c5ed7316841fa72aa1f46e14abe6239c"
+    },
+    "features_validation.parquet": {
+      "bytes": 2406712,
+      "rows": 351087,
+      "schema": "HV_Bat_Voltage: float\nPack_1_C_Temp: float\nSOC: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 456",
+      "sha256": "89d657f30de5f01d88bd04a17e14a19d35a5bdf9703ec30c2719062ff29eaf7c"
+    },
+    "frozen_parent_trip_splits.csv": {
+      "bytes": 15519,
+      "rows": null,
+      "schema": null,
+      "sha256": "1a34d1ca71e2f7eaa02a29f364bfc36c57244d57d4434cf42d44fa47bbedf6a5"
+    },
+    "metadata_test.parquet": {
+      "bytes": 3752017,
+      "rows": 340986,
+      "schema": "source_row: int64\nindex: int64\nTimestamp: int64\nTrip: double\nsplit: string\nsegment_id: int64\nquality_flags: uint32\nbattery_blocking_flags: uint32\ndrivetrain_unavailable_suspected: bool\nquality_status: string\nsource_dataset: string\nsource_file: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1573",
+      "sha256": "ad18376b47a80d5181619c7cf84865cc696ea5f25fbb975817fc278f86f1b3a0"
+    },
+    "metadata_train.parquet": {
+      "bytes": 18235975,
+      "rows": 1623891,
+      "schema": "source_row: int64\nindex: int64\nTimestamp: int64\nTrip: double\nsplit: string\nsegment_id: int64\nquality_flags: uint32\nbattery_blocking_flags: uint32\ndrivetrain_unavailable_suspected: bool\nquality_status: string\nsource_dataset: string\nsource_file: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1573",
+      "sha256": "9e57eb29282374c1a1d5d5dc1010ccbf95b3cde9d7a71752734f0c936518e232"
+    },
+    "metadata_validation.parquet": {
+      "bytes": 3846474,
+      "rows": 351087,
+      "schema": "source_row: int64\nindex: int64\nTimestamp: int64\nTrip: double\nsplit: string\nsegment_id: int64\nquality_flags: uint32\nbattery_blocking_flags: uint32\ndrivetrain_unavailable_suspected: bool\nquality_status: string\nsource_dataset: string\nsource_file: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1573",
+      "sha256": "cdbcd1314834352bc903bd34aa495f7a5b33065e889984a151658bc167b394f7"
+    },
+    "quality_flag_dictionary.json": {
+      "bytes": 2524,
+      "rows": null,
+      "schema": null,
+      "sha256": "04592404600c74501d5d3606b85eb5b0f4efe0cb2933d1458f858f572ceab464"
+    },
+    "row_ledger.parquet": {
+      "bytes": 72970049,
+      "rows": 2322105,
+      "schema": "index: int64\nTimestamp: int64\nSpeed: double\nOdometer: double\nRPM: double\nSOC: double\nSOH: double\nTorque: double\nMotor_Temp: double\nTP_FR: double\nTP_FL: double\nTP_RR: double\nTP_RL: double\nHV_Bat_Voltage: double\nBrake: double\nAcc_Pedal: double\nECO: double\nePedal: double\nHV_Bat_Current_2: double\nAmbient_C_Temp: double\nPack_1_C_Temp: double\nPack_2_C_Temp: double\nPack_4_C_Temp: double\nPack_Avg_C_Temp: double\nInstant_kW: double\nTrip: double\nsource_row: int64\nquality_flags: uint32\nquality_eligible: bool\nbattery_blocking_flags: uint32\ndrivetrain_unavailable_suspected: bool\nsegment_in_trip: int32\noperating_context: string\nsegment_id: int64\nsplit: string\ncross_split_repeat: bool\nexport_eligible: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4540",
+      "sha256": "f2e7cbe55f5e045c927db8b1450873bbe560149064d84a5bbf5897e011076161"
+    },
+    "segments.csv": {
+      "bytes": 836884,
+      "rows": null,
+      "schema": null,
+      "sha256": "df0307b000ebfe19a7cb74694d643db765f9875385cf5b6996a0a14b619a98f4"
+    },
+    "temperature_test.parquet": {
+      "bytes": 154408,
+      "rows": 4514,
+      "schema": "Trip: int64\nsegment_id: int64\nsplit: string\ninput_start_row: int64\nanchor_row: int64\ntarget_row: int64\ninput_start_us: int64\nanchor_us: int64\ntarget_us: int64\ninput_rows: int64\ntarget_temperature_c: double\ntemperature_change_c: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1540",
+      "sha256": "ebea65762842c6c11006287ec17fc864968ef40d37cf27b3232bbfa6dd6a0025"
+    },
+    "temperature_train.parquet": {
+      "bytes": 1387749,
+      "rows": 37753,
+      "schema": "Trip: int64\nsegment_id: int64\nsplit: string\ninput_start_row: int64\nanchor_row: int64\ntarget_row: int64\ninput_start_us: int64\nanchor_us: int64\ntarget_us: int64\ninput_rows: int64\ntarget_temperature_c: double\ntemperature_change_c: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1540",
+      "sha256": "e0b7187b6639a582e1ac2ac529fe37c1115085d99eb3daf7711cbe724621400d"
+    },
+    "temperature_validation.parquet": {
+      "bytes": 217875,
+      "rows": 6595,
+      "schema": "Trip: int64\nsegment_id: int64\nsplit: string\ninput_start_row: int64\nanchor_row: int64\ntarget_row: int64\ninput_start_us: int64\nanchor_us: int64\ntarget_us: int64\ninput_rows: int64\ntarget_temperature_c: double\ntemperature_change_c: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1540",
+      "sha256": "eaaa20cbdfa5c66426bc83fafebad98f859050bd6ff850c23a43316f8c6f50d2"
+    },
+    "training_horizon_feasibility.csv": {
+      "bytes": 67,
+      "rows": null,
+      "schema": null,
+      "sha256": "fa45690fff4e8c613419c30729002066c2479d1cb74183683a839610b66d86db"
+    },
+    "transformer.json": {
+      "bytes": 586,
+      "rows": null,
+      "schema": null,
+      "sha256": "a9d7a6befc55abb63a089328364656c60aba510d073978c73f0e13128c9631e5"
+    },
+    "trip_splits.csv": {
+      "bytes": 15600,
+      "rows": null,
+      "schema": null,
+      "sha256": "aa2c863704df564e6558e515cf4ca3e2e570b641a5c5bf9c856bf01243a027ed"
+    },
+    "window_accounting.csv": {
+      "bytes": 5819,
+      "rows": null,
+      "schema": null,
+      "sha256": "65c3d3ffd770d7a26f821dccdea6856ed00d859bd0df9d91387f4f9c237eb84b"
+    }
+  },
+  "parent_run_id": "d7e9e32e1ff2981a",
+  "reference_comparison": [
+    {
+      "feature_rows_difference": 0,
+      "split": "train",
+      "temperature_sequences_difference": 0
+    },
+    {
+      "feature_rows_difference": 0,
+      "split": "validation",
+      "temperature_sequences_difference": 0
+    },
+    {
+      "feature_rows_difference": 0,
+      "split": "test",
+      "temperature_sequences_difference": 0
+    }
+  ],
+  "run_id": "1d6fc5b045ee25d0",
+  "source_hashes": {
+    "data/nissan_leaf_2018/processed/Dataset_Preprocessed.csv": "609efebf1004f5694a1c5af9e3bc56ee11eed2f5b47b07aa736bc701c3918e81",
+    "data/nissan_leaf_2018/raw/Dataset_NissanLeaf-2021_2022.csv": "7fe9682e6132ac564eec4928ece989c82d8c9369290abfc00401b7a1c4cdb84c",
+    "ml/reports/nissan_leaf_2018/metadata/Nissan_Leaf_Model2018_Data_Description.xlsx": "3e2d4d44fbb055108e05d742111cc4ba369a9d0d53742d512214b8cda1429802",
+    "ml/reports/nissan_leaf_2018/metadata/source_page.html": "69eba6c312c2c7470be1a02f1391bc5a920dcf663d39f96d7722d58e1a45fc44"
+  },
+  "splits": [
+    {
+      "cross_split_repeat_exclusions": 0,
+      "end_utc": "2022-03-10 18:05:02.007252+00:00",
+      "feature_rows": 1623891,
+      "quality_excluded_rows": 5327,
+      "retained_recorded_days": 74,
+      "retained_trips": 139,
+      "source_recorded_days": 76,
+      "source_rows": 1629218,
+      "split": "train",
+      "start_utc": "2020-11-12 13:01:08.257560+00:00",
+      "temperature_sequences": 37753,
+      "trips": 142
+    },
+    {
+      "cross_split_repeat_exclusions": 74,
+      "end_utc": "2022-04-27 17:41:58.251000+00:00",
+      "feature_rows": 351087,
+      "quality_excluded_rows": 261,
+      "retained_recorded_days": 19,
+      "retained_trips": 34,
+      "source_recorded_days": 19,
+      "source_rows": 351422,
+      "split": "validation",
+      "start_utc": "2022-03-15 13:11:13.006783+00:00",
+      "temperature_sequences": 6595,
+      "trips": 34
+    },
+    {
+      "cross_split_repeat_exclusions": 89,
+      "end_utc": "2022-08-03 17:19:57.501000+00:00",
+      "feature_rows": 340986,
+      "quality_excluded_rows": 390,
+      "retained_recorded_days": 25,
+      "retained_trips": 50,
+      "source_recorded_days": 26,
+      "source_rows": 341465,
+      "split": "test",
+      "start_utc": "2022-04-28 13:21:37.250000+00:00",
+      "temperature_sequences": 4514,
+      "trips": 51
+    }
+  ],
+  "task_status": {
+    "anomaly": "conditional",
+    "energy": "blocked",
+    "temperature": "conditional"
+  },
+  "transformer": {
+    "center": {
+      "HV_Bat_Voltage": 379.59,
+      "Pack_1_C_Temp": 24.3,
+      "SOC": 81.7796
+    },
+    "features": [
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "fit_rows": 1623891,
+    "fit_split": "train",
+    "median": {
+      "HV_Bat_Voltage": 379.59,
+      "Pack_1_C_Temp": 24.3,
+      "SOC": 81.7796
+    },
+    "missing_policy": "exclude",
+    "output_features": [
+      "HV_Bat_Voltage",
+      "Pack_1_C_Temp",
+      "SOC"
+    ],
+    "scale": {
+      "HV_Bat_Voltage": 33.670000000000016,
+      "Pack_1_C_Temp": 14.86,
+      "SOC": 26.39555
+    },
+    "scaling": "robust",
+    "zero_scale_features": []
+  },
+  "validation": {
+    "future_feature_leakage_in_window_references": false,
+    "passed": true,
+    "rounded_feature_overlap_between_splits": 0,
+    "scope_note": "Rounding screen does not prove independent telemetry or rule out all near-neighbors.",
+    "source_rows_accounted": 2322105,
+    "temperature_windows_checked": 48862,
+    "timestamp_window_overlap_between_splits": 0,
+    "transform_matches_frozen_training_state": true,
+    "trip_overlap": 0
+  },
+  "window_accounting": {
+    "anchors_considered": 76473,
+    "exported": 48862,
+    "insufficient_history": 20360,
+    "no_future_match": 6543,
+    "unsafe_interval": 708
+  }
+}

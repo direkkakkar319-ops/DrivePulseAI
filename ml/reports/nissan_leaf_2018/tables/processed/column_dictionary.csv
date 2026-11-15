@@ -1,0 +1,35 @@
+column,original_header,dtype,role,description,unit,documentation,documented_polling,missing_pct,unique_values,constant_nonmissing,near_constant_99pct,most_common_fraction_nonmissing
+index,index,int64,identifier_or_export_index,Unknown,Unknown,Unknown,Unknown,0.0,1918299,False,False,5.212951682714739e-07
+Timestamp,Timestamp,int64,timestamp,Unknown,Unknown,Unknown,Unknown,0.0,1918299,False,False,5.212951682714739e-07
+Speed,Speed,float64,numeric_measurement_or_undocumented,Speed (km/h) from the Leaf ECU,km/h,Workbook row 44,1s: x,0.0,1451,False,False,0.27211712042804587
+Odometer,Odometer,float64,numeric_measurement_or_undocumented,Km total,km,Workbook row 6,10s: x,0.0,6892,False,False,0.056196140434833154
+RPM,RPM,float64,numeric_measurement_or_undocumented,Motor revolutions per minute,rev/min,Workbook row 16,1s: x,0.0,10497,False,False,0.2606783405506649
+SOC,SOC,float64,numeric_measurement_or_undocumented,State of Charge (SOC) of the HV Battery,%,Workbook row 63,Unknown,0.0,583281,False,False,0.0007814214572389393
+SOH,SOH,float64,numeric_measurement_or_undocumented,State of Health is another indication of the battery's ability to hold and release energy and is reported as a percentage. When the battery is new SOH=100%,%,Workbook row 23,Unknown,0.0,56,False,False,0.058350653365299154
+Torque,Torque,float64,numeric_measurement_or_undocumented,Motor Torque. https://www.carwow.co.uk/guides/glossary/what-is-torque (Nm).  Minimum unit step is 0.25 Nm,Nm,Workbook row 24,1s: x,0.0,1505,False,False,0.2931466888112854
+Motor_Temp,Motor_Temp,float64,numeric_measurement_or_undocumented,This field is the drive motor temperature,°C,Workbook row 25,10s: x,0.0,592,False,False,0.03711517339059239
+TP_FR,TP_FR,float64,numeric_measurement_or_undocumented,Front right tire pressure (in kPa),kPA,Workbook row 28,Unknown,0.0,56,False,False,0.10453636268381519
+TP_FL,TP_FL,float64,numeric_measurement_or_undocumented,Front left tire pressure (in kPa),kPA,Workbook row 29,Unknown,0.0,54,False,False,0.10491586556631682
+TP_RR,TP_RR,float64,numeric_measurement_or_undocumented,Rear right tire pressure (in kPa),kPA,Workbook row 30,Unknown,0.0,50,False,False,0.1052672185097318
+TP_RL,TP_RL,float64,numeric_measurement_or_undocumented,Rear left tire pressure (in kPa),kPA,Workbook row 31,Unknown,0.0,55,False,False,0.10285205799513006
+Aux_Pwr_100W,Aux_Pwr_100W,float64,numeric_measurement_or_undocumented,"Power used by the auxiliary equipment (Lights, Radio, Navigation system, rear defroster...)",W,Workbook row 12,10s: x,0.0,11,False,False,0.48936948828102395
+AC_Pwr_250W,AC_Pwr_250W,float64,numeric_measurement_or_undocumented,"A/C system Power (250W): Power used by the Air Conditioning System power. This includes the power used by the cabin PTC Heater.
+A/C Compressure Air Pressure(0.1MPa): A/C Compressor high side pressure in Mpa. Multiply by 14.50377 to get PSI.
+",W,Workbook combined AC power/pressure entry,10s: x,0.0,20,False,False,0.5759748610618053
+EstPwr_AC_50W,EstPwr_AC_50W,float64,numeric_measurement_or_undocumented,Estimated Air Conditioning System power (COOL),W,Workbook row 10,10s: x,0.0,70,False,False,0.5873693308498832
+HV_Bat_Voltage,HV_Bat_Voltage,float64,numeric_measurement_or_undocumented,High Voltage Battery Voltage (in V),V,Workbook row 68,Unknown,0.0,10265,False,False,0.0010519736495718341
+Brake,Brake,float64,numeric_measurement_or_undocumented,Brake pression measured from 0 (not pressed) to 369 (max). Unit??,Unknown,Workbook row 50,1s: x,0.0,148,False,False,0.8123144515010434
+Acc_Pedal,Acc_Pedal,float64,numeric_measurement_or_undocumented,Acceleration pedal pression measured from 0 (not pressed) to 200 (max). Unit??,Unknown,Workbook row 51,1s: x,0.0,172,False,False,0.4886704314603719
+ECO,ECO,float64,categorical_status,ECO mode ON/OFF,0/1,Workbook row 52,10s: x,0.0,2,False,False,0.5303234792907675
+ePedal,ePedal,float64,categorical_status,ePedal mode ON/OFF https://statics.quattroruote.it/content/dam/quattroruote/it/news/novita/2017/07/20/nuova_nissan_leaf_debutta_il_nuovo_e_pedal/gallery/rsmall/2017-epedal.jpg,0/1,Workbook row 53,10s: x,0.0,2,False,False,0.5261625012576246
+HV_Bat_Current_2,HV_Bat_Current_2,float64,numeric_measurement_or_undocumented,"High Voltage Battery Amperage (positive=from battery (driving), negative when regeneration or charging)",A,Workbook row 67,Unknown,0.0,95609,False,False,0.011138513860456582
+Ambient_C_Temp,Ambient_C_Temp,float64,numeric_measurement_or_undocumented,Ambient temperature comes from the Leaf's outside temperature sensor and is saved in degrees Fahrenheit. This value is only valid when the Leaf is ON (not ACC mode and not when charging),Unknown: workbook unit says °C; description says Fahrenheit,Workbook row 9,10s: x,0.0,93,False,False,0.03198875670581072
+Pack_1_C_Temp,Pack_1_C_Temp,float64,numeric_measurement_or_undocumented,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Workbook alias mapping to Packs Temperature,Unknown,0.0,6917,False,False,0.009598086638214376
+Pack_2_C_Temp,Pack_2_C_Temp,float64,numeric_measurement_or_undocumented,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Workbook alias mapping to Packs Temperature,Unknown,0.0,8077,False,False,0.01039514695050146
+Pack_4_C_Temp,Pack_4_C_Temp,float64,numeric_measurement_or_undocumented,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Workbook alias mapping to Packs Temperature,Unknown,0.0,7489,False,False,0.00801856227835181
+Pack_Avg_C_Temp,Pack_Avg_C_Temp,float64,derived_numeric,Unknown,Unknown,Unknown,Unknown,0.0,10477,False,False,0.0034483675381157997
+kWh_Remaining,kWh_Remaining,float64,derived_numeric,Unknown,Unknown,Unknown,Unknown,0.0,1309555,False,False,0.0008267741368785575
+Horsepower,Horsepower,float64,derived_numeric,"Derived from battery voltage × current, not a measured mechanical output",Unknown: formula gives 1.341 × kW,Workbook indirect formula; observed formula checked separately,Unknown,0.0,1525671,False,False,0.0011025392808941671
+Instant_kW,Instant_kW,float64,derived_numeric,Battery electrical power from voltage × current / 1000,kW,Workbook indirect formula; alias inferred and numerically checked,250ms: (kW going into the battery pack),0.0,1525649,False,False,0.0011025392808941671
+Driver_ID,Driver_ID,int64,identifier_or_export_index,Unknown,Unknown,Unknown,Unknown,0.0,7,False,False,0.4911617010695413
+Trip,Trip,int64,identifier_or_export_index,Unknown,Unknown,Unknown,Unknown,0.0,127,False,False,0.038892789914398124

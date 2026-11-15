@@ -1,5 +1,5 @@
 // Check account UI and route guards with a controllable authentication boundary.
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import type { AuthUser } from '../src/api/auth.types';
 import { authService } from '../src/api/auth';
 import { syncProfile } from '../src/api/client';
@@ -19,7 +19,9 @@ import { UsernameSaveNotice } from '../src/components/username-save-notice';
 import VerifyEmailScreen from '../src/app/verify-email';
 
 jest.mock('../src/api/client', () => ({ syncProfile: jest.fn() }));
-jest.mock('../src/auth/google', () => ({ googleAvailable: true }));
+let mockGoogleAvailable = true;
+let mockRouteParams: { mode?: string } = {};
+jest.mock('../src/auth/google', () => ({ get googleAvailable() { return mockGoogleAvailable; } }));
 
 jest.mock('../src/api/auth', () => ({
   authService: {
@@ -44,7 +46,7 @@ jest.mock('expo-router', () => {
     guard ? children : null;
   Stack.Screen = ({ name }: { name: string }) => React.createElement(Text, null, `route:${name}`);
   return {
-    useLocalSearchParams: () => ({}),
+    useLocalSearchParams: () => mockRouteParams,
     Stack,
     DarkTheme: {},
     ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -61,10 +63,92 @@ const unverified = {
 
 beforeEach(() => {
   jest.resetAllMocks();
+  mockGoogleAvailable = true;
+  mockRouteParams = {};
   (authService.subscribe as jest.Mock).mockImplementation((listener) => {
     notify = listener;
     return jest.fn();
   });
+});
+
+it('opens signup from the existing welcome route parameter', async () => {
+  mockRouteParams = { mode: 'signup' };
+  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  expect(screen.getByRole('header')).toHaveTextContent('Create your account');
+  expect(screen.getByLabelText('Username')).toHaveProp('autoComplete', 'username-new');
+  expect(screen.getByLabelText('Password')).toHaveProp('autoComplete', 'new-password');
+  expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Forgot password?' })).toBeNull();
+  await fireEvent.press(screen.getByRole('button', { name: 'Back to login' }));
+  expect(screen.getByRole('header')).toHaveTextContent('Welcome back');
+  expect(screen.queryByLabelText('Username')).toBeNull();
+});
+
+it('hides Google sign-in and its divider when unavailable while retaining email login', async () => {
+  mockGoogleAvailable = false;
+  (authService.signIn as jest.Mock).mockResolvedValue(undefined);
+  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
+  expect(screen.queryByText('or')).toBeNull();
+  expect(screen.queryByText(/Apple/)).toBeNull();
+  await fireEvent.changeText(screen.getByLabelText('Email'), 'user@example.com');
+  await fireEvent.changeText(screen.getByLabelText('Password'), 'existing-password');
+  await fireEvent.press(screen.getByRole('button', { name: 'Log in' }));
+  expect(authService.signIn).toHaveBeenCalledWith('user@example.com', 'existing-password');
+});
+
+it.each(['login', 'signup', 'reset'] as const)('locks %s fields and actions during a request without duplicate submissions', async mode => {
+  const user = userEvent.setup();
+  let release!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  (authService.signIn as jest.Mock).mockReturnValue(pending);
+  (authService.resetPassword as jest.Mock).mockReturnValue(pending);
+  (authService.signUp as jest.Mock).mockImplementation(async () => {
+    await pending;
+    return { uid: unverified.uid, profileSaved: true };
+  });
+  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  if (mode === 'signup') {
+    await fireEvent.press(screen.getByRole('button', { name: 'Create an account' }));
+    await fireEvent.changeText(screen.getByLabelText('Username'), 'Driver');
+  } else if (mode === 'reset') {
+    await fireEvent.press(screen.getByRole('button', { name: 'Forgot password?' }));
+  }
+  await fireEvent.changeText(screen.getByLabelText('Email'), unverified.email);
+  if (mode !== 'reset') await fireEvent.changeText(screen.getByLabelText('Password'), 'existing-password');
+  const title = mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Send reset link' : 'Log in';
+  // User events dispatch a press without waiting for the network promise to settle.
+  await user.press(screen.getByRole('button', { name: title }));
+  expect(screen.getByRole('button', { name: title })).toHaveProp('accessibilityState', expect.objectContaining({ busy: true }));
+  for (const button of screen.getAllByRole('button')) expect(button).toBeDisabled();
+  expect(screen.getByLabelText('Email')).toHaveProp('editable', false);
+  if (mode !== 'reset') expect(screen.getByLabelText('Password')).toHaveProp('editable', false);
+  if (mode === 'signup') expect(screen.getByLabelText('Username')).toHaveProp('editable', false);
+  await fireEvent.press(screen.getByRole('button', { name: title }));
+  const operation = mode === 'signup' ? authService.signUp : mode === 'reset' ? authService.resetPassword : authService.signIn;
+  expect(operation).toHaveBeenCalledTimes(1);
+  await act(async () => release());
+  expect(screen.getByRole('button', { name: title })).toBeEnabled();
+  expect(screen.getByLabelText('Email')).toHaveProp('editable', true);
+});
+
+it('recovers from reset errors and clears success feedback when returning to login', async () => {
+  (authService.resetPassword as jest.Mock)
+    .mockRejectedValueOnce({ code: 'auth/network-request-failed' })
+    .mockResolvedValueOnce(undefined);
+  await render(<AuthProvider><LoginScreen /></AuthProvider>);
+  await fireEvent.press(screen.getByRole('button', { name: 'Forgot password?' }));
+  await fireEvent.changeText(screen.getByLabelText('Email'), unverified.email);
+  await fireEvent.press(screen.getByRole('button', { name: 'Send reset link' }));
+  expect(screen.getByRole('alert')).toHaveTextContent(/Could not connect\./);
+  await fireEvent.press(screen.getByRole('button', { name: 'Send reset link' }));
+  expect(screen.queryByRole('alert')).toBeNull();
+  expect(screen.getByText(/If an account exists/)).toBeTruthy();
+  expect(authService.resetPassword).toHaveBeenNthCalledWith(2, unverified.email);
+  await fireEvent.press(screen.getByRole('button', { name: 'Back to login' }));
+  expect(screen.queryByText(/If an account exists/)).toBeNull();
+  expect(screen.getByLabelText('Email')).toHaveProp('value', unverified.email);
+  expect(screen.getByLabelText('Password')).toHaveProp('secureTextEntry', true);
 });
 
 it('waits for restoration and gates routes for logged-out, unverified, verified, and logged-out-again states', async () => {

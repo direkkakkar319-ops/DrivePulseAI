@@ -62,7 +62,9 @@ def date_partitions(dates: list[str]) -> dict[str, str]:
 
 def parse_time(value: str) -> float | None:
     try:
-        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f")
+        # KIT supplies a clock time, not a zoned instant. Preserve seconds since
+        # midnight without assigning a timezone absent from the source.
+        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f")  # noqa: DTZ007
     except ValueError:
         return None
     return (

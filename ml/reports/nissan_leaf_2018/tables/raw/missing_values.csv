@@ -1,0 +1,93 @@
+column,missing_count,missing_pct,missing_runs,longest_missing_run_rows,longest_missing_span_seconds
+Unnamed: 0.1,0,0.0,0,0,0.0
+Unnamed: 0,0,0.0,0,0,0.0
+index,0,0.0,0,0,0.0
+id,0,0.0,0,0,0.0
+Timestamp,0,0.0,0,0,0.0
+DateTime,0,0.0,0,0,0.0
+Power_SW,0,0.0,0,0,0.0
+Speed,0,0.0,0,0,0.0
+Odometer,0,0.0,0,0,0.0
+Gear,0,0.0,0,0,0.0
+RangeKm,0,0.0,0,0,0.0
+SWA,2322105,100.0,16052,52412,14097.000962
+RPM,0,0.0,0,0,0.0
+GIDs,2237693,96.36484999601655,14963,31986,8654.243902
+SOC,0,0.0,0,0,0.0
+SOH,2247,0.09676565013209996,14,1024,258.250299
+AHr,0,0.0,0,0,0.0
+Hx,0,0.0,0,0,0.0
+Rain_level,0,0.0,0,0,0.0
+Front_wiper_level,0,0.0,0,0,0.0
+Rear_wiper_level,0,0.0,0,0,0.0
+Front_washer,0,0.0,0,0,0.0
+Rear_washer,0,0.0,0,0,0.0
+Position_lights,0,0.0,0,0,0.0
+Headlights,0,0.0,0,0,0.0
+Anti_fog_lights,0,0.0,0,0,0.0
+HighBeam,0,0.0,0,0,0.0
+Torque,0,0.0,0,0,0.0
+Motor_Temp,0,0.0,0,0,0.0
+Motor_Pwr,0,0.0,0,0,0.0
+TP_FR,0,0.0,0,0,0.0
+TP_FL,0,0.0,0,0,0.0
+TP_RR,0,0.0,0,0,0.0
+TP_RL,0,0.0,0,0,0.0
+Quick_Charge,0,0.0,0,0,0.0
+L1_L2_Charge,0,0.0,0,0,0.0
+Aux_Pwr_100W,0,0.0,0,0,0.0
+AC_Pwr_250W,0,0.0,0,0,0.0
+AC_Compressor_Air_pressure,0,0.0,0,0,0.0
+EstPwr_AC_50W,0,0.0,0,0,0.0
+EstPwr_Htr_250W,0,0.0,0,0,0.0
+Plug_State,0,0.0,0,0,0.0
+Charge_Mode,0,0.0,0,0,0.0
+OBC_Out_Pwr,0,0.0,0,0,0.0
+HV_Bat_Voltage,0,0.0,0,0,0.0
+Insulation,0,0.0,0,0,0.0
+AC,0,0.0,0,0,0.0
+RearHeater,0,0.0,0,0,0.0
+HeaterTemp,7,0.0003014506234644859,1,7,1.493846
+FanSpeed,0,0.0,0,0,0.0
+Brake,0,0.0,0,0,0.0
+Acc_Pedal,0,0.0,0,0,0.0
+ECO,0,0.0,0,0,0.0
+ePedal,0,0.0,0,0,0.0
+Right_Arrow,0,0.0,0,0,0.0
+Left_Arrow,0,0.0,0,0,0.0
+HV_Bat_Current_1,0,0.0,0,0,0.0
+HV_Bat_Current_2,0,0.0,0,0,0.0
+Bat_12V_Voltage,0,0.0,0,0,0.0
+Bat_12V_Current,0,0.0,0,0,0.0
+Ambient_C_Temp,0,0.0,0,0,0.0
+Internal_C_Temp,1570235,67.62118853367957,4015,52412,14097.000962
+Pack_1_C_Temp,0,0.0,0,0,0.0
+Pack_2_C_Temp,0,0.0,0,0,0.0
+Pack_3_C_Temp,2322105,100.0,16052,52412,14097.000962
+Pack_4_C_Temp,0,0.0,0,0,0.0
+CellMaxVolt,1570184,67.61899225056575,3989,52412,14097.000962
+CellMinVolt,1570184,67.61899225056575,3989,52412,14097.000962
+cDrvPkt,500,0.02153218739032042,2,278,78.99813
+cLoopPkt,500,0.02153218739032042,2,278,78.99813
+Pack_Avg_C_Temp,0,0.0,0,0,0.0
+kWh_Remaining,0,0.0,0,0,0.0
+Horsepower,0,0.0,0,0,0.0
+Instant_kW,0,0.0,0,0,0.0
+Timestamp_Object,0,0.0,0,0,0.0
+Trip,0,0.0,0,0,0.0
+Odometer_diff,0,0.0,0,0,0.0
+accu_Speed,0,0.0,0,0,0.0
+accu_Brake,0,0.0,0,0,0.0
+accu_HV_Bat_Current_2,0,0.0,0,0,0.0
+accu_Torque,0,0.0,0,0,0.0
+accu_Motor_Pwr,0,0.0,0,0,0.0
+accu_Acc_Pedal,0,0.0,0,0,0.0
+accu_Horsepower,0,0.0,0,0,0.0
+accu_Instant_kW,0,0.0,0,0,0.0
+accu_Odometer_diff,0,0.0,0,0,0.0
+Day sin,0,0.0,0,0,0.0
+Day cos,0,0.0,0,0,0.0
+Season sin,0,0.0,0,0,0.0
+Season cos,0,0.0,0,0,0.0
+Year sin,0,0.0,0,0,0.0
+Year cos,0,0.0,0,0,0.0

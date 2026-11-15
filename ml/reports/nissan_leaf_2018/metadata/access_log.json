@@ -1,0 +1,26 @@
+{
+  "resolved_dataset_access_issues": [
+    {
+      "method": "web browser fetch",
+      "url": "https://ubilab.mpu.edu.mo/data.html",
+      "error": "502 Bad Gateway"
+    },
+    {
+      "method": "sandboxed curl",
+      "url": "https://ubilab.mpu.edu.mo/data.html",
+      "error": "curl exit 6: Could not resolve host",
+      "resolution": "Approved direct curl outside network sandbox succeeded, HTTP 200"
+    }
+  ],
+  "supporting_paper_downloads": [
+    {
+      "url": "https://cris.unibo.it/retrieve/handle/11585/875565/d638f26b-7214-4d8e-8e4c-8a1ffb426078/Aguiari-Monitoring_Electric_Vehicles_on_The_Go.pdf",
+      "error": "HTTP 403; curl exit 22"
+    },
+    {
+      "url": "https://cris.unibo.it/retrieve/d638f26b-7214-4d8e-8e4c-8a1ffb426078/Aguiari-Monitoring_Electric_Vehicles_on_The_Go.pdf",
+      "error": "HTTP 403; curl exit 22"
+    }
+  ],
+  "paper_access_note": "Institutional landing page and browser-indexed manuscript readable, but no PDF was downloaded. Use https://cris.unibo.it/handle/11585/875565 and its Visualizza/Apri link in a browser; direct download could not be verified from this shell."
+}

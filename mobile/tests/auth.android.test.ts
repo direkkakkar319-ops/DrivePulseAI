@@ -128,6 +128,18 @@ it('subscribes to restored sessions and forwards logout without exposing tokens'
   expect(unsubscribe).toHaveBeenCalledTimes(1);
 });
 
+it('exposes only Firebase provider IDs for security capability checks, not credentials or provider identities', () => {
+  (onIdTokenChanged as jest.Mock).mockReturnValue(jest.fn());
+  const listener = jest.fn();
+  const stop = authService.subscribe(listener);
+  const callback = (onIdTokenChanged as jest.Mock).mock.calls[0][1];
+  callback({ ...user, refreshToken: 'never-expose', providerData: [
+    { providerId: 'password', uid: 'private-provider-uid' }, { providerId: 'google.com', uid: 'google-private-uid' },
+  ] });
+  expect(listener).toHaveBeenLastCalledWith({ ...user, providerIds: ['password', 'google.com'] });
+  stop();
+});
+
 
 it('publishes logout then a successful re-login even before a native token event', async () => {
   (onIdTokenChanged as jest.Mock).mockReturnValue(jest.fn());
