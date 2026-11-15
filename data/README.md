@@ -1,5 +1,10 @@
 # Dataset inventory and audit
 
+For the repository-wide map, see [`docs/PROJECT_MAP.md`](../docs/PROJECT_MAP.md).
+Dataset paths follow `data/<domain>/<source>/<release>/`; retain publisher files
+in each release's `raw/` directory and keep derived views separate and
+reproducible. Dataset-specific decisions and rights below remain authoritative.
+
 Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Dataset audits refreshed 2026-11-14. KIT and Oxford exploratory preprocessing artifacts have been generated locally. KIT has an XGBoost forecast-novelty baseline; Oxford preprocessing, RUL-target EDA, and a per-cell Theil–Sen trend prototype are complete. The Oxford prototype has large rolling-origin errors and does not resolve the target ambiguity. Raw data remain unchanged.
 
 **AI4I is an industrial-machine benchmark and must not be interpreted as automotive telemetry.**
