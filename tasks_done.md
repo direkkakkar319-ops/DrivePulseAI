@@ -1,6 +1,6 @@
 # Tasks done and verification log
 
-This log records the ordered work and verification. Status labels distinguish verified results from open work. Before Step 0, repository source code, configuration and notebooks were not edited during the audit; Step 0 added only the shared seed helper. Acquired source archives are unchanged downloads under `data/automotive_prognostics/scania_component_x/v3/raw/`, `data/automotive_prognostics/onroad_ev_capacity/source_release/`, and `data/automotive_prognostics/ev_fault_347/v1/raw/`.
+This log records the ordered work and verification. Status labels distinguish verified results from open work. Earlier audit notes record the initial shared seed helper; that unused helper was later removed and documented below. Acquired source archives are unchanged downloads under `data/automotive_prognostics/scania_component_x/v3/raw/`, `data/automotive_prognostics/onroad_ev_capacity/source_release/`, and `data/automotive_prognostics/ev_fault_347/v1/raw/`.
 
 ## KIT forecast-based novelty model — 2026-11-14
 
@@ -15,6 +15,117 @@ This log records the ordered work and verification. Status labels distinguish ve
   labels, so no real fault metrics or diagnostic claim is supported.
 - Detailed split, per-signal results, RMS comparison, and limitations are in
   `ml/reports/modeling/kit_xgb_forecast_baseline.*`. Artifact remains ignored.
+
+## Oxford preprocessing and RUL-target EDA — 2026-11-14
+
+- Reran `ml/scripts/preprocess_oxford_battery.py` from the retained original MAT
+  file. It reproduced 519 characterization rows across eight cells; no raw
+  source files changed.
+- Added reproducible `ml/scripts/eda_oxford_battery.py`, JSON audit output, and
+  [`ml/reports/eda/oxford_battery_eda.md`](ml/reports/eda/oxford_battery_eda.md).
+- Under the exploratory 75%-of-first-capacity rule, 116 rows have derived RUL and
+  403 rows are unlabeled/censored/post-crossing. Cell2's first crossing at cycle
+  7,400 recovers above threshold at 7,500 and 7,600; the source curve is shorter
+  than its neighbors. Cell5's crossing occurs only at its last record.
+- No cell has two consecutive below-threshold observations from its first
+  crossing. This is a diagnostic, not an official EOL rule. The target remains
+  ambiguous and meaningful cell-disjoint RUL evaluation is unsupported with
+  only two nominal event cells.
+
+## Oxford Theil–Sen RUL trend prototype — 2026-11-14
+
+- Chose a per-cell Theil–Sen capacity-trend extrapolator instead of XGBoost or a
+  pooled learned regressor because there are only two nominal event cells and
+  the target crossings are questionable. Theil–Sen gives an interpretable local
+  slope and is less sensitive to single noisy capacity points.
+- Implemented `TheilSenCapacityTrendRUL` in `ml/src/models/rul_regressor.py`. At
+  each cutoff it uses only that cell's prior 1,000 drive-cycle history (minimum
+  four observations) and projects the capacity slope to the exploratory 75%
+  threshold. It is a per-cell rule, not a transferable global model.
+- Added `ml/scripts/evaluate_oxford_rul_trend.py` and modeling reports. A
+  rolling-origin backtest over 107 correlated origins produced pooled MAE
+  1,419 cycles and RMSE 2,406 cycles. Cell2 MAE was 1,426 cycles; Cell5 MAE was
+  1,408 cycles, with opposite bias directions. These results are poor and do
+  not establish generalization to new cells.
+- No target smoothing, SMOTE, or random row split was used. No production model
+  or passenger-EV claim is supported. The baseline is being included with the
+  Oxford EDA PR for review; do not merge without user approval.
+
+## Oxford EOL rule audit — 2026-11-14
+
+- Researched battery EOL criteria. A 2024 review says mobile-application EOL
+  capacity cutoffs are commonly 70–80% and depend on manufacturer/use case
+  ([Paarmann et al.](https://doi.org/10.1002/batt.202300594)); the Oxford release
+  does not define its own cutoff. Kept 75% explicitly exploratory.
+- Added a separate conservative screen requiring two consecutive
+  characterizations at or below 75%. This is a transparent project convention,
+  not an official or universal EOL rule. Kept first-crossing labels only for
+  reproducing the historical exploratory baseline.
+- Updated preprocessing to write the persistent-rule target separately and the
+  EDA audit to count confirmed events. Reran both against the local source:
+  519 rows / 8 cells reproduced, with **0 confirmed persistent events and 0
+  persistent-rule RUL labels**. The historical proxy still has 116 rows in two
+  cells, but it is unconfirmed and is not treated as ground truth.
+- Updated the Oxford EDA/model reports, dataset READMEs, README, datasets,
+  progress, scope, remaining-work notes, and this local `agent_context.md` to
+  explain the rule choice and why. This prevents users from mistaking proxy
+  metrics for confirmed EOL model evaluation.
+- Result: the Oxford release currently has no defensible supervised RUL target.
+  Next assess event-cell sufficiency and evaluation feasibility; do not fit a
+  supervised regressor to these labels as if confirmed.
+
+### Step 2 — Check whether there are enough independent event cells
+
+- Deep-reviewed battery RUL evaluation practice. A peer-reviewed LOCO study
+  explains that cycle-level splits can leak a cell's autocorrelated trajectory
+  and uses whole-cell partitions to assess new-cell generalization
+  ([Scientific Reports](https://www.nature.com/articles/s41598-026-58379-0)).
+- Verified the regenerated audit: the selected persistent rule yields **0
+  confirmed event cells and 0 supervised RUL examples**. The historical
+  unconfirmed first-crossing proxy has only two event cells (Cell2, Cell5).
+- Conclusion: this Oxford release cannot supply independent train, validation,
+  and test cells with the selected target. SMOTE cannot manufacture real EOL
+  events or independent cell trajectories; it is not a remedy for this gap.
+- Updated `ml/reports/eda/oxford_battery_eda.md` and `remaining.md` to record
+  the evidence and prioritize a better labeled source. Next is Step 3: document
+  the evaluation protocol and explicitly mark it infeasible on this release.
+
+### Step 3 — Define leakage-safe evaluation and feasibility
+
+- Protocol: split by whole cell before windowing; fit preprocessing only on
+  training cells; use validation cells for model selection; freeze the model and
+  evaluate once on held-out cells. Report per-cell errors and cell-level spread.
+  LOCO is suitable only when each fold retains enough independent event cells.
+- Research basis: published Oxford RUL work uses leave-one-cell-out to measure
+  unseen-cell generalization and explicitly avoids cycle splits because the
+  same cell trajectories can leak across splits (link in EDA report).
+- Feasibility check: this release has zero confirmed events. On the two-cell
+  first-crossing proxy, holding one event cell out leaves one event cell for
+  training and none for independent validation/uncertainty. The old rolling
+  origins are same-cell diagnostics, not cross-cell evaluation.
+- Updated the EDA and model reports to distinguish those protocols and state
+  why the proper one cannot be executed here. No metric is being presented as
+  unseen-cell performance. Next is Step 4: clarify baseline comparisons and
+  honest error/uncertainty reporting for any future eligible dataset.
+
+### Step 4 — Baselines, errors, and uncertainty
+
+- Researched evaluation practice: battery RUL frameworks report cell-disjoint
+  errors and caution that uncertainty intervals must also be assessed at the
+  independent-cell level ([censor-aware framework](https://www.mdpi.com/2313-0105/12/11/484)).
+- Audited existing report: it already reports MAE, RMSE, and signed mean error
+  for each of Cell2 and Cell5. Its 107 origins are repeated points from only two
+  cells; no valid cell-level confidence interval can be estimated. The persistent
+  target has no examples, and the first-crossing proxy cannot validate EOL.
+- Documented that future comparisons should include a training-cell median-RUL
+  baseline and causal capacity-trend baseline under identical held-out-cell
+  folds; include MAE/RMSE/median absolute error/bias per cell, and interval
+  coverage plus width when uncertainty estimates are available. Do not treat
+  rolling origins as independent for bootstrap uncertainty.
+- Updated EDA and historical model reports. No proxy-only extra benchmark was
+  fitted, because the user has not selected the unconfirmed proxy for a demo.
+  Next is Step 5: research and identify better EOL-labeled data or record the
+  exact acquisition requirements.
 
 ## Step 0 — Setup and baseline
 
@@ -258,6 +369,24 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
 - Kept the generated graph snapshots; excluded the incremental cache through
   `.gitignore`.
 
+### Step 5 — Identify a stronger labeled source
+
+- Researched the MIT/Stanford/TRI Severson battery-life dataset. The original
+  *Nature Energy* study reports 124 commercial LFP/graphite cells and cycle
+  lives spanning roughly 150–2,300 cycles
+  ([paper](https://doi.org/10.1038/s41560-019-0356-8)); the research data portal is
+  [MATR](https://data.matr.io/1/projects/5c48dd2bc625d700019f3204).
+- This is a materially stronger candidate for cell-level lifetime method
+  development than Oxford's eight cells because it provides many more
+  independent trajectories and published cycle-life labels. It remains a
+  controlled lab dataset and cannot support passenger-EV fleet claims.
+- The portal is a JavaScript app and the web reader did not expose its files or
+  terms. Access, exact target construction, split metadata, and data
+  license/redistribution terms are **unverified**. Do not start acquisition or
+  training until these are checked directly.
+- Updated the EDA report, `remaining.md`, and this record. Next action: audit
+  MATR's current download/metadata and terms, then checksum and inspect files;
+  find another adequately labeled source if access or terms fail.
 ## Remove unused ML reproducibility helper — 2026-11-14
 
 - Removed `ml/src/reproducibility.py`: its only public function,
@@ -327,3 +456,14 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
   supported without verified labels.
 - Updated README, progress, tasks log, model report/JSON, and `agent_context.md`
   after this step with the method choice and reasons.
+
+## PR #59 conflict resolution — 2026-11-14
+
+- Merged the current `main` into `ml/oxford-rul-eda` to resolve PR #59 conflicts.
+  The conflict was limited to the end of this log: preserved Oxford Step 5 from
+  PR #59 and the already-merged cleanup and KIT anomaly-improvement records from
+  `main`.
+- Preserved the PR #60 deletion of the unused reproducibility helper and the PR
+  #61 KIT model/report changes; did not revert or duplicate their code.
+- Updated this log's historical introduction to note the helper was later
+  removed. Recheck the complete merge diff and CI before merging PR #59.

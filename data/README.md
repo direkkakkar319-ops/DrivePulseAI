@@ -1,6 +1,6 @@
 # Dataset inventory and audit
 
-Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Dataset audits refreshed 2026-11-14. KIT and Oxford exploratory preprocessing artifacts have been generated locally. A KIT XGBoost forecast-novelty baseline has been run; it does not establish fault detection. Raw data remain unchanged.
+Documents the local dataset inventory, immutable raw locations, validation findings, and deferred loader corrections. Dataset audits refreshed 2026-11-14. KIT and Oxford exploratory preprocessing artifacts have been generated locally. KIT has an XGBoost forecast-novelty baseline; Oxford preprocessing, RUL-target EDA, and a per-cell Theil–Sen trend prototype are complete. The Oxford prototype has large rolling-origin errors and does not resolve the target ambiguity. Raw data remain unchanged.
 
 **AI4I is an industrial-machine benchmark and must not be interpreted as automotive telemetry.**
 
@@ -76,6 +76,7 @@ Directory grouping is organizational: placing a candidate under `dieselobd` or `
 - Reproducible exploratory preprocessing: from `ml/`, run `python scripts/preprocess_kit_obd.py`. The script writes a local-only `processed/windows_10s.csv.gz` and `processed/preprocessing_summary.json`; generated output is gitignored. It aggregates each signal into median, population standard deviation, and missing fraction per 10-second window. It performs no imputation, drops windows with a signal entirely absent, retains source acquisition order, and starts a new segment at each backward timestamp jump. The chronological split groups every recording from the same filename date into one split (70% train, 15% validation, 15% test). This is a temporal exploratory split, not an official split or evidence of independent vehicles. Windows remain unlabeled; no supervised fault or RUL claim is supported.
 - EDA findings and balancing decision are recorded in [`ml/reports/eda/kit_obd_eda.md`](../ml/reports/eda/kit_obd_eda.md): the dataset has no verified fault classes, so SMOTE/class balancing is not applicable. Road-condition filename contexts are descriptive metadata only.
 - An exploratory XGBoost model forecasts the next 10-second window and scores forecast residual novelty; the method and descriptive split rates are in [`ml/reports/modeling/kit_xgb_forecast_baseline.md`](../ml/reports/modeling/kit_xgb_forecast_baseline.md). It is not supervised fault classification and has no verified fault evaluation.
+- Oxford preprocessing reproduces 519 rows across eight cells. The first-crossing 75% proxy has two cells, but a project screening rule requiring two consecutive below-threshold readings confirms zero EOL events. The rule is explicitly a conservative project convention, not a universal or source-provided definition. A historical Theil–Sen experiment against the proxy had large errors; Oxford currently has no defensible supervised RUL target. See the [EDA](../ml/reports/eda/oxford_battery_eda.md) and [model report](../ml/reports/modeling/oxford_rul_trend_baseline.md).
 
 ## Scania APS Failure
 
