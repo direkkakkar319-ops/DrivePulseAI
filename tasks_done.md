@@ -507,3 +507,12 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
 - Checks: the comparison script ran successfully on the locally available
   processed Oxford table; Ruff lint and formatting checks passed. No broader
   test suite was run.
+
+## Remove empty Docker Compose override — 2026-11-15
+
+- Removed `docker-compose.dev.yml`, which contained only a comment and defined
+  no services or overrides.
+- Kept `docker-compose.yml`: it defines the PostgreSQL service used by the
+  documented local backend setup and PostgreSQL integration-test workflow.
+- Updated the repository inventory to describe the remaining Compose use
+  accurately. No backend/mobile files or runtime behavior changed.
