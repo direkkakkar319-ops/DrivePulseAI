@@ -38,7 +38,7 @@ class UserOnboarding(Base):
             name="ck_onboarding_name",
         ),
         CheckConstraint(
-            "completed_at IS NULL OR (profile_completed_at IS NOT NULL AND first_vehicle_id IS NOT NULL AND active_vehicle_id IS NOT NULL)",
+            "completed_at IS NULL OR profile_completed_at IS NOT NULL",
             name="ck_onboarding_complete",
         ),
     )

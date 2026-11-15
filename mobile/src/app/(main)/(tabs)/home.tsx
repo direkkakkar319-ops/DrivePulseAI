@@ -1,2 +1,2 @@
-// Recorded telemetry route; presentation and state are shared across screens.
-export { OverviewScreen as default } from '@/components/recorded/screens';
+// Account dashboard; recorded telemetry remains available through explicitly separate links.
+export { HomeScreen as default } from '@/components/home/home-screen';

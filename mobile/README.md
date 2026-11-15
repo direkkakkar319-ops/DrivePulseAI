@@ -1,5 +1,10 @@
 # DrivePulseAI Android app
 
+Vehicle onboarding and Garage Add/Edit share a small local demo catalog, dependent
+manufacturer/model/year selectors, explicit engine/type and conditional fuel
+selection, and manual fallback. No external catalog is called by the form.
+See [demo coverage, sources and one-time onboarding](VEHICLE_CATALOG.md).
+
 React Native + Expo frontend with Firebase email/password and Android Google authentication.
 
 ## Implemented
@@ -14,11 +19,16 @@ React Native + Expo frontend with Firebase email/password and Android Google aut
 - Native Firebase session persistence and logout on this device.
 - Protected routes: signed-out users see login; unverified users see verification;
   only verified users enter the account area.
-- Three signed-in tabs: Overview, Telemetry and Insights; header access to Account.
+- Five signed-in tabs: Home, Garage, AI Insights, History and Profile. Home links
+  to recorded Telemetry and Replay, independently of saved account vehicles.
 - Recorded Nissan Leaf replay with 416 real observations and saved Isolation Forest scores.
   See [recorded replay architecture and API contract](RECORDED_REPLAY.md).
-- Older session-only simulated vehicle routes remain available through their existing URLs,
-  outside the primary recorded-data navigation.
+- Garage manages PostgreSQL-backed vehicles: add, edit, confirm removal, and set
+  active. The shared account provider synchronizes selection with Home. Removing
+  the active vehicle selects the oldest remaining saved vehicle; removing the last
+  leaves Garage empty without resetting onboarding. Apply backend migration 0003 first.
+- Older session-only simulated vehicles remain accessible from Garage's explicitly
+  labeled simulated-Garage link and their existing detail/add/edit URLs.
 - Account uses real Firebase information; profile synchronization runs on entry
   to the signed-in area and supports retry from Account.
 
@@ -37,13 +47,37 @@ permission checks.
 FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
 Live use requires server credentials and a reachable API. Cloud deployment remains
 a subsequent step. Primary battery screens use a local recorded-data provider; legacy vehicle/report routes use the isolated simulator provider. Backend
-vehicle/report routes remain placeholders.
+report routes remain placeholders; saved vehicle metadata uses authenticated PostgreSQL APIs.
 iOS and web authentication have not been configured; they display a setup message.
 The Firebase Auth config plugin only adds iOS setup in the installed version, so
 it is omitted for this Android integration. Add it with the iOS Firebase config
 when implementing iOS support.
 
 ## Firebase setup
+
+### Android shows “Account unavailable” after login
+
+Firebase login and the local FastAPI service use separate network connections.
+Successful Firebase login does not prove the phone can reach PostgreSQL-backed
+account storage. Keep the existing error/Retry screen; never bypass onboarding.
+
+1. Confirm FastAPI is running with `--host 0.0.0.0 --port 8000` and the existing
+   Firebase Admin credentials exported in that terminal.
+2. Check the computer's current Wi-Fi address (`hostname -I` on Linux; exclude
+   Docker bridge addresses). DHCP can change it between sessions.
+3. Set `EXPO_PUBLIC_API_URL=http://YOUR_CURRENT_WIFI_IP:8000` in `mobile/.env`.
+   A physical phone must not use localhost, an old IP, or the emulator's 10.0.2.2.
+4. On the same Wi-Fi, open `http://YOUR_CURRENT_WIFI_IP:8000/health` in the phone's
+   browser. Failure here means network/backend availability needs fixing before login.
+   A successful health check proves reachability, not Firebase or database readiness.
+5. Restart Metro with `npx expo start --dev-client --clear` and fully reload the
+   installed development app so it receives the corrected environment value.
+   Tap **Try again**. No new APK is required for this JavaScript configuration change.
+
+If health works but account loading still fails, inspect the backend response:
+401 means rejected authentication, 403 unverified email, 409 an account mismatch,
+and 503 an unavailable authentication/database service. Native Android requests
+do not require browser CORS permissions. Never share ID tokens or private keys.
 
 1. Use project `drivepulse-d2034` and enable **Authentication → Sign-in method →
    Email/Password**. Passwordless email-link sign-in is not required.

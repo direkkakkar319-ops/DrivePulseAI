@@ -1,5 +1,5 @@
 // Exercise authenticated wire contracts and ensure photos and cross-account state never pass through.
-import { onboardingApi, validateOnboarding } from '../src/api/onboarding';
+import { onboardingApi, vehicleManagementApi, validateOnboarding } from '../src/api/onboarding';
 import { authService } from '../src/api/auth';
 import { accountState } from './onboarding-fixtures';
 
@@ -23,6 +23,17 @@ it('loads durable state with a fresh token and explicit expected-account precond
   }));
 });
 
+it('persists active vehicle selection through the existing authenticated vehicle endpoint', async () => {
+  const state = accountState('home');
+  (fetch as jest.Mock).mockResolvedValue(response(200, state));
+  await expect(onboardingApi.selectActive('alice', state.active_vehicle_id!)).resolves.toEqual(state);
+  expect(fetch).toHaveBeenCalledWith(`https://api.example.test/api/v1/vehicles/${state.active_vehicle_id}/active`, expect.objectContaining({
+    method: 'PUT', body: '{}', headers: {
+      Authorization: 'Bearer token', 'X-Account-UID': 'alice', 'Content-Type': 'application/json',
+    },
+  }));
+});
+
 it('sends only explicit app profile data and never local photo references or a user-supplied owner', async () => {
   (fetch as jest.Mock).mockResolvedValue(response(200, accountState('vehicle')));
   const input = { full_name: 'Chosen name', driving_licence: 'no' as const, photo: 'file:///private-preview.jpg' };
@@ -36,6 +47,38 @@ it('maps the typed vehicle input to the backend fuel_type contract', async () =>
   (fetch as jest.Mock).mockResolvedValue(response(200, accountState('home')));
   await onboardingApi.saveFirstVehicle('alice', { powertrain: 'ev', manufacturer: 'Any Brand', model: 'Example EV', year: 2024, fuelType: null, nickname: null });
   expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toEqual({ powertrain: 'ev', manufacturer: 'Any Brand', model: 'Example EV', year: 2024, fuel_type: null, nickname: null });
+});
+
+it('accepts a completed empty Garage and a removed original first vehicle', () => {
+  const complete = accountState('home');
+  expect(validateOnboarding({ ...complete, vehicles: [], first_vehicle_id: null, active_vehicle_id: null }, 'alice').completed_at).toBe(complete.completed_at);
+  expect(validateOnboarding({ ...complete, first_vehicle_id: null }, 'alice').vehicles).toHaveLength(1);
+  expect(() => validateOnboarding({ ...complete, active_vehicle_id: null }, 'alice')).toThrow('unexpected');
+});
+
+it('creates with a stable request ID and reloads authoritative account state', async () => {
+  const state = accountState('home');
+  (fetch as jest.Mock).mockResolvedValueOnce(response(201, state)).mockResolvedValueOnce(response(200, state));
+  await expect(vehicleManagementApi.create('alice', { powertrain: 'ev', manufacturer: 'Any Brand', model: 'Example EV', year: 2024, fuelType: null, nickname: null }, state.active_vehicle_id!)).resolves.toEqual(state);
+  expect(fetch).toHaveBeenNthCalledWith(1, 'https://api.example.test/api/v1/vehicles', expect.objectContaining({
+    method: 'POST', headers: expect.objectContaining({ 'X-Vehicle-ID': state.active_vehicle_id, 'X-Account-UID': 'alice' }),
+  }));
+  expect(fetch).toHaveBeenNthCalledWith(2, 'https://api.example.test/api/v1/onboarding', expect.objectContaining({ method: 'GET' }));
+});
+
+it('edits through the owner-authenticated PUT endpoint', async () => {
+  const state = accountState('home'); (fetch as jest.Mock).mockResolvedValue(response(200, state));
+  await vehicleManagementApi.update('alice', state.active_vehicle_id!, { powertrain: 'ev', manufacturer: 'Any Brand', model: 'Example EV', year: 2024, fuelType: null, nickname: 'Edited' });
+  expect(fetch).toHaveBeenCalledWith(`https://api.example.test/api/v1/vehicles/${state.active_vehicle_id}`, expect.objectContaining({ method: 'PUT' }));
+  expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).nickname).toBe('Edited');
+});
+
+it('deletes without a body and recovers a lost successful response through reload', async () => {
+  const state = { ...accountState('home'), vehicles: [], first_vehicle_id: null, active_vehicle_id: null };
+  (fetch as jest.Mock).mockResolvedValueOnce(response(404)).mockResolvedValueOnce(response(200, state));
+  await expect(vehicleManagementApi.remove('alice', accountState('home').active_vehicle_id!)).resolves.toEqual(state);
+  expect((fetch as jest.Mock).mock.calls[0][1]).toMatchObject({ method: 'DELETE', headers: expect.objectContaining({ Authorization: 'Bearer token' }) });
+  expect((fetch as jest.Mock).mock.calls[0][1].body).toBeUndefined();
 });
 
 it('retries one 401 with refreshed credentials', async () => {

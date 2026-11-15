@@ -1,5 +1,33 @@
 # DrivePulseAI API
 
+## Garage lifecycle (Phase 4.3)
+
+Apply `cd backend && .venv/bin/alembic upgrade head` before using the updated
+Garage. Migration `0003_garage_lifecycle` changes only the onboarding completion
+check: completed accounts may have no vehicles. Existing timestamps, records,
+and owner-constrained foreign keys are preserved.
+
+- `PUT /api/v1/vehicles/{id}` replaces validated metadata and returns the complete
+  onboarding/vehicle snapshot. ID, owner and creation time cannot be edited.
+- `DELETE /api/v1/vehicles/{id}` returns the updated snapshot. It clears a removed
+  first-vehicle reference and retains completion. An active vehicle is replaced by
+  the oldest remaining vehicle, ordered by creation timestamp then ID; removing the
+  last vehicle clears active selection. The app explains this before confirmation.
+- Existing `POST /api/v1/vehicles` retains its vehicle response and activates a new
+  vehicle only when no active vehicle exists. Optional UUID header `X-Vehicle-ID`
+  deduplicates matching creation retries; reusing it for different metadata or an
+  already-owned foreign ID returns 409. Mobile retains the ID while the form is open.
+
+All writes serialize on the account's onboarding row and commit references and
+vehicle changes atomically. All endpoints require verified Firebase credentials
+and the matching `X-Account-UID` precondition. No telemetry associations are created.
+The first-vehicle onboarding endpoint cannot restart a completed journey after
+its original vehicle has been deleted.
+
+Downgrade to `0002_onboarding_vehicles` is possible only when completed accounts
+still have valid first/active references. Otherwise it refuses without changing
+data; it never clears completion or invents vehicle references to force rollback.
+
 FastAPI validates Firebase ID tokens and stores minimal user profiles in PostgreSQL.
 Firebase remains responsible for passwords, email verification, login, and sessions.
 

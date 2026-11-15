@@ -29,8 +29,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         application.add_middleware(
             CORSMiddleware,
             allow_origins=settings.cors_origins,
-            allow_methods=["GET", "PUT", "POST"],
-            allow_headers=["Authorization", "Content-Type", "X-Account-UID"],
+            allow_methods=["GET", "PUT", "POST", "DELETE"],
+            allow_headers=[
+                "Authorization",
+                "Content-Type",
+                "X-Account-UID",
+                "X-Vehicle-ID",
+            ],
         )
     application.include_router(router)
     application.include_router(onboarding_router)

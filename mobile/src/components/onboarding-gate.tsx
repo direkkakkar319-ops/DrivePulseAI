@@ -25,7 +25,7 @@ export function OnboardingGate({ children }: PropsWithChildren) {
   }
   if (resource.status !== 'ready') return <AppScreen>
     <AppDataState status={resource.status === 'error' ? 'error' : 'loading'} title={resource.status === 'error' ? 'Account unavailable' : 'Loading your account'}
-      message={resource.status === 'error' ? resource.message : undefined} onRetry={() => { void reload(); }} />
+      message={resource.status === 'error' ? resource.message : undefined} retryLabel="Retry" onRetry={() => { void reload(); }} />
     {!!error && <AppStatus label={error} tone="error" variant="notice" />}
     <AppButton title="Log out" variant="text" loading={loggingOut} onPress={logout} />
   </AppScreen>;

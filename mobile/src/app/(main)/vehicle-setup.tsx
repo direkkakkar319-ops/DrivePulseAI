@@ -41,9 +41,8 @@ function FirstVehicleSetup() {
     <AppHeader title="Your first vehicle" subtitle="Start with a few details about your vehicle."
       onBack={completed ? () => router.canGoBack() ? router.back() : leave() : undefined} />
     <AppText variant="caption" tone="secondary">Continue saves this vehicle to your Garage and makes it active. Telemetry will remain unavailable until a supported data source is connected.</AppText>
-    <VehicleSetupForm onSubmit={async value => { await account.saveFirstVehicle(value); }} />
+    <VehicleSetupForm onSubmit={async value => { await account.saveFirstVehicle(value); }} onRetry={() => account.reload()} />
     {!!error && <AppStatus label={error} tone="error" variant="notice" />}
-    <AppButton title="Reload account" variant="text" disabled={account.saving} onPress={() => { void account.reload(); }} />
     <AppButton title="Log out" variant="text" disabled={account.saving} onPress={logout} />
   </AppScreen>;
 }

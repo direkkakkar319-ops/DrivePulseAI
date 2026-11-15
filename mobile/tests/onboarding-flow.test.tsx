@@ -11,6 +11,7 @@ import { authService } from '../src/api/auth';
 import type { OnboardingApi, OnboardingState } from '../src/api/onboarding';
 import type { AuthUser } from '../src/api/auth.types';
 import { accountState, savedVehicle, secondVehicleId } from './onboarding-fixtures';
+import { chooseVehicleType, enterManualVehicle } from './vehicle-form-helpers';
 
 const account: AuthUser = { uid: 'alice', email: 'alice@example.com', displayName: 'Firebase name', emailVerified: true };
 let mockUser: AuthUser | null = account;
@@ -68,10 +69,8 @@ it('walks first-time users through profile, vehicle and Home using only confirme
   expect(await screen.findByText('redirect:/(main)/vehicle-setup')).toBeTruthy();
   expect(api.saveProfile).toHaveBeenCalledWith('alice', { full_name: 'Chosen app name', driving_licence: 'no' });
   mockRoute = 'vehicle-setup'; await view.rerender(<Session api={api} />);
-  await fireEvent.press(screen.getByRole('radio', { name: 'Fully Electric (EV)' }));
-  await fireEvent.changeText(screen.getByLabelText('Manufacturer'), 'Any Brand');
-  await fireEvent.changeText(screen.getByLabelText('Model'), 'Example EV');
-  await fireEvent.changeText(screen.getByLabelText('Model year'), '2024');
+  await chooseVehicleType('Fully Electric (EV)');
+  await enterManualVehicle('Any Brand', 'Example EV');
   await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
   expect(await screen.findByText('redirect:/(main)/dashboard')).toBeTruthy();
   expect(api.saveFirstVehicle).toHaveBeenCalledWith('alice', expect.objectContaining({ powertrain: 'ev', fuelType: null }));
@@ -107,6 +106,50 @@ it.each(['profile', 'vehicle', 'home'] as const)('restores %s server state after
   expect(api.load).toHaveBeenCalledTimes(2);
 });
 
+it('returns completed accounts directly to Home after logout and a restored login without resaving onboarding', async () => {
+  const { api } = makeApi('home');
+  const view = await render(<Session api={api} />);
+  await screen.findByText(/^Home:/);
+  mockUser = null; await view.rerender(<Session api={api} />);
+  expect(screen.getByText('Signed out')).toBeTruthy();
+  mockUser = account; await view.rerender(<Session api={api} />);
+  expect(await screen.findByText(/^Home:/)).toBeTruthy();
+  expect(screen.queryByText(/^redirect:/)).toBeNull();
+  expect(api.load).toHaveBeenCalledTimes(2);
+  expect(api.saveProfile).not.toHaveBeenCalled();
+  expect(api.saveFirstVehicle).not.toHaveBeenCalled();
+});
+
+it('restores completed onboarding with an empty Garage into Home rather than first-vehicle setup', async () => {
+  const { api, setState } = makeApi('home');
+  setState({ ...accountState('home'), vehicles: [], first_vehicle_id: null, active_vehicle_id: null });
+  const view = await render(<Session api={api} />);
+  expect(await screen.findByText('Home:null')).toBeTruthy();
+  await view.unmount(); await render(<Session api={api} />);
+  expect(await screen.findByText('Home:null')).toBeTruthy();
+  expect(screen.queryByText(/^redirect:/)).toBeNull();
+  expect(api.saveFirstVehicle).not.toHaveBeenCalled();
+});
+
+it('offers account Retry only after a failed save and follows the reloaded server completion', async () => {
+  const { api, setState } = makeApi('vehicle'); mockRoute = 'vehicle-setup';
+  (api.saveFirstVehicle as jest.Mock).mockRejectedValueOnce(new Error('Response unavailable'));
+  await render(<Session api={api} />);
+  await screen.findByRole('button', { name: 'Engine / Vehicle Type' });
+  expect(screen.queryByRole('button', { name: 'Reload account' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+  expect(screen.getByRole('button', { name: 'Log out' })).toBeEnabled();
+  await chooseVehicleType('Fully Electric (EV)');
+  await enterManualVehicle('Any Brand', 'Example EV');
+  await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
+  expect(screen.queryByText(/^redirect:/)).toBeNull();
+  setState(accountState('home'));
+  await fireEvent.press(screen.getByRole('button', { name: 'Retry' }));
+  expect(await screen.findByText('redirect:/(main)/dashboard')).toBeTruthy();
+  expect(api.load).toHaveBeenCalledTimes(2);
+  expect(api.saveFirstVehicle).toHaveBeenCalledTimes(1);
+});
+
 it('redirects completed accounts away from onboarding deep links without a redirect loop', async () => {
   const { api } = makeApi('home'); mockRoute = 'profile-setup';
   const view = await render(<Session api={api} />);
@@ -123,7 +166,7 @@ it('keeps backend load failures outside Home and offers Retry and Logout', async
   expect(await screen.findByText('Backend offline')).toBeTruthy();
   expect(screen.queryByText(/^Home:/)).toBeNull();
   expect(screen.getByRole('button', { name: 'Log out' })).toBeEnabled();
-  await fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Retry' }));
   expect(await screen.findByText('redirect:/(main)/profile-setup')).toBeTruthy();
 });
 
@@ -152,10 +195,8 @@ it('retains the vehicle draft after a backend failure and advances only after re
   const { api } = makeApi('vehicle'); mockRoute = 'vehicle-setup';
   (api.saveFirstVehicle as jest.Mock).mockRejectedValueOnce(new Error('Backend unavailable'));
   await render(<Session api={api} />);
-  await fireEvent.press(await screen.findByRole('radio', { name: 'Fully Electric (EV)' }));
-  await fireEvent.changeText(screen.getByLabelText('Manufacturer'), 'Any Brand');
-  await fireEvent.changeText(screen.getByLabelText('Model'), 'Example EV');
-  await fireEvent.changeText(screen.getByLabelText('Model year'), '2024');
+  await screen.findByRole('button', { name: 'Engine / Vehicle Type' }); await chooseVehicleType('Fully Electric (EV)');
+  await enterManualVehicle('Any Brand', 'Example EV');
   await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
   expect(await screen.findByText('Could not continue. Please try again.')).toBeTruthy();
   expect(screen.queryByText(/^redirect:/)).toBeNull();
@@ -169,11 +210,11 @@ it('does not optimistically switch the saved active vehicle when the backend rej
   setState({ ...accountState('home'), vehicles: [savedVehicle(), { ...savedVehicle(), id: secondVehicleId, nickname: 'Second car' }] });
   (api.selectActive as jest.Mock).mockRejectedValueOnce(new Error('Selection not saved'));
   await render(<Session api={api} />);
-  await fireEvent.press(await screen.findByRole('button', { name: 'Make active' }));
+  await fireEvent.press(await screen.findByRole('button', { name: 'Set Second car active' }));
   expect(await screen.findByText('Selection not saved')).toBeTruthy();
-  expect(screen.getByRole('button', { name: 'Make active' })).toBeEnabled();
-  expect(screen.getByRole('button', { name: 'Active vehicle' })).toBeDisabled();
-  await fireEvent.press(screen.getByRole('button', { name: 'Make active' }));
+  expect(screen.getByRole('button', { name: 'Set Second car active' })).toBeEnabled();
+  expect(screen.getByText('Active vehicle')).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: 'Set Second car active' }));
   expect(screen.queryByText('Selection not saved')).toBeNull();
   expect(api.selectActive).toHaveBeenCalledTimes(2);
 });
@@ -183,15 +224,16 @@ it('reloads owned vehicles and active selection into Garage without sending them
   setState({ ...accountState('home'), vehicles: [savedVehicle(), { ...savedVehicle(), id: secondVehicleId, nickname: 'Second car' }] });
   const view = await render(<Session api={api} />);
   expect(await screen.findByText('Personal car')).toBeTruthy();
-  expect(screen.getByText('Demo garage')).toBeTruthy();
-  expect(screen.getByText('My Sedan · Selected')).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Explore simulated Garage' })).toBeTruthy();
+  expect(screen.queryByText('My Sedan · Selected')).toBeNull();
   expect(screen.queryByRole('button', { name: 'View Personal car' })).toBeNull();
-  await fireEvent.press(screen.getByRole('button', { name: 'Make active' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Set Second car active' }));
   expect(api.selectActive).toHaveBeenCalledWith('alice', secondVehicleId);
   await view.unmount(); await render(<Session api={api} />);
   expect(await screen.findByText('Second car')).toBeTruthy();
-  expect(screen.getByRole('button', { name: 'Active vehicle' })).toBeDisabled();
-  await fireEvent.press(screen.getByRole('button', { name: 'View My Sedan · Selected' }));
+  expect(screen.getByText('Active vehicle')).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: 'Explore simulated Garage' }));
+  expect(mockPush).toHaveBeenCalledWith('/(main)/demo-garage');
   expect(api.selectActive).toHaveBeenCalledTimes(1);
 });
 
@@ -234,10 +276,8 @@ it('prevents a second vehicle mutation while the first is in flight', async () =
   (api.saveFirstVehicle as jest.Mock).mockImplementationOnce(() => new Promise(done => { resolve = done; }));
   const user = userEvent.setup();
   await render(<Session api={api} />);
-  await fireEvent.press(await screen.findByRole('radio', { name: 'Fully Electric (EV)' }));
-  await fireEvent.changeText(screen.getByLabelText('Manufacturer'), 'Any Brand');
-  await fireEvent.changeText(screen.getByLabelText('Model'), 'Example EV');
-  await fireEvent.changeText(screen.getByLabelText('Model year'), '2024');
+  await screen.findByRole('button', { name: 'Engine / Vehicle Type' }); await chooseVehicleType('Fully Electric (EV)');
+  await enterManualVehicle('Any Brand', 'Example EV');
   await user.press(screen.getByRole('button', { name: 'Continue' }));
   await fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
   expect(api.saveFirstVehicle).toHaveBeenCalledTimes(1);

@@ -124,6 +124,10 @@ def save_first_vehicle(
             raise HTTPException(409, "First vehicle already saved; reload your account")
         # Lost-response retries must not reset a subsequently chosen active vehicle.
         return response_for(state, db, response)
+    if state.completed_at is not None:
+        raise HTTPException(
+            409, "Onboarding already completed; add vehicles through Garage"
+        )
     vehicle = Vehicle(owner_uid=identity.uid, **data.model_dump())
     db.add(vehicle)
     db.flush()
@@ -151,16 +155,96 @@ def list_vehicles(
 
 @router.post("/vehicles", response_model=SavedVehicleResponse, status_code=201)
 def add_vehicle(
-    data: VehicleInput, identity: CurrentIdentity, db: Database, response: Response
+    data: VehicleInput,
+    identity: CurrentIdentity,
+    db: Database,
+    response: Response,
+    request_id: Annotated[UUID | None, Header(alias="X-Vehicle-ID")] = None,
 ) -> Vehicle:
     state = state_for(identity, db, lock=True)
     if state.completed_at is None:
         raise HTTPException(409, "Complete first vehicle setup first")
+    # The mobile form retains this ID across lost-response retries. The account
+    # lock serializes all vehicle writes; the existing primary key deduplicates adds.
+    if request_id is not None:
+        existing = db.get(Vehicle, request_id)
+        if existing is not None:
+            if existing.owner_uid != identity.uid or any(
+                getattr(existing, field) != value
+                for field, value in data.model_dump().items()
+            ):
+                raise HTTPException(
+                    409, "Vehicle request already used; reload your Garage"
+                )
+            response.headers["Cache-Control"] = "no-store"
+            return existing
     vehicle = Vehicle(owner_uid=identity.uid, **data.model_dump())
+    if request_id is not None:
+        vehicle.id = request_id
     db.add(vehicle)
+    db.flush()
+    if state.active_vehicle_id is None:
+        state.active_vehicle_id = vehicle.id
     db.commit()
     response.headers["Cache-Control"] = "no-store"
     return vehicle
+
+
+def owned_vehicle(vehicle_id: UUID, identity: Identity, db: Session) -> Vehicle:
+    vehicle = db.scalars(
+        select(Vehicle).where(
+            Vehicle.id == vehicle_id, Vehicle.owner_uid == identity.uid
+        )
+    ).one_or_none()
+    if vehicle is None:
+        raise HTTPException(404, "Vehicle not found")
+    return vehicle
+
+
+@router.put("/vehicles/{vehicle_id}", response_model=OnboardingResponse)
+def update_vehicle(
+    vehicle_id: UUID,
+    data: VehicleInput,
+    identity: CurrentIdentity,
+    db: Database,
+    response: Response,
+) -> OnboardingResponse:
+    state = state_for(identity, db, lock=True)
+    vehicle = owned_vehicle(vehicle_id, identity, db)
+    for field, value in data.model_dump().items():
+        setattr(vehicle, field, value)
+    result = response_for(state, db, response)
+    db.commit()
+    return result
+
+
+@router.delete("/vehicles/{vehicle_id}", response_model=OnboardingResponse)
+def remove_vehicle(
+    vehicle_id: UUID,
+    identity: CurrentIdentity,
+    db: Database,
+    response: Response,
+) -> OnboardingResponse:
+    # Every create/edit/select/delete locks the same account row before reading
+    # vehicles, so concurrent writes cannot leave a dangling active reference.
+    state = state_for(identity, db, lock=True)
+    vehicle = owned_vehicle(vehicle_id, identity, db)
+    if state.first_vehicle_id == vehicle_id:
+        state.first_vehicle_id = None
+    if state.active_vehicle_id == vehicle_id:
+        replacement = db.scalars(
+            select(Vehicle)
+            .where(Vehicle.owner_uid == identity.uid, Vehicle.id != vehicle_id)
+            .order_by(Vehicle.created_at, Vehicle.id)
+            .limit(1)
+        ).first()
+        state.active_vehicle_id = replacement.id if replacement else None
+    db.flush()  # Release first/active references before the immediate FK checks.
+    db.delete(vehicle)
+    db.flush()
+    result = response_for(state, db, response)
+    db.commit()
+    return result
 
 
 @router.get("/vehicles/{vehicle_id}", response_model=SavedVehicleResponse)

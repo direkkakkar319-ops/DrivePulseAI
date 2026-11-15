@@ -36,7 +36,7 @@ export function vehicleYearBounds(currentYear = new Date().getFullYear()) {
 export function validateVehicleSetup(draft: VehicleSetupDraft, currentYear = new Date().getFullYear()): VehicleSetupValidation {
   const errors: VehicleSetupErrors = {};
   const manufacturer = draft.manufacturer.trim(), model = draft.model.trim(), nickname = draft.nickname.trim();
-  if (!draft.powertrain || !powertrainOptions.some(option => option.value === draft.powertrain)) errors.powertrain = 'Choose a powertrain.';
+  if (!draft.powertrain || !powertrainOptions.some(option => option.value === draft.powertrain)) errors.powertrain = 'Choose an engine / vehicle type.';
   if (!manufacturer) errors.manufacturer = 'Enter a manufacturer.';
   else if (manufacturer.length > vehicleTextLimits.manufacturer) errors.manufacturer = `Use ${vehicleTextLimits.manufacturer} characters or fewer.`;
   if (!model) errors.model = 'Enter a model.';

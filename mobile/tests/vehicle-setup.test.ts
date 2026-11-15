@@ -8,7 +8,7 @@ const valid: VehicleSetupDraft = {
 
 it('reports each required field without requiring a nickname', () => {
   expect(validateVehicleSetup(emptyVehicleSetup(), 2026)).toEqual({ valid: false, errors: {
-    powertrain: 'Choose a powertrain.', manufacturer: 'Enter a manufacturer.', model: 'Enter a model.', year: 'Enter a model year.',
+    powertrain: 'Choose an engine / vehicle type.', manufacturer: 'Enter a manufacturer.', model: 'Enter a model.', year: 'Enter a model year.',
   } });
 });
 
