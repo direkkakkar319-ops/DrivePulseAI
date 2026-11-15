@@ -1,8 +1,53 @@
 # DrivePulseAI Android app
 
+Vehicle onboarding and Garage Add/Edit share a small local demo catalog, dependent
+manufacturer/model/year selectors, explicit engine/type and conditional fuel
+selection, and manual fallback. No external catalog is called by the form.
+See [demo coverage, sources and one-time onboarding](VEHICLE_CATALOG.md).
+
 React Native + Expo frontend with Firebase email/password and Android Google authentication.
 
+## AI Insights demonstration (Phase 4.4)
+
+AI Insights uses the shared light UI with Choose Data Source, Analysis Results,
+and Telemetry Data sections. The switch starts off; Home's **Explore Demo Data**
+opens it in demo mode. Results are visibly tagged Demo, include illustrative
+explanations, and never enter account analysis history. Fixed typed fixtures in
+`src/config/demo-insights.ts` are UI samples, unrelated to saved vehicles,
+recordings, training datasets, or actual model output. No charts or inference run.
+
+This build has no compatible CSV picker: selection/upload is explicitly unavailable
+and the select-file button is disabled. No dependency was added. An optional
+metadata-only picker contract is provided for a future integration; its component
+tests inject a picker to verify filename/size/type, cancellation, replacement,
+errors, and source switching. This does not enable native selection in the app.
+Even with that adapter, selecting a file shows **Analysis not available yet**;
+the UI does not read its contents, upload it, parse telemetry, or run ML.
+
+Home retains saved Garage vehicles and empty genuine-history state. Its separate
+recorded telemetry/replay links still work. Recorded experimental results now live
+at `/(main)/recorded-insights`, including links from recorded replay/overview;
+recorded detail routes and source labels remain intact. The five-tab layout,
+authentication, onboarding, and backend APIs are unchanged.
+
+On Android, reload the development app and check both the Insights switch and the
+Home demo entry (including returning to it after turning demo off), large font
+sizes, safe areas, scrolling, recorded replay/details, and Android Back. No new
+APK is required for these JS-only changes. The earlier intermittent Garage
+maximum-depth crash still needs physical-device tracing; these changes do not
+claim to fix it.
+
 ## Implemented
+
+Profile and Settings use the shared light UI and existing account/Firebase state.
+Profile name edits persist through the existing backend profile endpoint;
+Security offers provider-aware Firebase actions, and normal Logout lives in
+Settings. See [Profile, Settings, privacy and verification](PROFILE_SETTINGS.md).
+
+History uses the shared light UI and an honest empty state with an Explore AI
+Insights action. Reusable typed cards and an unrouted details screen are ready
+for future genuine records; no history API or persistence exists yet. See
+[History behavior and missing API contract](HISTORY.md).
 
 - Signup with exactly Username, Email, and Password; email/password login.
 - Google sign-in through Android Credential Manager, exchanged for a Firebase session.
@@ -14,10 +59,16 @@ React Native + Expo frontend with Firebase email/password and Android Google aut
 - Native Firebase session persistence and logout on this device.
 - Protected routes: signed-out users see login; unverified users see verification;
   only verified users enter the account area.
-- Four signed-in tabs: Home, Vehicles, Insights, Account.
-- Session-only demo vehicles, deterministic sensor histories, labelled illustrative
-  assessments, observation details and report previews. No real telemetry or
-  production predictions are generated.
+- Five signed-in tabs: Home, Garage, AI Insights, History and Profile. Home links
+  to recorded Telemetry and Replay, independently of saved account vehicles.
+- Recorded Nissan Leaf replay with 416 real observations and saved Isolation Forest scores.
+  See [recorded replay architecture and API contract](RECORDED_REPLAY.md).
+- Garage manages PostgreSQL-backed vehicles: add, edit, confirm removal, and set
+  active. The shared account provider synchronizes selection with Home. Removing
+  the active vehicle selects the oldest remaining saved vehicle; removing the last
+  leaves Garage empty without resetting onboarding. Apply backend migration 0003 first.
+- Older session-only simulated vehicles remain accessible from Garage's explicitly
+  labeled simulated-Garage link and their existing detail/add/edit URLs.
 - Account uses real Firebase information; profile synchronization runs on entry
   to the signed-in area and supports retry from Account.
 
@@ -35,14 +86,38 @@ permission checks.
 
 FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
 Live use requires server credentials and a reachable API. Cloud deployment remains
-a subsequent step. Mobile vehicle/report screens now use an isolated demo provider. Backend
-vehicle/report routes remain placeholders.
+a subsequent step. Primary battery screens use a local recorded-data provider; legacy vehicle/report routes use the isolated simulator provider. Backend
+report routes remain placeholders; saved vehicle metadata uses authenticated PostgreSQL APIs.
 iOS and web authentication have not been configured; they display a setup message.
 The Firebase Auth config plugin only adds iOS setup in the installed version, so
 it is omitted for this Android integration. Add it with the iOS Firebase config
 when implementing iOS support.
 
 ## Firebase setup
+
+### Android shows “Account unavailable” after login
+
+Firebase login and the local FastAPI service use separate network connections.
+Successful Firebase login does not prove the phone can reach PostgreSQL-backed
+account storage. Keep the existing error/Retry screen; never bypass onboarding.
+
+1. Confirm FastAPI is running with `--host 0.0.0.0 --port 8000` and the existing
+   Firebase Admin credentials exported in that terminal.
+2. Check the computer's current Wi-Fi address (`hostname -I` on Linux; exclude
+   Docker bridge addresses). DHCP can change it between sessions.
+3. Set `EXPO_PUBLIC_API_URL=http://YOUR_CURRENT_WIFI_IP:8000` in `mobile/.env`.
+   A physical phone must not use localhost, an old IP, or the emulator's 10.0.2.2.
+4. On the same Wi-Fi, open `http://YOUR_CURRENT_WIFI_IP:8000/health` in the phone's
+   browser. Failure here means network/backend availability needs fixing before login.
+   A successful health check proves reachability, not Firebase or database readiness.
+5. Restart Metro with `npx expo start --dev-client --clear` and fully reload the
+   installed development app so it receives the corrected environment value.
+   Tap **Try again**. No new APK is required for this JavaScript configuration change.
+
+If health works but account loading still fails, inspect the backend response:
+401 means rejected authentication, 403 unverified email, 409 an account mismatch,
+and 503 an unavailable authentication/database service. Native Android requests
+do not require browser CORS permissions. Never share ID tokens or private keys.
 
 1. Use project `drivepulse-d2034` and enable **Authentication → Sign-in method →
    Email/Password**. Passwordless email-link sign-in is not required.
@@ -166,30 +241,34 @@ email delivery, native compilation, or Android back-stack/deep-link behavior.
 - [React Native Firebase setup](https://rnfirebase.io/)
 - [Firebase Android setup](https://firebase.google.com/docs/android/setup)
 
-## Demo frontend and integration boundary
+## Recorded frontend and integration boundary
 
-The navy/cyan mobile UI follows the approved reference. Every simulated view is
-labelled. Account → Prototype controls selects deterministic scenarios, including
-missing readings, waiting, collecting, loading, failure, stale and disconnected
-states. Loading/failure fixtures remain in that state until another scenario is
-selected. Demo playback is a fixed, dated snapshot, not a live network connection.
+Phase 3.4 adds a server-backed onboarding gate before signed-in screens. Apply the
+backend Alembic migration and run FastAPI first; configure `EXPO_PUBLIC_API_URL` to
+a URL reachable from the phone. See the [onboarding API](../backend/README.md#persistent-onboarding-and-garage-phase-34).
 
-Vehicle edits are in memory and reset after logout or app restart. New vehicles
-start without readings; make/model never generate telemetry. No external vehicle
-API, vehicle-size categories, confidence, failure probability or RUL are invented.
+Verified users resume Profile Setup or First Vehicle Setup using PostgreSQL
+milestones. Saving the first vehicle activates it and opens Home. Completed
+accounts enter Home directly. Backend failures offer Retry/Logout and never
+fabricate completion. Firebase login, verification, and identity synchronization
+are unchanged. The chosen app name is separate from Firebase's display name.
 
-The only numeric health assessment is an explicitly illustrative 86/100 fixture,
-with an explanation that it is authored rather than model-calculated. Report
-previews reuse the displayed telemetry and observations. No PDF/export is offered.
+Account → My Garage shows owned vehicles and the persisted active selection above
+the separate session-only Demo garage. Demo selection never changes the active
+owned vehicle. Add demo vehicle remains available. Owned records have no connected
+telemetry and are never assigned bundled Nissan Leaf recordings.
 
-Data flows through `src/api/vehicle-data-provider.ts` and
-`src/store/vehicleDataStore.tsx`; fixtures are centralized in `src/demo/`.
-Nullable frontend view models are in `src/types/vehicle-health.ts`. These do not
-redefine the provisional backend prediction contract.
+Profile photos are temporary local previews only. They are not uploaded, referenced
+in PostgreSQL, or restored across sessions; initials remain the fallback. Profile
+and vehicle steps advance only after server confirmation. There is no local
+completion flag or in-memory substitute for durable storage.
 
-`react-native-svg` and `expo-linear-gradient` support charts, the gauge and visual
-styling. Rebuild the Android development app after installing these native modules.
-The existing iOS command does not configure iOS Firebase authentication.
+The primary MVP uses a light, restrained battery telemetry interface with genuine saved
+Nissan Leaf measurements and experimental anomaly scores. See [RECORDED_REPLAY.md](RECORDED_REPLAY.md)
+for navigation, provenance, playback semantics, data contracts and Step 3 requirements.
 
-See [future mobile integration](../docs/future-mobile-integration.md) for the
-Implemented / Demo / Planned / Requires Validation roadmap and manual UI checks.
+The replay data adapter is local, but the onboarding gate now requires backend
+connectivity to restore account state. Existing profile synchronization and account
+retry remain separate. No FastAPI replay endpoints or live inference were added.
+Legacy simulated vehicle, sensor and report routes remain labelled and are not mixed
+into recorded screens. Physical Android verification is still required after this change.

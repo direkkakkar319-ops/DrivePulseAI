@@ -1,0 +1,5 @@
+condition,rows,interpretation
+negative_current_moving,1177745,Current sign per workbook; regeneration/charging cannot be distinguished from sign alone
+negative_current_stationary,582793,Current sign per workbook; regeneration/charging cannot be distinguished from sign alone
+positive_current,319199,Current sign per workbook; regeneration/charging cannot be distinguished from sign alone
+zero_current,3117,Current sign per workbook; regeneration/charging cannot be distinguished from sign alone

@@ -1,5 +1,33 @@
 # DrivePulseAI API
 
+## Garage lifecycle (Phase 4.3)
+
+Apply `cd backend && .venv/bin/alembic upgrade head` before using the updated
+Garage. Migration `0003_garage_lifecycle` changes only the onboarding completion
+check: completed accounts may have no vehicles. Existing timestamps, records,
+and owner-constrained foreign keys are preserved.
+
+- `PUT /api/v1/vehicles/{id}` replaces validated metadata and returns the complete
+  onboarding/vehicle snapshot. ID, owner and creation time cannot be edited.
+- `DELETE /api/v1/vehicles/{id}` returns the updated snapshot. It clears a removed
+  first-vehicle reference and retains completion. An active vehicle is replaced by
+  the oldest remaining vehicle, ordered by creation timestamp then ID; removing the
+  last vehicle clears active selection. The app explains this before confirmation.
+- Existing `POST /api/v1/vehicles` retains its vehicle response and activates a new
+  vehicle only when no active vehicle exists. Optional UUID header `X-Vehicle-ID`
+  deduplicates matching creation retries; reusing it for different metadata or an
+  already-owned foreign ID returns 409. Mobile retains the ID while the form is open.
+
+All writes serialize on the account's onboarding row and commit references and
+vehicle changes atomically. All endpoints require verified Firebase credentials
+and the matching `X-Account-UID` precondition. No telemetry associations are created.
+The first-vehicle onboarding endpoint cannot restart a completed journey after
+its original vehicle has been deleted.
+
+Downgrade to `0002_onboarding_vehicles` is possible only when completed accounts
+still have valid first/active references. Otherwise it refuses without changing
+data; it never clears completion or invents vehicle references to force rollback.
+
 FastAPI validates Firebase ID tokens and stores minimal user profiles in PostgreSQL.
 Firebase remains responsible for passwords, email verification, login, and sessions.
 
@@ -28,7 +56,8 @@ refresh tokens, and ID tokens are never stored in this database.
 | `created_at` | First profile synchronization time |
 | `updated_at` | Most recent synchronization time |
 
-No vehicles, telemetry, or reports are persisted yet. No custom backend sessions
+Account-owned vehicles and onboarding milestones are persisted as described below.
+Telemetry and reports are not persisted. No custom backend sessions
 are created. Signing out clears the device's Firebase session; it does not delete
 this profile or revoke every previously issued token. Revocation/disabled-user
 checks run on each protected request. Deleting a Firebase user does not currently
@@ -134,8 +163,8 @@ export TEST_DATABASE_URL='postgresql+psycopg2://drivepulse:drivepulse_dev@127.0.
 .venv/bin/ruff format --check app migrations tests
 ```
 
-The test database name must end in `_test`. Tests migrate it and clear only its
-`users` table between cases. PostgreSQL tests skip when `TEST_DATABASE_URL` is
+The test database name must end in `_test`. Tests migrate it and clear its
+`user_onboarding`, `vehicles`, and `users` tables between cases. PostgreSQL tests skip when `TEST_DATABASE_URL` is
 absent; CI starts PostgreSQL and runs them. Remote Firebase verification is mocked
 in API tests, so they do not establish live project credentials or phone connectivity.
 Do not use a real user database as the test database.
@@ -152,3 +181,54 @@ Do not use a real user database as the test database.
 - `tests/test_user_profiles.py`: real PostgreSQL isolation and concurrency tests.
 
 [Firebase token verification](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
+
+## Persistent onboarding and Garage (Phase 3.4)
+
+Apply `alembic upgrade head` from `backend/` before serving the updated mobile app.
+Migration `0002_onboarding_vehicles` adds `user_onboarding` and `vehicles`; it does
+not alter or delete existing `users` rows. Only the dedicated test database was
+migrated during implementation. Downgrading this revision removes the two new
+tables and their data; use normal deployment backup and migration procedures.
+
+All new endpoints require a verified Firebase bearer token plus `X-Account-UID`
+matching the authenticated UID. The header is an account-switch precondition,
+never an alternative identity source. A mismatch fails before a database operation.
+Existing `/users/me` contracts remain unchanged.
+
+| Endpoint | Behavior |
+| --- | --- |
+| `GET /api/v1/onboarding` | Load/create account milestones and return owned vehicles |
+| `PUT /api/v1/onboarding/profile` | Save `{full_name, driving_licence}` and confirm the profile step |
+| `PUT /api/v1/onboarding/first-vehicle` | Atomically save/activate the first vehicle and complete onboarding |
+| `GET /api/v1/vehicles` | List only the authenticated account's vehicles |
+| `POST /api/v1/vehicles` | Add another owned vehicle after onboarding; keep active selection |
+| `GET /api/v1/vehicles/{id}` | Read owned metadata; unknown/foreign IDs return 404 |
+| `PUT /api/v1/vehicles/{id}/active` | Persist an owned active vehicle and return refreshed state |
+
+Vehicle bodies contain `powertrain`, `manufacturer`, `model`, integer `year`,
+`fuel_type`, and nullable `nickname`. Backend validation mirrors the setup form:
+ICE petrol/diesel/CNG; hybrid petrol-electric/diesel-electric; EV null fuel;
+nonblank bounded names; year 1886 through next year. Extra fields, including
+client-supplied owner IDs and photo data, are rejected.
+
+The onboarding name is separate from Firebase-synchronized `users.username`.
+An omitted name falls back to the verified Firebase name, then email prefix.
+Skipping optional profile fields confirms the profile step and records
+`prefer-not-to-say` for an omitted licence answer. Every licence choice permits access.
+
+First-vehicle requests lock the account's onboarding row. A matching retry returns
+the existing first vehicle; a different retry payload returns 409. Creation,
+activation, and completion share one transaction. Composite foreign keys prevent
+first/active pointers referencing another owner. A lost-response retry never
+resets a later active selection. Clients can reload state after ambiguous failures.
+Additional-vehicle POST is separate from the singleton idempotent onboarding API.
+
+No avatar binary, local URI, image URL, or cloud storage is persisted. Photos remain
+explicitly temporary previews; initials are the fallback. No telemetry is generated
+for owned vehicles and no recorded datasets are attached to them.
+
+Existing accounts have no prior durable completion marker and complete this journey
+once. Completed accounts enter Home directly on later logins. The mobile app needs
+a reachable backend to restore state on entering the signed-in area. Failure offers
+Retry/Logout instead of assuming completion. Account rows and vehicles survive
+restarts/logout; client state is discarded on logout or UID change.

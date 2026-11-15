@@ -1,16 +1,16 @@
 // Email/password account creation, sign-in, and password recovery using Firebase.
 import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { authService } from '@/api/auth';
 import { authErrorMessage } from '@/api/auth-errors';
 import { googleAvailable } from '@/auth/google';
-import {
-  AuthButton,
-  AuthForm,
-  AuthInput,
-  AuthMessage,
-  AuthPasswordInput,
-} from '@/components/auth-form';
+import { AuthScreen } from '@/components/auth-screen';
+import { AppButton } from '@/components/ui/app-button';
+import { AppStatus } from '@/components/ui/app-status';
+import { AppText } from '@/components/ui/app-text';
+import { AppTextField } from '@/components/ui/app-text-field';
+import { colors, spacing } from '@/theme/tokens';
 import { useAuthStore } from '@/store/authStore';
 
 type Mode = 'login' | 'signup' | 'reset';
@@ -87,7 +87,7 @@ export default function LoginScreen() {
         ? 'Reset your password'
         : 'Welcome back';
   return (
-    <AuthForm
+    <AuthScreen
       title={title}
       subtitle={
         mode === 'signup'
@@ -97,62 +97,85 @@ export default function LoginScreen() {
             : 'Log in to your DrivePulseAI account.'
       }
     >
-      {mode === 'signup' && (
-        <AuthInput
-          label="Username"
-          value={username}
-          onChangeText={setUsername}
+      <View style={styles.fields}>
+        {mode === 'signup' && (
+          <AppTextField
+            label="Username"
+            value={username}
+            onChangeText={setUsername}
+            editable={!busy}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="username-new"
+          />
+        )}
+        <AppTextField
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
           editable={!busy}
+          keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
-          autoComplete="username-new"
+          autoComplete="email"
         />
-      )}
-      <AuthInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        editable={!busy}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoComplete="email"
-      />
-      {mode !== 'reset' && (
-        <AuthPasswordInput
-          key={mode}
-          value={password}
-          onChangeText={setPassword}
-          editable={!busy}
-          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+        {mode !== 'reset' && (
+          <AppTextField
+            key={mode}
+            label="Password"
+            password
+            value={password}
+            onChangeText={setPassword}
+            editable={!busy}
+            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+          />
+        )}
+        {mode === 'login' && (
+          <AppButton title="Forgot password?" variant="text" disabled={busy}
+            style={styles.forgot} onPress={() => changeMode('reset')} />
+        )}
+      </View>
+      {!!error && <AppStatus label={error} tone="error" variant="notice" />}
+      {!!message && <AppStatus label={message} tone="success" variant="notice" />}
+      <View style={styles.actions}>
+        <AppButton
+          title={
+            mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Send reset link' : 'Log in'
+          }
+          onPress={submit}
+          loading={busy}
         />
-      )}
-      <AuthMessage message={error} error />
-      <AuthMessage message={message} />
-      <AuthButton
-        title={
-          mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Send reset link' : 'Log in'
-        }
-        onPress={submit}
-        loading={busy}
-      />
-      {mode === 'login' && googleAvailable && (
-        <AuthButton title="Continue with Google" secondary disabled={busy} onPress={googleLogin} />
-      )}
-      {mode === 'login' && (
-        <AuthButton
-          title="Forgot password?"
-          secondary
+        {mode === 'login' && googleAvailable && (
+          <>
+            <View style={styles.dividerRow}>
+              <View style={styles.divider} />
+              <AppText variant="caption" tone="secondary">or</AppText>
+              <View style={styles.divider} />
+            </View>
+            <AppButton title="Continue with Google" variant="secondary" disabled={busy} onPress={googleLogin} />
+          </>
+        )}
+      </View>
+      <View style={styles.switcher}>
+        <AppText variant="label" tone="secondary">
+          {mode === 'login' ? 'New to DrivePulse AI?' : mode === 'signup' ? 'Already have an account?' : 'Remember your password?'}
+        </AppText>
+        <AppButton
+          title={mode === 'login' ? 'Create an account' : 'Back to login'}
+          variant="text"
           disabled={busy}
-          onPress={() => changeMode('reset')}
+          onPress={() => changeMode(mode === 'login' ? 'signup' : 'login')}
         />
-      )}
-      <AuthButton
-        title={mode === 'login' ? 'Create an account' : 'Back to login'}
-        secondary
-        disabled={busy}
-        onPress={() => changeMode(mode === 'login' ? 'signup' : 'login')}
-      />
-    </AuthForm>
+      </View>
+    </AuthScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  fields: { gap: spacing.md },
+  actions: { gap: spacing.md },
+  forgot: { alignSelf: 'flex-end' },
+  switcher: { alignItems: 'center', gap: spacing.xxs },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  divider: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.border },
+});

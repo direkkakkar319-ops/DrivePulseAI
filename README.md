@@ -12,13 +12,21 @@ production diagnostics or maintenance predictions.
 
 | Area | Implemented | Not implemented |
 | --- | --- | --- |
-| Android app | Firebase sign-in and a clearly labelled demo garage with illustrative vehicle, sensor, insight, and report screens | Live vehicle data, backend-backed vehicle records, and production assessments |
-| Backend | FastAPI health route and authenticated Firebase user-profile synchronization with PostgreSQL | Telemetry ingestion, vehicle APIs, prediction services, and report generation |
-| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford battery capacity/RUL target audit and historical trend baseline | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
+| Android app | Firebase sign-in, one-time onboarding, PostgreSQL-backed Garage, five-tab light UI, demo Insights, honest History, Profile/Settings, and separate recorded research replay | Live vehicle data, native CSV upload/processing, persisted analysis history, durable profile photos, and production assessments |
+| Backend | FastAPI health, Firebase identity verification, PostgreSQL profile/onboarding storage, owner-scoped vehicle APIs, and persistent active selection | Live telemetry ingestion, analysis-history APIs, production prediction services, and report generation |
+| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford battery capacity/RUL target audit and historical trend baseline; audited Nissan Leaf battery preparation and a frozen Isolation Forest research baseline | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
 
-The mobile demo uses deterministic, session-only fixtures. Its assessments are
-illustrations, not measurements from a real vehicle. See [mobile setup](mobile/README.md)
-and [backend setup](backend/README.md) for details on the implemented app and API.
+Saved vehicle metadata, profile names, and onboarding completion persist through
+the authenticated backend; the backend must be reachable to restore account state.
+Removing all vehicles does not restart completed onboarding. Profile photo
+selection is a temporary local preview.
+
+Generic AI Insights uses clearly labeled illustrative fixtures, not actual model
+outputs or measurements from a saved vehicle, and never adds records to History.
+The older session-only simulated Garage and recorded research replay remain
+separate. Recorded experimental results are not production diagnoses or analyses
+of the active Garage vehicle. See [mobile setup](mobile/README.md) and
+[backend setup](backend/README.md) for details.
 
 ## Current ML experiment: KIT OBD-II
 
@@ -65,6 +73,10 @@ the repository's software license.
 
 ## Data and evaluation boundaries
 
+- **Recorded Nissan Leaf battery telemetry:** audited temporal preparation and a
+  frozen Isolation Forest baseline support separate research replay. Unusual
+  scores are not verified faults, battery-health estimates, or future-failure
+  predictions, and are not attached to saved Garage vehicles.
 - **KIT OBD-II:** supports exploratory automotive telemetry novelty scoring; it
   has no verified mechanical fault labels, RUL target, or verified vehicle IDs.
 - **Oxford battery data:** supports capacity/SOH exploration. The historical
@@ -93,7 +105,7 @@ end-to-end claim.
 - **Web frontend:** Next.js and TypeScript
 
 ```text
-backend/       FastAPI service; user-profile endpoints are implemented
+backend/       FastAPI service; profiles, onboarding, and owned vehicle APIs
 data/          Dataset provenance, audits, and local-data rules
 docs/          Product and integration notes, including Graphify documentation
 frontend/      Next.js web application

@@ -1,0 +1,8 @@
+check,status,details
+CSV_readability_and_chunk_schema,pass,1918299 rows read; 32 columns
+header_names,pass,Duplicate names=[]; blank names=0
+numeric_and_date_parse,pass,"{""index"": 0, ""Timestamp"": 0, ""Speed"": 0, ""Odometer"": 0, ""RPM"": 0, ""SOC"": 0, ""SOH"": 0, ""Torque"": 0, ""Motor_Temp"": 0, ""TP_FR"": 0, ""TP_FL"": 0, ""TP_RR"": 0, ""TP_RL"": 0, ""Aux_Pwr_100W"": 0, ""AC_Pwr_250W"": 0, ""EstPwr_AC_50W"": 0, ""HV_Bat_Voltage"": 0, ""Brake"": 0, ""Acc_Pedal"": 0, ""ECO"": 0, ""ePedal"": 0, ""HV_Bat_Current_2"": 0, ""Ambient_C_Temp"": 0, ""Pack_1_C_Temp"": 0, ""Pack_2_C_Temp"": 0, ""Pack_4_C_Temp"": 0, ""Pack_Avg_C_Temp"": 0, ""kWh_Remaining"": 0, ""Horsepower"": 0, ""Instant_kW"": 0, ""Driver_ID"": 0, ""Trip"": 0}"
+analysis_fields_present,pass,"Timestamp and Trip present; these are observed analysis dependencies, not a publisher-required schema"
+published_required_fields,not_defined,"Workbook is a parameter catalogue, not a mandatory CSV schema"
+unit_consistency,review,Ambient temperature unit conflict; pedal/brake units unknown
+duplicate_sessions,pass_screen,0 identical sequence-hash groups; cannot prove all sessions independent

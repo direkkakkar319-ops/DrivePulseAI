@@ -48,7 +48,7 @@ def database_url() -> str:
 def client(database_url: str, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     engine = create_engine(database_url)
     with engine.begin() as connection:
-        connection.execute(text("TRUNCATE users"))
+        connection.execute(text("TRUNCATE user_onboarding, vehicles, users"))
     engine.dispose()
 
     # Only remote token verification is mocked; HTTP identity checks and real

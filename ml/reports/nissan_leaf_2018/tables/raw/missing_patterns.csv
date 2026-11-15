@@ -1,0 +1,11 @@
+missing_columns,rows,pct
+SWA|GIDs|Internal_C_Temp|Pack_3_C_Temp|CellMaxVolt|CellMinVolt,1483018,63.86524295843642
+SWA|GIDs|Pack_3_C_Temp,751851,32.3779932431996
+SWA|Internal_C_Temp|Pack_3_C_Temp|CellMaxVolt|CellMinVolt,84412,3.635150003983455
+SWA|GIDs|SOH|Internal_C_Temp|Pack_3_C_Temp|CellMaxVolt|CellMinVolt,2237,0.09633500638429356
+SWA|GIDs|Internal_C_Temp|Pack_3_C_Temp|CellMaxVolt|CellMinVolt|cDrvPkt|cLoopPkt,500,0.02153218739032042
+SWA|GIDs|Internal_C_Temp|Pack_3_C_Temp,60,0.0025838624868384508
+SWA|GIDs|Pack_3_C_Temp|CellMaxVolt|CellMinVolt,10,0.00043064374780640835
+SWA|GIDs|SOH|Pack_3_C_Temp,9,0.0003875793730257676
+SWA|GIDs|HeaterTemp|Internal_C_Temp|Pack_3_C_Temp|CellMaxVolt|CellMinVolt,7,0.0003014506234644859
+SWA|GIDs|SOH|Internal_C_Temp|Pack_3_C_Temp,1,4.306437478064084e-05

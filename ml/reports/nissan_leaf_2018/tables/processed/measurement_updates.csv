@@ -1,0 +1,25 @@
+column,eligible_adjacent_pairs,changed_pairs,unchanged_pct,interpretation
+Speed,1910188,302465,84.16569468554927,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Odometer,1910188,7337,99.61590168088166,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+RPM,1910188,354737,81.42921010916203,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+SOC,1910188,1733459,9.251916565280485,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+SOH,1910188,367,99.98078723141387,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Torque,1910188,336002,82.41000362268008,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Motor_Temp,1910188,13486,99.29399619304488,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+TP_FR,1910188,1132,99.94073881733107,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+TP_FL,1910188,1155,99.93953474736517,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+TP_RR,1910188,969,99.94927200882844,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+TP_RL,1910188,948,99.95037137705818,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Aux_Pwr_100W,1910188,1778,99.90692015655004,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+AC_Pwr_250W,1910188,14508,99.24049360586497,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+EstPwr_AC_50W,1910188,30705,98.3925665955393,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+HV_Bat_Voltage,1910188,1669708,12.589336756382094,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Brake,1910188,53672,97.19022420829782,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Acc_Pedal,1910188,223657,88.29136189736299,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+ECO,1910188,49,99.99743480746397,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+ePedal,1910188,42,99.99780126354055,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+HV_Bat_Current_2,1910188,1780948,6.765826190929898,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Ambient_C_Temp,1910188,4386,99.77038909259194,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Pack_1_C_Temp,1910188,10280,99.46183307611606,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Pack_2_C_Temp,1910188,11529,99.39644684188154,Value change frequency is not polling frequency; physical constancy and sample holding both possible
+Pack_4_C_Temp,1910188,10837,99.43267364259434,Value change frequency is not polling frequency; physical constancy and sample holding both possible

@@ -1,0 +1,4 @@
+split,trips,retained_trips,source_rows,quality_excluded_rows,cross_split_repeat_exclusions,feature_rows,temperature_sequences,source_recorded_days,retained_recorded_days,start_utc,end_utc
+train,142,139,1629218,5327,0,1623891,37753,76,74,2020-11-12 13:01:08.257560+00:00,2022-03-10 18:05:02.007252+00:00
+validation,34,34,351422,261,74,351087,6595,19,19,2022-03-15 13:11:13.006783+00:00,2022-04-27 17:41:58.251000+00:00
+test,51,50,341465,390,89,340986,4514,26,25,2022-04-28 13:21:37.250000+00:00,2022-08-03 17:19:57.501000+00:00

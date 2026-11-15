@@ -12,6 +12,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 from ml.src.models.rul_regressor import TheilSenCapacityTrendRUL
 
 ROOT = Path(__file__).resolve().parents[2]

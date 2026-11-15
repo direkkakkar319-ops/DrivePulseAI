@@ -1,0 +1,17 @@
+{
+  "purpose": "Experimental battery pattern baseline; no verified fault labels.",
+  "preparation_run_id": "1d6fc5b045ee25d0",
+  "preparation_manifest_sha256": "55d15a5ab13a762bc5cacabcb4ea621fed1e8530a9d7319330e0d81513aeab80",
+  "features": ["HV_Bat_Voltage", "Pack_1_C_Temp", "SOC"],
+  "fit_policy": "all_training_rows",
+  "model": {"n_estimators": 200, "max_samples": "auto", "max_features": 1.0, "bootstrap": false, "random_state": 42, "n_jobs": -1, "contamination": "auto"},
+  "alert_budgets": [0.001, 0.005, 0.01],
+  "provisional_budget": 0.005,
+  "threshold_reason": "Predeclared middle review budget; no labels or operator capacity evidence justify an optimal threshold. Continuous scores remain primary.",
+  "aggregation": {"max_gap_seconds": 1.0, "minimum_duration_seconds": 2.0},
+  "persistence_candidates_seconds": [0.0, 2.0, 5.0],
+  "aggregation_reason": "Consecutive flagged source observations only; respect preparation segments and 1s gap ceiling. Two seconds is a provisional review filter, not a physical fault duration.",
+  "context_seconds": 15.0,
+  "review_intervals_per_split": 5,
+  "score_batch_rows": 100000
+}

@@ -1,0 +1,103 @@
+column,description,unit,documented_polling,selected,reason
+Unnamed: 0.1,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Unnamed: 0,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+index,Unknown,Unknown,Unknown,False,"Original exported ID, audit only"
+id,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Timestamp,Unknown,Unknown,Unknown,False,"Temporal key, never scaled as a measurement"
+DateTime,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Power_SW,This field will be True if Power Switch is ON otherwise it will be False,0/1,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Speed,Speed (km/h) from the Leaf ECU,km/h,1s: x,True,Documented unit; usable only under explicit quality exclusions; no claim of physical validation
+Odometer,Km total,km,10s: x,False,Aging shortcut and discontinuities; audit only
+Gear,"Gear position (0=not read yet, 1=Park, 2=Reverse, 3=Neutral, 4=Drive, 7=B/Eco)",see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+RangeKm,Remaining km to turtle mode,km,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+SWA,Steering Wheel angle The angle ranges from -720 to 720 degrees with negative being left turn.,° (360°),Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+RPM,Motor revolutions per minute,rev/min,1s: x,False,Redundant with Speed; use Speed in conservative view
+GIDs,Gids which indicates the energy in the Leaf battery. Nissan multiplies this value by 80 Wh to get current capacity of the HV Battery,---,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+SOC,State of Charge (SOC) of the HV Battery,%,Unknown,True,Documented unit; usable only under explicit quality exclusions; no claim of physical validation
+SOH,State of Health is another indication of the battery's ability to hold and release energy and is reported as a percentage. When the battery is new SOH=100%,%,Unknown,False,"Slow aging/identity shortcut, not a fault label"
+AHr,"Capacity of HV Battery. This is how much energy the battery could hold when fully charged.
+You can get an estimate of energy currently in the battery by multiplying SOC% times AHr times 360 volts (nominal HV battery voltage) = WHr",Ah,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Hx,"This is an indication of the HV Battery's health. A value of 100 would be a battery in factory new condition.
+The number is thought to be an indication of battery internal resistance with 100 indicating a new battery with lowest resistance.
+As the value decreases the internal resistance is increasing. As the internal resistance increases more energy is wasted as heat inside the battery instead of powering the Leaf",%,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Rain_level,"Rain sensitivity level for front wiper (automatic mode) (1: low, 4: high)",see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Front_wiper_level,-1: Off; 0: Automatic; 1: Continous slow speed; 2: Continous high speed,see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Rear_wiper_level,-1: Off; 1: Intermittent; 2: Continous low speed,see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Front_washer,-1: Not active; 1: Active,see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Rear_washer,-1: Not active; 1: Active,see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Position_lights,-1: Off; 0: Automatic mode; 1: On,see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Headlights,-1: Off; 0: Automatic mode; 1: On,see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Anti_fog_lights,-1: Off; 1: On,see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+HighBeam,-1: Off; 0: Automatic mode; 1: On; 2: Manual,see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Torque,Motor Torque. https://www.carwow.co.uk/guides/glossary/what-is-torque (Nm).  Minimum unit step is 0.25 Nm,Nm,1s: x,True,Documented unit; usable only under explicit quality exclusions; no claim of physical validation
+Motor_Temp,This field is the drive motor temperature,°C,10s: x,True,Documented unit; usable only under explicit quality exclusions; no claim of physical validation
+Motor_Pwr,Drive motor power in watt units,W,1s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+TP_FR,Front right tire pressure (in kPa),kPA,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+TP_FL,Front left tire pressure (in kPa),kPA,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+TP_RR,Rear right tire pressure (in kPa),kPA,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+TP_RL,Rear left tire pressure (in kPa),kPA,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Quick_Charge,Number of Quick Charges. Each time a Quick Charge occurs this number increments by 1,---,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+L1_L2_Charge,"Number of L1/L2 connections and charges.
+This number increases each time the J1772 charge cord is plugged into the Leaf.
+It also increases by one for each delayed charge that takes place. If the Leaf charge timer is not active, so charging starts immediately when the charge cord is plugged in, then the count will increase by only one.
+But if the timer is active then the count will increase by two. Once when the charge cord is initially plugged in and a second time when the timer starts the delayed charge.",---,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Aux_Pwr_100W,"Power used by the auxiliary equipment (Lights, Radio, Navigation system, rear defroster...)",W,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+AC_Pwr_250W,"A/C system Power (250W): Power used by the Air Conditioning System power. This includes the power used by the cabin PTC Heater.
+A/C Compressure Air Pressure(0.1MPa): A/C Compressor high side pressure in Mpa. Multiply by 14.50377 to get PSI.
+",W,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+AC_Compressor_Air_pressure,"A/C system Power (250W): Power used by the Air Conditioning System power. This includes the power used by the cabin PTC Heater.
+A/C Compressure Air Pressure(0.1MPa): A/C Compressor high side pressure in Mpa. Multiply by 14.50377 to get PSI.
+",MPa,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+EstPwr_AC_50W,Estimated Air Conditioning System power (COOL),W,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+EstPwr_Htr_250W,Estimated Cabin PTC Heater power (HEAT),W,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Plug_State,"Plug state of J1772 (L1/L2) charge port ( 0=Not plugged, 1=Partial Plugged, 2=Plugged )",see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Charge_Mode,"Charging mode. ( 0=Not charging, 1=Level 1 charging (100-120 volts), 2=Level 2 charging (200-240 volts),  3=Level 3 Quick Charging )",see Info,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+OBC_Out_Pwr,Charging power coming into the Leaf in watts (W),W,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+HV_Bat_Voltage,High Voltage Battery Voltage (in V),V,Unknown,True,Documented unit; usable only under explicit quality exclusions; no claim of physical validation
+Insulation,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+AC,Unknown,0/1,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+RearHeater,Unknown,0/1,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+HeaterTemp,Heater temperature from 16.5°C to 30°C set by the driver,°C,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+FanSpeed,Fan speed from 0 (off) to 8 (max),0-8,100s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Brake,Brake pression measured from 0 (not pressed) to 369 (max). Unit??,Unknown,1s: x,False,Physical units undocumented; keep in audit only
+Acc_Pedal,Acceleration pedal pression measured from 0 (not pressed) to 200 (max). Unit??,Unknown,1s: x,False,Physical units undocumented; keep in audit only
+ECO,ECO mode ON/OFF,0/1,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+ePedal,ePedal mode ON/OFF https://statics.quattroruote.it/content/dam/quattroruote/it/news/novita/2017/07/20/nuova_nissan_leaf_debutta_il_nuovo_e_pedal/gallery/rsmall/2017-epedal.jpg,0/1,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Right_Arrow,-1: Off; 1: Active,see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Left_Arrow,-1: Off; 1: Active,see Info,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+HV_Bat_Current_1,"High Voltage Battery Amperage (positive=from battery (driving), negative when regeneration or charging)",A,Unknown,False,Current polarity unresolved
+HV_Bat_Current_2,"High Voltage Battery Amperage (positive=from battery (driving), negative when regeneration or charging)",A,Unknown,False,"Current polarity unresolved; retain original in audit, do not integrate energy"
+Bat_12V_Voltage,The voltage of the 12 volt battery as read by the Leaf's Vehicle Control Module ECU,V,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Bat_12V_Current,12 volt battery current. Minus is drain and positive is charging.,A,10s: x,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Ambient_C_Temp,Ambient temperature comes from the Leaf's outside temperature sensor and is saved in degrees Fahrenheit. This value is only valid when the Leaf is ON (not ACC mode and not when charging),Unknown: workbook unit says °C; description says Fahrenheit,10s: x,False,Celsius/Fahrenheit conflict unresolved
+Internal_C_Temp,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Pack_1_C_Temp,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Unknown,True,Documented unit; usable only under explicit quality exclusions; no claim of physical validation
+Pack_2_C_Temp,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Unknown,False,Highly correlated with Pack 1; consistency/sentinel audit only
+Pack_3_C_Temp,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Pack_4_C_Temp,"HV Battery temperature sensors (Pack_1_C_Temp, Pack_2_C_Temp, Pack_3_C_Temp, Pack_4_C_Temp). On Leaf 2018 40kW, Pack 3 is missing",°C,Unknown,False,Highly correlated with Pack 1; consistency/sentinel audit only
+CellMaxVolt,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+CellMinVolt,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+cDrvPkt,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+cLoopPkt,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Pack_Avg_C_Temp,Unknown,Unknown,Unknown,False,Derived/redundant; select documented component target instead
+kWh_Remaining,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Horsepower,"Derived from battery voltage × current, not a measured mechanical output",Unknown: formula gives 1.341 × kW,Unknown,False,"Deterministic power conversion, not independent mechanical output"
+Instant_kW,Battery electrical power from voltage × current / 1000,kW,250ms: (kW going into the battery pack),False,Derived; polarity/energy-accounting unresolved
+Timestamp_Object,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Trip,Unknown,Unknown,Unknown,False,"Grouping key, never an input"
+Odometer_diff,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Speed,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Brake,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_HV_Bat_Current_2,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Torque,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Motor_Pwr,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Acc_Pedal,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Horsepower,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Instant_kW,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+accu_Odometer_diff,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Day sin,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Day cos,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Season sin,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Season cos,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Year sin,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory
+Year cos,Unknown,Unknown,Unknown,False,Not selected: outside conservative documented measurement scope; see readiness inventory

@@ -4,7 +4,9 @@ from alembic import context
 
 from app.config import get_settings
 from app.database import Base, build_engine
+from app.models.onboarding import UserOnboarding  # noqa: F401
 from app.models.user import UserProfile  # noqa: F401
+from app.models.vehicle import Vehicle  # noqa: F401
 
 if context.is_offline_mode():
     context.configure(

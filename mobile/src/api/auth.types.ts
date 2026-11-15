@@ -4,6 +4,8 @@ export interface AuthUser {
   email: string | null;
   emailVerified: boolean;
   displayName: string | null;
+  /** Provider IDs exposed by Firebase; absent means provider support is unknown. */
+  providerIds?: readonly string[];
 }
 
 export interface AuthService {

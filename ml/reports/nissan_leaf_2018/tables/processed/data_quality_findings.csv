@@ -1,0 +1,35 @@
+severity,column,rule,count,interpretation
+statistical_observation,RPM,1.5_IQR_fences,16,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,SOC,1.5_IQR_fences,11777,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Torque,1.5_IQR_fences,176972,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Motor_Temp,1.5_IQR_fences,18032,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,TP_FR,1.5_IQR_fences,206121,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_FR,zero_pressure_or_voltage,200532,Possible unavailable-value code; context needed
+statistical_observation,TP_FL,1.5_IQR_fences,205940,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_FL,zero_pressure_or_voltage,201260,Possible unavailable-value code; context needed
+statistical_observation,TP_RR,1.5_IQR_fences,207843,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_RR,zero_pressure_or_voltage,201934,Possible unavailable-value code; context needed
+statistical_observation,TP_RL,1.5_IQR_fences,200987,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_RL,zero_pressure_or_voltage,197301,Possible unavailable-value code; context needed
+statistical_observation,Aux_Pwr_100W,1.5_IQR_fences,39531,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,AC_Pwr_250W,1.5_IQR_fences,48379,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,EstPwr_AC_50W,1.5_IQR_fences,116309,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,HV_Bat_Voltage,1.5_IQR_fences,3,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,HV_Bat_Voltage,zero_pressure_or_voltage,2,Possible unavailable-value code; context needed
+statistical_observation,Brake,1.5_IQR_fences,360037,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documentation_uncertainty,Brake,unknown_units,1918299,Workbook explicitly questions units; do not call this percent
+statistical_observation,Acc_Pedal,1.5_IQR_fences,39853,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documentation_uncertainty,Acc_Pedal,unknown_units,1918299,Workbook explicitly questions units; do not call this percent
+statistical_observation,HV_Bat_Current_2,1.5_IQR_fences,107231,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Ambient_C_Temp,1.5_IQR_fences,5051,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documentation_conflict,Ambient_C_Temp,unit_conflict,1918299,Workbook unit is Celsius but prose says Fahrenheit; no conversion applied
+statistical_observation,Pack_1_C_Temp,1.5_IQR_fences,2389,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Pack_2_C_Temp,1.5_IQR_fences,3979,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Pack_Avg_C_Temp,1.5_IQR_fences,1592,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,kWh_Remaining,1.5_IQR_fences,13714,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Horsepower,1.5_IQR_fences,97082,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Instant_kW,1.5_IQR_fences,97082,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,Timestamp,within_trip_gap_over_1s,7984,Heuristic four nominal row intervals; not proof packets were lost
+requires_investigation,Odometer,odometer_decrease_within_trip,321,"Cumulative distance moves backwards within a trip; reset, decoding or recording error requires investigation"
+requires_investigation,Odometer,odometer_jump_over_1km_within_1s,304,Change inconsistent with ordinary road motion; retained for review
+requires_investigation,HV_Bat_Voltage,voltage_over_500V_review_screen,1,Exploratory threshold for nominal-360V documentation; not a manufacturer limit or fault label

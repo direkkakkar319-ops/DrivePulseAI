@@ -1,0 +1,82 @@
+severity,column,rule,count,interpretation
+definite_schema_issue,header,empty_column_name,1,Pandas supplies an Unnamed alias; original header is preserved in dictionary
+data_availability,Power_SW,constant,2322105,No within-file variation; may be legitimate status
+requires_investigation,Speed,negative_nonnegative_quantity,266235,Possible invalid/unavailable-value code; no automatic replacement
+statistical_observation,Odometer,1.5_IQR_fences,223,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,Odometer,negative_nonnegative_quantity,83431,Possible invalid/unavailable-value code; no automatic replacement
+statistical_observation,RangeKm,1.5_IQR_fences,692,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+data_availability,SWA,all_missing,2322105,No observed values; preserved
+statistical_observation,RPM,1.5_IQR_fences,36,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,SOC,1.5_IQR_fences,24737,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,SOC,outside_0_100_percent,2040,Outside documented percentage scale; not a verified fault
+statistical_observation,SOH,1.5_IQR_fences,2853,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,AHr,1.5_IQR_fences,2041,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Hx,1.5_IQR_fences,2044,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+data_availability,Rear_wiper_level,constant,2322105,No within-file variation; may be legitimate status
+data_availability,Rear_washer,constant,2322105,No within-file variation; may be legitimate status
+statistical_observation,Torque,1.5_IQR_fences,227287,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Motor_Temp,1.5_IQR_fences,18899,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Motor_Pwr,1.5_IQR_fences,151795,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,TP_FR,1.5_IQR_fences,430205,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_FR,negative_nonnegative_quantity,183069,Possible invalid/unavailable-value code; no automatic replacement
+requires_investigation,TP_FR,zero_pressure_or_voltage,244965,Possible unavailable-value code; context needed
+statistical_observation,TP_FL,1.5_IQR_fences,432329,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_FL,negative_nonnegative_quantity,183067,Possible invalid/unavailable-value code; no automatic replacement
+requires_investigation,TP_FL,zero_pressure_or_voltage,247981,Possible unavailable-value code; context needed
+statistical_observation,TP_RR,1.5_IQR_fences,435952,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_RR,negative_nonnegative_quantity,183067,Possible invalid/unavailable-value code; no automatic replacement
+requires_investigation,TP_RR,zero_pressure_or_voltage,251321,Possible unavailable-value code; context needed
+statistical_observation,TP_RL,1.5_IQR_fences,426120,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,TP_RL,negative_nonnegative_quantity,183067,Possible invalid/unavailable-value code; no automatic replacement
+requires_investigation,TP_RL,zero_pressure_or_voltage,242018,Possible unavailable-value code; context needed
+statistical_observation,Quick_Charge,1.5_IQR_fences,357616,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,L1_L2_Charge,1.5_IQR_fences,5090,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Aux_Pwr_100W,1.5_IQR_fences,66004,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,AC_Pwr_250W,1.5_IQR_fences,90710,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,AC_Compressor_Air_pressure,1.5_IQR_fences,1885,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,EstPwr_AC_50W,1.5_IQR_fences,156097,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,EstPwr_Htr_250W,1.5_IQR_fences,93062,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,OBC_Out_Pwr,1.5_IQR_fences,164898,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,HV_Bat_Voltage,1.5_IQR_fences,2141,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,HV_Bat_Voltage,negative_nonnegative_quantity,2134,Possible invalid/unavailable-value code; no automatic replacement
+requires_investigation,HV_Bat_Voltage,zero_pressure_or_voltage,5,Possible unavailable-value code; context needed
+statistical_observation,Insulation,1.5_IQR_fences,60172,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,AC,outside_documented_binary_codes,707240,Retained; may be an undocumented unavailable code
+requires_investigation,RearHeater,outside_documented_binary_codes,2322105,Retained; may be an undocumented unavailable code
+data_availability,RearHeater,constant,2322105,No within-file variation; may be legitimate status
+statistical_observation,Brake,1.5_IQR_fences,671131,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documentation_uncertainty,Brake,unknown_units,2322105,Workbook explicitly questions units; do not call this percent
+statistical_observation,Acc_Pedal,1.5_IQR_fences,67283,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documentation_uncertainty,Acc_Pedal,unknown_units,2322105,Workbook explicitly questions units; do not call this percent
+requires_investigation,ECO,outside_documented_binary_codes,149899,Retained; may be an undocumented unavailable code
+requires_investigation,ePedal,outside_documented_binary_codes,83339,Retained; may be an undocumented unavailable code
+statistical_observation,HV_Bat_Current_1,1.5_IQR_fences,172869,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,HV_Bat_Current_2,1.5_IQR_fences,172133,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Bat_12V_Voltage,1.5_IQR_fences,5109,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Bat_12V_Current,1.5_IQR_fences,455696,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documentation_conflict,Ambient_C_Temp,unit_conflict,2322105,Workbook unit is Celsius but prose says Fahrenheit; no conversion applied
+statistical_observation,Internal_C_Temp,1.5_IQR_fences,117111,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+documented_unavailable,Pack_3_C_Temp,all_missing,2322105,Workbook states pack 3 sensor absent on this Leaf variant
+data_availability,Pack_3_C_Temp,all_missing,2322105,No observed values; preserved
+statistical_observation,Pack_4_C_Temp,1.5_IQR_fences,2469,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,CellMaxVolt,1.5_IQR_fences,73000,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,cDrvPkt,1.5_IQR_fences,300034,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,cLoopPkt,1.5_IQR_fences,40594,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,kWh_Remaining,1.5_IQR_fences,27027,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Horsepower,1.5_IQR_fences,160270,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Instant_kW,1.5_IQR_fences,160270,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Odometer_diff,1.5_IQR_fences,8403,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Speed,1.5_IQR_fences,12887,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Brake,1.5_IQR_fences,211670,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_HV_Bat_Current_2,1.5_IQR_fences,70215,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Torque,1.5_IQR_fences,9366,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Motor_Pwr,1.5_IQR_fences,42618,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Acc_Pedal,1.5_IQR_fences,130632,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Horsepower,1.5_IQR_fences,62999,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Instant_kW,1.5_IQR_fences,62999,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,accu_Odometer_diff,1.5_IQR_fences,407941,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+statistical_observation,Day cos,1.5_IQR_fences,22197,Not evidence of error/fault; zero IQR can flag every departure from the modal value
+requires_investigation,Timestamp,within_trip_gap_over_1s,15825,Heuristic four nominal row intervals; not proof packets were lost
+requires_investigation,Odometer,odometer_decrease_within_trip,202,"Cumulative distance moves backwards within a trip; reset, decoding or recording error requires investigation"
+requires_investigation,Odometer,odometer_jump_over_1km_within_1s,190,Change inconsistent with ordinary road motion; retained for review
+requires_investigation,HV_Bat_Voltage,voltage_over_500V_review_screen,2,Exploratory threshold for nominal-360V documentation; not a manufacturer limit or fault label

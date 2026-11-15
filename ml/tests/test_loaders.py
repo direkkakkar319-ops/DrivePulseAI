@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from src.data.loaders import (
     _assign_tongji_vehicle_splits,
     load_aps,
