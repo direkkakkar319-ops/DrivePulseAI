@@ -28,6 +28,28 @@ separate. Recorded experimental results are not production diagnoses or analyses
 of the active Garage vehicle. See [mobile setup](mobile/README.md) and
 [backend setup](backend/README.md) for details.
 
+## How the application currently connects
+
+```text
+Mobile app ── Firebase ID token ──> FastAPI ──> PostgreSQL
+     │
+     ├── Recorded Nissan Leaf replay (precomputed research scores)
+     └── Demo Insights (illustrative fixtures)
+
+ML preparation and experiments ──> reports/local artifacts
+                                   (no inference API connection yet)
+```
+
+The implemented API flow covers authenticated profile, onboarding, and owned
+vehicle data. Telemetry ingestion, model inference, saved assessments, and
+analysis history are not yet connected. The detailed [API-flow diagram](docs/architecture/api-flow.md)
+and [project map](docs/PROJECT_MAP.md) show the current boundaries and where
+each part of the repository lives.
+
+Docker Compose is optional for ML work and mobile UI development. The current
+Compose file starts local PostgreSQL for backend development; it does not
+containerize FastAPI or model inference. See [backend setup](backend/README.md).
+
 ## Current ML experiment: KIT OBD-II
 
 The current model uses unlabeled OBD-II recordings of a Seat Leon. It predicts
@@ -83,7 +105,10 @@ the repository's software license.
   Theil–Sen trend experiment used an unconfirmed first-crossing proxy and had
   large errors. A stricter two-reading 75% screen confirms no EOL events, so this
   release currently has no defensible supervised RUL target and is not evidence
-  of passenger-EV fleet performance.
+  of passenger-EV fleet performance. A separate exponential trend comparison
+  modestly improved proxy error on later cutoffs within the same two cells, but
+  remains experimental and does not establish new-cell RUL performance; see the
+  [method comparison](ml/reports/modeling/oxford_rul_method_comparison.md).
 - **Tongji EV data:** candidate for vehicle-disjoint SOH experiments; SOH is not
   observed RUL or a future-failure label.
 - **Scania APS and Component X:** heavy-truck datasets. They must not support
@@ -117,6 +142,8 @@ simulator/     Synthetic telemetry tools; not a source of vehicle evidence
 The generated code relationship map is under [`graphify-out/`](graphify-out/).
 Its inferred links are navigation hints and should be checked against source.
 See [`docs/graphify.md`](docs/graphify.md).
+The [ML workspace guide](ml/README.md) maps experiment code, reports, and
+artifacts. The [dataset catalog](data/README.md) records source status and rights.
 
 ## Safety and scope
 
