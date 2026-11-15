@@ -1,0 +1,77 @@
+{
+  "audit_type": "public_metadata_only",
+  "audit_date": "2026-11-13",
+  "source": {
+    "title": "Large-Scale Lithium-Ion Battery Dataset for Real-World New Energy Vehicles",
+    "publisher": "State Key Laboratory of Intelligent Vehicle Safety Technology",
+    "url": "https://ivstskl.changan.com.cn/?p=2697",
+    "associated_paper": "https://doi.org/10.1038/s41467-025-56485-7",
+    "version": "not stated on publisher page"
+  },
+  "publisher_claims": {
+    "vehicles": 300,
+    "vehicle_description": "discontinued fleet electric vehicles; passenger-car body class not specified",
+    "mileage_range_km": [0, 500000],
+    "operating_duration_years": [0.5, 4],
+    "sampling_interval_seconds": 10,
+    "records_approx": 850000000,
+    "compressed_size_gb_approx": 72,
+    "uncompressed_size_gb_approx": 581,
+    "sample_size_mb_advertised": 100,
+    "listed_fields": [
+      "terminaltime",
+      "soc",
+      "speed",
+      "totalodometer",
+      "chargestatus",
+      "totalvoltage",
+      "totalcurrent",
+      "minvoltagebattery",
+      "maxvoltagebattery",
+      "mintemperaturevalue",
+      "maxtemperaturevalue",
+      "batteryvoltage",
+      "probetemperatures"
+    ]
+  },
+  "license_and_access": {
+    "license": "CC BY-NC-SA 4.0",
+    "additional_terms_url": "https://ivstskl.changan.com.cn/?p=2758",
+    "terms_summary": [
+      "scientific research use only",
+      "no commercial use or external services",
+      "redistribution requires authorization"
+    ],
+    "request_form_fields": [
+      "name",
+      "phone",
+      "email",
+      "institution",
+      "use purpose",
+      "acceptance of terms"
+    ],
+    "sample_acquired": false,
+    "sample_acquisition_status": "two official form submission attempts returned HTTP 524; user received no confirmation; no sample acquired; automated retries stopped",
+    "checksum": null
+  },
+  "target_evidence": {
+    "paper_target": "SOH estimation; paper describes SOH labels derived from telemetry with working-condition filtering, SOC correction and ampere-hour integration",
+    "publisher_claimed_research_uses": [
+      "SOH estimation",
+      "RUL prediction",
+      "fault diagnosis"
+    ],
+    "verified_native_rul_target": false,
+    "verified_failure_event_timestamp": false,
+    "verified_censoring_indicator": false,
+    "verified_prediction_horizon": false,
+    "stable_vehicle_id_verified": false,
+    "passenger_car_class_verified": false,
+    "assessment": {
+      "soh": "promising candidate from the associated paper; sample and ID/split audit pending",
+      "rul": "not established by public metadata; require sample evidence of longitudinal target and observed end-of-life/censoring",
+      "future_failure": "not established by public metadata; require event labels, timestamps, cutoff semantics and horizon"
+    }
+  },
+  "raw_data_committed": false
+}

@@ -1,0 +1,8 @@
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+data/
+requirements*.txt
+output.md

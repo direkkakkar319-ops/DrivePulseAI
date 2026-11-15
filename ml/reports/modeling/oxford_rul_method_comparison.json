@@ -1,0 +1,676 @@
+{
+  "dataset": "Oxford Battery Degradation Dataset 1",
+  "source_doi": "10.5287/bodleian:KO2kdmYGg",
+  "target": "unconfirmed first-observed 75% capacity crossing proxy",
+  "protocol": {
+    "development_cutoffs": "as_of_cycle / proxy_crossing_cycle <= 0.6",
+    "holdout_cutoffs": "as_of_cycle / proxy_crossing_cycle > 0.6",
+    "minimum_history_observations": 4,
+    "selection_metric": "mean of per-cell development MAE, missing predictions penalized as zero RUL",
+    "minimum_development_coverage": 0.75,
+    "predictions_use_future_features": false,
+    "holdout_is_cell_disjoint": false
+  },
+  "cells": {
+    "Cell1": {
+      "status": "right_censored",
+      "origins": 0
+    },
+    "Cell2": {
+      "status": "first_crossing_proxy_only",
+      "crossing_cycle": 7400,
+      "candidate_origins": 66
+    },
+    "Cell3": {
+      "status": "right_censored",
+      "origins": 0
+    },
+    "Cell4": {
+      "status": "right_censored",
+      "origins": 0
+    },
+    "Cell5": {
+      "status": "first_crossing_proxy_only",
+      "crossing_cycle": 5000,
+      "candidate_origins": 42
+    },
+    "Cell6": {
+      "status": "right_censored",
+      "origins": 0
+    },
+    "Cell7": {
+      "status": "right_censored",
+      "origins": 0
+    },
+    "Cell8": {
+      "status": "right_censored",
+      "origins": 0
+    }
+  },
+  "selected_method": "exponential_lookback_2000",
+  "selected_method_reason": "lowest macro-cell development MAE among methods with at least 75% development coverage",
+  "selected_temporal_holdout": {
+    "scored_origins": 43,
+    "mae_cycles": 1161.4433262539008,
+    "rmse_cycles": 1452.4416637942338,
+    "median_absolute_error_cycles": 966.6735915780457,
+    "mean_error_cycles": 574.0977594482612
+  },
+  "selected_temporal_holdout_by_cell": {
+    "Cell2": {
+      "scored_origins": 27,
+      "mae_cycles": 560.9040052724475,
+      "rmse_cycles": 719.517327770919,
+      "median_absolute_error_cycles": 495.96388808357733,
+      "mean_error_cycles": -374.49819371431215
+    },
+    "Cell5": {
+      "scored_origins": 16,
+      "mae_cycles": 2174.853430410104,
+      "rmse_cycles": 2189.951366971426,
+      "median_absolute_error_cycles": 2196.461019286773,
+      "mean_error_cycles": 2174.853430410104
+    }
+  },
+  "candidates": {
+    "ols_lookback_500": {
+      "family": "ols",
+      "lookback_cycles": "500",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1182.2245710068296,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1197.4296477349928,
+        "rmse_cycles": 1402.4340781217936,
+        "median_absolute_error_cycles": 1177.2544000658854,
+        "mean_error_cycles": -436.8260720938168
+      },
+      "temporal_holdout_coverage": 0.9069767441860465,
+      "temporal_holdout_metrics": {
+        "scored_origins": 39,
+        "mae_cycles": 1379.9249808579698,
+        "rmse_cycles": 1712.9967681770597,
+        "median_absolute_error_cycles": 1547.257232963485,
+        "mean_error_cycles": 925.9272127748299
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 23,
+          "mae_cycles": 744.5102547253049,
+          "rmse_cycles": 1103.3559726669353,
+          "median_absolute_error_cycles": 363.7470062283253,
+          "mean_error_cycles": -25.312047676540946
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2293.3336496736756,
+          "rmse_cycles": 2324.326353053203,
+          "median_absolute_error_cycles": 2292.8665361364065,
+          "mean_error_cycles": 2293.3336496736756
+        }
+      }
+    },
+    "ols_lookback_1000": {
+      "family": "ols",
+      "lookback_cycles": "1000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1208.8488911297463,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1249.9329433892183,
+        "rmse_cycles": 1485.113584006228,
+        "median_absolute_error_cycles": 1116.1007012417258,
+        "mean_error_cycles": -661.0945853368308
+      },
+      "temporal_holdout_coverage": 0.9534883720930233,
+      "temporal_holdout_metrics": {
+        "scored_origins": 41,
+        "mae_cycles": 1206.0658468859901,
+        "rmse_cycles": 1500.736136831621,
+        "median_absolute_error_cycles": 1232.0470289304506,
+        "mean_error_cycles": 684.2271754693375
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 25,
+          "mae_cycles": 609.79163067904,
+          "rmse_cycles": 844.5835885353068,
+          "median_absolute_error_cycles": 410.2696482763555,
+          "mean_error_cycles": -246.0237904442706
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2137.74430970935,
+          "rmse_cycles": 2157.943626139027,
+          "median_absolute_error_cycles": 2073.0202112517063,
+          "mean_error_cycles": 2137.74430970935
+        }
+      }
+    },
+    "ols_lookback_2000": {
+      "family": "ols",
+      "lookback_cycles": "2000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1206.4306399833515,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1286.1725185292582,
+        "rmse_cycles": 1529.423309247609,
+        "median_absolute_error_cycles": 1173.8762878194789,
+        "mean_error_cycles": -853.9000665397243
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 1080.1439789042038,
+        "rmse_cycles": 1307.8493192306491,
+        "median_absolute_error_cycles": 1026.566531968013,
+        "mean_error_cycles": 425.7112141431595
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 606.4117872656315,
+          "rmse_cycles": 757.9631507122184,
+          "median_absolute_error_cycles": 478.5781813743695,
+          "mean_error_cycles": -435.83298624269855
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1879.5670522942946,
+          "rmse_cycles": 1904.5748127256663,
+          "median_absolute_error_cycles": 1910.7572215871148,
+          "mean_error_cycles": 1879.5670522942946
+        }
+      }
+    },
+    "ols_lookback_all": {
+      "family": "ols",
+      "lookback_cycles": "all",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1235.6250783180856,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1336.2492837569998,
+        "rmse_cycles": 1563.0353417333645,
+        "median_absolute_error_cycles": 1218.8520930487675,
+        "mean_error_cycles": -964.1505886717093
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 938.0955004530565,
+        "rmse_cycles": 1089.5067635411558,
+        "median_absolute_error_cycles": 911.7681480948395,
+        "mean_error_cycles": 170.29069026473252
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 618.0469642128519,
+          "rmse_cycles": 752.8423714417381,
+          "median_absolute_error_cycles": 621.4411547830038,
+          "mean_error_cycles": -604.7532890500346
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1478.177405358402,
+          "rmse_cycles": 1494.5576330694014,
+          "median_absolute_error_cycles": 1488.2517394937493,
+          "mean_error_cycles": 1478.177405358402
+        }
+      }
+    },
+    "theil_sen_lookback_500": {
+      "family": "theil_sen",
+      "lookback_cycles": "500",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1131.535508667882,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1140.542904096204,
+        "rmse_cycles": 1316.458412231469,
+        "median_absolute_error_cycles": 1061.5563753774418,
+        "mean_error_cycles": -320.4710011017995
+      },
+      "temporal_holdout_coverage": 0.8837209302325582,
+      "temporal_holdout_metrics": {
+        "scored_origins": 38,
+        "mae_cycles": 1400.9714154143928,
+        "rmse_cycles": 1822.743265006477,
+        "median_absolute_error_cycles": 1429.1569595927128,
+        "mean_error_cycles": 1051.4491927888491
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 22,
+          "mae_cycles": 685.8775436989946,
+          "rmse_cycles": 1210.934384796976,
+          "median_absolute_error_cycles": 281.86175093551253,
+          "mean_error_cycles": 82.15734098214695
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2384.2254890230647,
+          "rmse_cycles": 2423.7234852929037,
+          "median_absolute_error_cycles": 2406.5615711478204,
+          "mean_error_cycles": 2384.2254890230647
+        }
+      }
+    },
+    "theil_sen_lookback_1000": {
+      "family": "theil_sen",
+      "lookback_cycles": "1000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1130.810400664915,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1170.0262443265358,
+        "rmse_cycles": 1369.0287118815615,
+        "median_absolute_error_cycles": 1090.289100527188,
+        "mean_error_cycles": -554.8707930755445
+      },
+      "temporal_holdout_coverage": 0.9534883720930233,
+      "temporal_holdout_metrics": {
+        "scored_origins": 41,
+        "mae_cycles": 1463.0609914049091,
+        "rmse_cycles": 1974.7184706785433,
+        "median_absolute_error_cycles": 1626.2610816670124,
+        "mean_error_cycles": 1099.4452035687316
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 25,
+          "mae_cycles": 1011.6025525864735,
+          "rmse_cycles": 1825.9495507234496,
+          "median_absolute_error_cycles": 424.9515634677475,
+          "mean_error_cycles": 415.27266053514256
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2168.4648020587147,
+          "rmse_cycles": 2187.0033797887695,
+          "median_absolute_error_cycles": 2140.388832302063,
+          "mean_error_cycles": 2168.4648020587147
+        }
+      }
+    },
+    "theil_sen_lookback_2000": {
+      "family": "theil_sen",
+      "lookback_cycles": "2000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1142.7575426176627,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1213.0435231575839,
+        "rmse_cycles": 1399.435990262063,
+        "median_absolute_error_cycles": 1108.6238246592766,
+        "mean_error_cycles": -712.6109058575967
+      },
+      "temporal_holdout_coverage": 0.9767441860465116,
+      "temporal_holdout_metrics": {
+        "scored_origins": 42,
+        "mae_cycles": 1032.7491203467364,
+        "rmse_cycles": 1282.2117919549853,
+        "median_absolute_error_cycles": 861.1388493909369,
+        "mean_error_cycles": 499.1190083295481
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 26,
+          "mae_cycles": 508.3063391068421,
+          "rmse_cycles": 640.9076522621227,
+          "median_absolute_error_cycles": 463.6426479454838,
+          "mean_error_cycles": -353.7115341516929
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1884.9686398615645,
+          "rmse_cycles": 1910.0227297250551,
+          "median_absolute_error_cycles": 1899.8363599962145,
+          "mean_error_cycles": 1884.9686398615645
+        }
+      }
+    },
+    "theil_sen_lookback_all": {
+      "family": "theil_sen",
+      "lookback_cycles": "all",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1189.4933056385073,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1270.6794738912206,
+        "rmse_cycles": 1436.3290290076714,
+        "median_absolute_error_cycles": 1120.7306586081504,
+        "mean_error_cycles": -776.4589970257238
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 949.1631046926143,
+        "rmse_cycles": 1104.2972922589188,
+        "median_absolute_error_cycles": 938.6842844895828,
+        "mean_error_cycles": 183.65427283760584
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 616.5238530414085,
+          "rmse_cycles": 749.4218879900409,
+          "median_absolute_error_cycles": 606.6787084126781,
+          "mean_error_cycles": -602.6198421350864
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1510.4918418540237,
+          "rmse_cycles": 1526.2949917472802,
+          "median_absolute_error_cycles": 1517.0060978143124,
+          "mean_error_cycles": 1510.4918418540237
+        }
+      }
+    },
+    "weighted_ols_lookback_500": {
+      "family": "weighted_ols",
+      "lookback_cycles": "500",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1177.6008368783853,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1191.665276126034,
+        "rmse_cycles": 1393.7611459033305,
+        "median_absolute_error_cycles": 1161.3041026008332,
+        "mean_error_cycles": -426.5265766310306
+      },
+      "temporal_holdout_coverage": 0.9302325581395349,
+      "temporal_holdout_metrics": {
+        "scored_origins": 40,
+        "mae_cycles": 88866.20231715766,
+        "rmse_cycles": 553567.0896944936,
+        "median_absolute_error_cycles": 1656.0327627542404,
+        "mean_error_cycles": 88430.04147929032
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 24,
+          "mae_cycles": 146578.82041470686,
+          "rmse_cycles": 714649.5107828585,
+          "median_absolute_error_cycles": 390.3263253412144,
+          "mean_error_cycles": 145851.88568492795
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2297.2751708338674,
+          "rmse_cycles": 2328.5379125808163,
+          "median_absolute_error_cycles": 2303.778612531627,
+          "mean_error_cycles": 2297.2751708338674
+        }
+      }
+    },
+    "weighted_ols_lookback_1000": {
+      "family": "weighted_ols",
+      "lookback_cycles": "1000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1191.206674458255,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1230.7815698534546,
+        "rmse_cycles": 1463.4632943932502,
+        "median_absolute_error_cycles": 1121.1785522639448,
+        "mean_error_cycles": -632.251822592838
+      },
+      "temporal_holdout_coverage": 0.9767441860465116,
+      "temporal_holdout_metrics": {
+        "scored_origins": 42,
+        "mae_cycles": 2266.646741706304,
+        "rmse_cycles": 7073.594492777471,
+        "median_absolute_error_cycles": 1348.909822266241,
+        "mean_error_cycles": 1769.8169942930565
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 26,
+          "mae_cycles": 2337.094417736752,
+          "rmse_cycles": 8827.396442587265,
+          "median_absolute_error_cycles": 431.50190203132456,
+          "mean_error_cycles": 1534.5232872999663
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2152.1692681568265,
+          "rmse_cycles": 2172.3390792949767,
+          "median_absolute_error_cycles": 2083.396570147652,
+          "mean_error_cycles": 2152.1692681568265
+        }
+      }
+    },
+    "weighted_ols_lookback_2000": {
+      "family": "weighted_ols",
+      "lookback_cycles": "2000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1191.1473149046356,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1262.8107400261295,
+        "rmse_cycles": 1494.7218972342528,
+        "median_absolute_error_cycles": 1143.77973981503,
+        "mean_error_cycles": -792.6825993135858
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 1082.0924449592628,
+        "rmse_cycles": 1333.552366954448,
+        "median_absolute_error_cycles": 1054.60108303104,
+        "mean_error_cycles": 454.69790855482285
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 580.2342538514939,
+          "rmse_cycles": 757.8356487723647,
+          "median_absolute_error_cycles": 443.9909429218977,
+          "mean_error_cycles": -418.94963745928084
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1928.9781424536231,
+          "rmse_cycles": 1951.971132883463,
+          "median_absolute_error_cycles": 1949.895585009605,
+          "mean_error_cycles": 1928.9781424536231
+        }
+      }
+    },
+    "weighted_ols_lookback_all": {
+      "family": "weighted_ols",
+      "lookback_cycles": "all",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1215.3347336126637,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1301.8777092006237,
+        "rmse_cycles": 1517.1380356372192,
+        "median_absolute_error_cycles": 1170.0977509927252,
+        "mean_error_cycles": -871.9178353875227
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 970.6784215799732,
+        "rmse_cycles": 1158.7030135891048,
+        "median_absolute_error_cycles": 921.2928489211743,
+        "mean_error_cycles": 253.51028081275751
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 581.6282574362223,
+          "rmse_cycles": 730.5665768569023,
+          "median_absolute_error_cycles": 531.7715813864559,
+          "mean_error_cycles": -560.5284111930473
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1627.200573572553,
+          "rmse_cycles": 1645.464255198385,
+          "median_absolute_error_cycles": 1640.9255131734171,
+          "mean_error_cycles": 1627.200573572553
+        }
+      }
+    },
+    "exponential_lookback_500": {
+      "family": "exponential",
+      "lookback_cycles": "500",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1173.8503052971823,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1119.5821517370257,
+        "rmse_cycles": 1317.773885130271,
+        "median_absolute_error_cycles": 960.5577376099659,
+        "mean_error_cycles": 0.8902838125897268
+      },
+      "temporal_holdout_coverage": 0.9069767441860465,
+      "temporal_holdout_metrics": {
+        "scored_origins": 39,
+        "mae_cycles": 1485.3310978831844,
+        "rmse_cycles": 1845.7696853278687,
+        "median_absolute_error_cycles": 1785.527114304713,
+        "mean_error_cycles": 1047.039579891915
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 23,
+          "mae_cycles": 759.3419389579416,
+          "rmse_cycles": 1112.6825024268517,
+          "median_absolute_error_cycles": 382.79394003792504,
+          "mean_error_cycles": 16.151973668398913
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2528.9405138382203,
+          "rmse_cycles": 2554.314113440974,
+          "median_absolute_error_cycles": 2570.4511674454134,
+          "mean_error_cycles": 2528.9405138382203
+        }
+      }
+    },
+    "exponential_lookback_1000": {
+      "family": "exponential",
+      "lookback_cycles": "1000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1121.7775245014432,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1098.7083437459353,
+        "rmse_cycles": 1323.5985374444078,
+        "median_absolute_error_cycles": 939.675119508759,
+        "mean_error_cycles": -211.09314211598158
+      },
+      "temporal_holdout_coverage": 0.9534883720930233,
+      "temporal_holdout_metrics": {
+        "scored_origins": 41,
+        "mae_cycles": 1306.7749838318362,
+        "rmse_cycles": 1640.6063320373128,
+        "median_absolute_error_cycles": 1195.159605568978,
+        "mean_error_cycles": 816.1117027564937
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 25,
+          "mae_cycles": 611.513822016692,
+          "rmse_cycles": 841.8756994219087,
+          "median_absolute_error_cycles": 428.4550060924139,
+          "mean_error_cycles": -193.17395894686925
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2393.1205491679984,
+          "rmse_cycles": 2406.193665231845,
+          "median_absolute_error_cycles": 2318.1897873751977,
+          "mean_error_cycles": 2393.1205491679984
+        }
+      }
+    },
+    "exponential_lookback_2000": {
+      "family": "exponential",
+      "lookback_cycles": "2000",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1108.27342901246,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1115.9898354126015,
+        "rmse_cycles": 1307.340925279327,
+        "median_absolute_error_cycles": 974.6204732786991,
+        "mean_error_cycles": -371.3070384924399
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 1161.4433262539008,
+        "rmse_cycles": 1452.4416637942338,
+        "median_absolute_error_cycles": 966.6735915780457,
+        "mean_error_cycles": 574.0977594482612
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 560.9040052724475,
+          "rmse_cycles": 719.517327770919,
+          "median_absolute_error_cycles": 495.96388808357733,
+          "mean_error_cycles": -374.49819371431215
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 2174.853430410104,
+          "rmse_cycles": 2189.951366971426,
+          "median_absolute_error_cycles": 2196.461019286773,
+          "mean_error_cycles": 2174.853430410104
+        }
+      }
+    },
+    "exponential_lookback_all": {
+      "family": "exponential",
+      "lookback_cycles": "all",
+      "development_coverage": 1.0,
+      "selection_score_macro_cell_mae_cycles": 1124.5879469434874,
+      "development_metrics": {
+        "scored_origins": 65,
+        "mae_cycles": 1148.7002508951032,
+        "rmse_cycles": 1307.1872603381337,
+        "median_absolute_error_cycles": 1044.3656115981566,
+        "mean_error_cycles": -456.5494298360159
+      },
+      "temporal_holdout_coverage": 1.0,
+      "temporal_holdout_metrics": {
+        "scored_origins": 43,
+        "mae_cycles": 1004.6986079943364,
+        "rmse_cycles": 1243.4217664910543,
+        "median_absolute_error_cycles": 749.1682060664671,
+        "mean_error_cycles": 385.80743597828405
+      },
+      "temporal_holdout_by_cell": {
+        "Cell2": {
+          "scored_origins": 27,
+          "mae_cycles": 501.958028055209,
+          "rmse_cycles": 639.0810794486138,
+          "median_absolute_error_cycles": 459.6637859087065,
+          "mean_error_cycles": -483.683468118504
+        },
+        "Cell5": {
+          "scored_origins": 16,
+          "mae_cycles": 1853.0733366416139,
+          "rmse_cycles": 1861.6984137232057,
+          "median_absolute_error_cycles": 1857.4855298729162,
+          "mean_error_cycles": 1853.0733366416139
+        }
+      }
+    }
+  },
+  "limitations": [
+    "All candidate metrics use the unconfirmed first-crossing proxy, not confirmed EOL labels.",
+    "Only two cells provide proxy crossings; temporal holdout origins are not independent cells.",
+    "The two-reading 75% screen confirms no EOL events in this release.",
+    "Selection/holdout measure within-cell temporal behavior only and do not establish new-cell generalization.",
+    "No passenger-EV field-RUL or service-life claim is supported."
+  ]
+}

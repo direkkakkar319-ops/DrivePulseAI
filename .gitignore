@@ -22,9 +22,23 @@ htmlcov/
 # Data & Model Artifacts
 data/raw/*
 !data/raw/README.md
+# External audit datasets are kept out of commits; provenance and checksums
+# belong in the Markdown audit reports. Keep only per-release README metadata.
+data/automotive_prognostics/**
+!data/automotive_prognostics/**/
+!data/automotive_prognostics/**/README.md
+# KIT raw inputs are locally retained; generated feature windows are local-only.
+data/automotive_obd/kit_obd/processed/
+# Existing 20-car source-release bundle is retained locally for audit only.
+data/automotive_prognostics/onroad_ev_capacity/source_release/**
 ml/artifacts/*
 !ml/artifacts/.gitkeep
 mlruns/
+
+# Graphify's incremental cache is machine-local; tracked snapshots live in graphify-out/.
+graphify-out/cache/
+graphify-out/**/cost.json
+graphify-out/.cloud-cta-shown
 
 # Node & Frontend
 node_modules/

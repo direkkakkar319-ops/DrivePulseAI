@@ -1,0 +1,509 @@
+# Tasks done and verification log
+
+This log records the ordered work and verification. Status labels distinguish verified results from open work. Earlier audit notes record the initial shared seed helper; that unused helper was later removed and documented below. Acquired source archives are unchanged downloads under `data/automotive_prognostics/scania_component_x/v3/raw/`, `data/automotive_prognostics/onroad_ev_capacity/source_release/`, and `data/automotive_prognostics/ev_fault_347/v1/raw/`.
+
+## KIT forecast-based novelty model — 2026-11-14
+
+- Trains next-window forecasting on KIT sensor summaries. Pairs stay within
+  recording/segment/date. Model choices use a training-date holdout; later
+  training dates calibrate the residual scales and threshold.
+- The selected hybrid forecasts improve test MAE vs XGBoost on five signals,
+  worsen two, and tie three. Max aggregation, selected using validation synthetic
+  sensitivity, gives 1.48% validation and 2.29% test novelty rates.
+- Max scores flagged 97.6% of 10x-scale synthetic sensor shifts on validation
+  (RMS: 92.2%). This is artificial perturbation sensitivity only; KIT lacks fault
+  labels, so no real fault metrics or diagnostic claim is supported.
+- Detailed split, per-signal results, RMS comparison, and limitations are in
+  `ml/reports/modeling/kit_xgb_forecast_baseline.*`. Artifact remains ignored.
+
+## Oxford preprocessing and RUL-target EDA — 2026-11-14
+
+- Reran `ml/scripts/preprocess_oxford_battery.py` from the retained original MAT
+  file. It reproduced 519 characterization rows across eight cells; no raw
+  source files changed.
+- Added reproducible `ml/scripts/eda_oxford_battery.py`, JSON audit output, and
+  [`ml/reports/eda/oxford_battery_eda.md`](ml/reports/eda/oxford_battery_eda.md).
+- Under the exploratory 75%-of-first-capacity rule, 116 rows have derived RUL and
+  403 rows are unlabeled/censored/post-crossing. Cell2's first crossing at cycle
+  7,400 recovers above threshold at 7,500 and 7,600; the source curve is shorter
+  than its neighbors. Cell5's crossing occurs only at its last record.
+- No cell has two consecutive below-threshold observations from its first
+  crossing. This is a diagnostic, not an official EOL rule. The target remains
+  ambiguous and meaningful cell-disjoint RUL evaluation is unsupported with
+  only two nominal event cells.
+
+## Oxford Theil–Sen RUL trend prototype — 2026-11-14
+
+- Chose a per-cell Theil–Sen capacity-trend extrapolator instead of XGBoost or a
+  pooled learned regressor because there are only two nominal event cells and
+  the target crossings are questionable. Theil–Sen gives an interpretable local
+  slope and is less sensitive to single noisy capacity points.
+- Implemented `TheilSenCapacityTrendRUL` in `ml/src/models/rul_regressor.py`. At
+  each cutoff it uses only that cell's prior 1,000 drive-cycle history (minimum
+  four observations) and projects the capacity slope to the exploratory 75%
+  threshold. It is a per-cell rule, not a transferable global model.
+- Added `ml/scripts/evaluate_oxford_rul_trend.py` and modeling reports. A
+  rolling-origin backtest over 107 correlated origins produced pooled MAE
+  1,419 cycles and RMSE 2,406 cycles. Cell2 MAE was 1,426 cycles; Cell5 MAE was
+  1,408 cycles, with opposite bias directions. These results are poor and do
+  not establish generalization to new cells.
+- No target smoothing, SMOTE, or random row split was used. No production model
+  or passenger-EV claim is supported. The baseline is being included with the
+  Oxford EDA PR for review; do not merge without user approval.
+
+## Oxford EOL rule audit — 2026-11-14
+
+- Researched battery EOL criteria. A 2024 review says mobile-application EOL
+  capacity cutoffs are commonly 70–80% and depend on manufacturer/use case
+  ([Paarmann et al.](https://doi.org/10.1002/batt.202300594)); the Oxford release
+  does not define its own cutoff. Kept 75% explicitly exploratory.
+- Added a separate conservative screen requiring two consecutive
+  characterizations at or below 75%. This is a transparent project convention,
+  not an official or universal EOL rule. Kept first-crossing labels only for
+  reproducing the historical exploratory baseline.
+- Updated preprocessing to write the persistent-rule target separately and the
+  EDA audit to count confirmed events. Reran both against the local source:
+  519 rows / 8 cells reproduced, with **0 confirmed persistent events and 0
+  persistent-rule RUL labels**. The historical proxy still has 116 rows in two
+  cells, but it is unconfirmed and is not treated as ground truth.
+- Updated the Oxford EDA/model reports, dataset READMEs, README, datasets,
+  progress, scope, remaining-work notes, and this local `agent_context.md` to
+  explain the rule choice and why. This prevents users from mistaking proxy
+  metrics for confirmed EOL model evaluation.
+- Result: the Oxford release currently has no defensible supervised RUL target.
+  Next assess event-cell sufficiency and evaluation feasibility; do not fit a
+  supervised regressor to these labels as if confirmed.
+
+### Step 2 — Check whether there are enough independent event cells
+
+- Deep-reviewed battery RUL evaluation practice. A peer-reviewed LOCO study
+  explains that cycle-level splits can leak a cell's autocorrelated trajectory
+  and uses whole-cell partitions to assess new-cell generalization
+  ([Scientific Reports](https://www.nature.com/articles/s41598-026-58379-0)).
+- Verified the regenerated audit: the selected persistent rule yields **0
+  confirmed event cells and 0 supervised RUL examples**. The historical
+  unconfirmed first-crossing proxy has only two event cells (Cell2, Cell5).
+- Conclusion: this Oxford release cannot supply independent train, validation,
+  and test cells with the selected target. SMOTE cannot manufacture real EOL
+  events or independent cell trajectories; it is not a remedy for this gap.
+- Updated `ml/reports/eda/oxford_battery_eda.md` and `remaining.md` to record
+  the evidence and prioritize a better labeled source. Next is Step 3: document
+  the evaluation protocol and explicitly mark it infeasible on this release.
+
+### Step 3 — Define leakage-safe evaluation and feasibility
+
+- Protocol: split by whole cell before windowing; fit preprocessing only on
+  training cells; use validation cells for model selection; freeze the model and
+  evaluate once on held-out cells. Report per-cell errors and cell-level spread.
+  LOCO is suitable only when each fold retains enough independent event cells.
+- Research basis: published Oxford RUL work uses leave-one-cell-out to measure
+  unseen-cell generalization and explicitly avoids cycle splits because the
+  same cell trajectories can leak across splits (link in EDA report).
+- Feasibility check: this release has zero confirmed events. On the two-cell
+  first-crossing proxy, holding one event cell out leaves one event cell for
+  training and none for independent validation/uncertainty. The old rolling
+  origins are same-cell diagnostics, not cross-cell evaluation.
+- Updated the EDA and model reports to distinguish those protocols and state
+  why the proper one cannot be executed here. No metric is being presented as
+  unseen-cell performance. Next is Step 4: clarify baseline comparisons and
+  honest error/uncertainty reporting for any future eligible dataset.
+
+### Step 4 — Baselines, errors, and uncertainty
+
+- Researched evaluation practice: battery RUL frameworks report cell-disjoint
+  errors and caution that uncertainty intervals must also be assessed at the
+  independent-cell level ([censor-aware framework](https://www.mdpi.com/2313-0105/12/11/484)).
+- Audited existing report: it already reports MAE, RMSE, and signed mean error
+  for each of Cell2 and Cell5. Its 107 origins are repeated points from only two
+  cells; no valid cell-level confidence interval can be estimated. The persistent
+  target has no examples, and the first-crossing proxy cannot validate EOL.
+- Documented that future comparisons should include a training-cell median-RUL
+  baseline and causal capacity-trend baseline under identical held-out-cell
+  folds; include MAE/RMSE/median absolute error/bias per cell, and interval
+  coverage plus width when uncertainty estimates are available. Do not treat
+  rolling origins as independent for bootstrap uncertainty.
+- Updated EDA and historical model reports. No proxy-only extra benchmark was
+  fitted, because the user has not selected the unconfirmed proxy for a demo.
+  Next is Step 5: research and identify better EOL-labeled data or record the
+  exact acquisition requirements.
+
+## Step 0 — Setup and baseline
+
+**Status: ✅ Done and verified in the existing local environment.**
+
+- Created branch `pipeline/data-and-training` from `9d79a59`.
+- Recorded host capacity: WSL2 Linux x86_64, Python 3.12.3, 12 CPUs, 15 GiB RAM, 175 GiB free.
+- Used the existing root `.venv`; system Python was not used for ML imports because it lacks NumPy/pandas/scikit-learn/XGBoost. The `.venv` versions are recorded in `ml/requirements.lock.txt`.
+- Ran `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **41 passed in 8.15 seconds**.
+- Added `ml/src/reproducibility.py` with `GLOBAL_SEED = 42` and optional PyTorch seeding. MLflow remains unavailable in `.venv`; it is listed in `ml/requirements.txt`, while `ml/src/training/mlflow_utils.py` is currently a comment-only stub. No experiment run was created.
+- Step 0 gate: **pass** for the existing environment and mapped data layout. Step 1 dataset validation is not started.
+
+## Step 1 — Verify Component X release, terms, targets and joins
+
+**Status: ✅ Done and verified against the official publisher record and documentation.**
+
+- Reviewed the [SND catalogue record](https://researchdata.se/en/catalogue/dataset/2024-34), [final dataset paper](https://doris.snd.se//api/file/2024-34/3/documentation?filePath=Scania_Component_X.pdf), and [IDA challenge documentation](https://api.researchdata.se/dataset/2024-34/1/file/documentation?filePath=2024_IDA_challenge_v2.pdf).
+- Current release is **v3**, DOI [10.5878/bnh5-ka77](https://doi.org/10.5878/bnh5-ka77); catalogue says open access and **CC BY 4.0**. Version 2 DOI is 10.5878/jvb5-d390; v3 replaces the manuscript with the final paper.
+- Source is real-world **Scania heavy-duty truck** data for one anonymized component. It is not passenger-car data and does not identify a named engine/clutch/brake subsystem.
+- `vehicle_id` is the cross-file join key. `train_tte.csv` columns are `vehicle_id,length_of_study_time_step,in_study_repair`; `in_study_repair=1` means a repair/replacement was observed by study end, while 0 means no observed event by study end (right-censored), not exact RUL. Validation/test `class_label` values 0–4 encode event lead-time bands; class 0 groups >48 time units and no observed event. Therefore `class_label > 0` is not a fully observed binary label for every unit.
+- Publisher docs describe vehicle-disjoint 70/15/15 train/validation/test partitioning, irregular operational readings and anonymized counter/bin features. The target is suitable for a truck-component time-to-event study, subject to censoring-aware methods.
+
+## Step 2 — Acquire and audit Component X v3 source files
+
+**Status: ✅ Done and verified.**
+
+- Acquired nine CSV files and two publisher documentation PDFs individually from the versioned official endpoint `https://scania.open.care.snd.se/downloads/public/2024-34/3/data/` and `/documentation/` into `data/automotive_prognostics/scania_component_x/v3/raw/`.
+- A bulk ZIP attempt stalled and was rejected. The large training CSV was fetched in HTTP byte ranges and reconstructed to the publisher-reported exact byte size. Individual raw files were not transformed or edited. Publisher `Content-Length` matched all local sizes listed below.
+- Streamed schema and key audit: train ops 1,122,452 rows × 107 columns, 23,550 unique vehicles; validation ops 196,227 × 107, 5,046 vehicles; test ops 198,140 × 107, 5,045 vehicles. Train/validation/test specifications have 9 columns. TTE has 3 columns; validation/test labels have 2. No malformed records or within-file time-order breaks were reported by the audit script.
+- All operational vehicle ID sets exactly match their same-split specification and TTE/label ID sets; no unmatched keys. Train, validation and test vehicle IDs are pairwise disjoint. Train TTE records: 21,278 observed repairs, 2,272 censored. Validation labels: class counts 0=4,910; 1=16; 2=14; 3=30; 4=76. Test: 0=4,903; 1=26; 2=15; 3=41; 4=60. This is highly imbalanced.
+- Sizes and SHA-256 checksums:
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `2024_IDA_challenge_v2.pdf` | 231,630 | `b4261fe713811c9f3c02fe95d01b56f756c181ebec7b1277df36f7fdaeffb87f` |
+| `Scania_Component_X.pdf` | 3,283,883 | `b8450509bc4b11c6a47a70e56cc37b4aaf1a40e6ebcaeef67477c79691123610` |
+| `test_labels.csv` | 38,682 | `60f923051d4ba1bef4c81166cf9e8ca01daf3b7a29c73016c6f48a23dcfa0223` |
+| `test_operational_readouts.csv` | 214,897,259 | `81f2709cd339e0ff561f5fd3188d7f431680e32400bd788814880d7759615ba1` |
+| `test_specifications.csv` | 231,658 | `40ac8a111f6d5b416107ec1786f639766ecf1293a1c9c0c0dbf24f14c1c5d0e7` |
+| `train_operational_readouts.csv` | 1,219,209,878 | `e01cb0bd87dfab4c9dbad215d51d81282fc0d413be96d6f819ea872fb7a3c715` |
+| `train_specifications.csv` | 1,081,118 | `47cc9a67aee19d5e2ee8620fe8e467490b2125bacc7787ce781ce9f3c1f0c38f` |
+| `train_tte.csv` | 345,412 | `d8c2379ed7c95a575dd869730b2b3b96d660317f49e57de300518ff3b08d53a5` |
+| `validation_labels.csv` | 38,742 | `ad876c95c3696f4cfca2d76212ad6bb3cac6b2d2950a4aeaf218ee8b1548d08c` |
+| `validation_operational_readouts.csv` | 215,593,159 | `1e1597eec866588c2ad95eb923555ad719c64b3697d9140f9cec6809349809af` |
+| `validation_specifications.csv` | 231,765 | `a31e832846538dd7a1829108b69420d9377dcd05d6446d8ac1270a974fc58ae2` |
+
+- Audit implementation was temporary and outside the repository (`/tmp/audit_component_x_v3.py`). No training was run. Raw data acquisition succeeded; the data’s domain suitability for this product did not.
+
+## Step 3 — Freeze project domain and data-contract direction
+
+**Status: ✅ Domain frozen; detailed car data contract remains open.**
+
+- User decision: **cars only**, interpreted as passenger cars including passenger EVs. Trucks, buses, aircraft, industrial machines and surrogate-domain data cannot be included in a DrivePulseAI car performance claim.
+- Component X v3 is a successful acquisition/audit, but is **out of scope for training or validating this project’s car models** because the publisher documents heavy-duty Scania truck data. Keep it only as a separately named external truck benchmark if useful.
+- Do not start a Component X RUL baseline for this car project. The project still needs verified passenger-car/EV failure and degradation labels. KIT OBD remains eligible only for unsupervised car telemetry anomaly exploration; Scania APS remains an independent truck classification benchmark.
+- Scope requirements and gaps were updated in `scope.md`, `progress.md`, `remaining.md` and `datasets.md`. Data contract choices still needed: first supported car subsystem, feature schema, RUL unit/health-score mapping, failure horizon, and label/censoring semantics.
+
+## Dataset-to-model exclusions after the cars-only scope freeze
+
+Unsuitable model/dataset pairings have been removed from the active assignment list. The audit findings remain in `datasets.md` as evidence of why they were excluded. Current assignments are listed under “Active model-to-dataset assignments after exclusions” below.
+
+## Step 4 — Acquire and audit a passenger-EV capacity-history candidate
+
+**Status: 🟡 Acquired and schema-audited; not approved for RUL training.**
+
+- Source: [BatICM repository](https://github.com/BatICM/battery-charging-data-of-on-road-electric-vehicles), pinned snapshot commit [`36fef4bd99f626561e2d138a40ccff3d1f3ddfc2`](https://github.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/commit/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2), dated 2025-03-31. The author README identifies 20 BAIC EU500 commercial EVs with CATL NCM packs and about 29 months of records, and says capacity extraction code is provided.
+- Downloaded the 20 original `.rar` archives, `README.md`, `LICENSE`, and `Supplementary materials.pdf` into `data/automotive_prognostics/onroad_ev_capacity/source_release/`. The 20 archives total 230,024,681 bytes; all 23 selected files total 230,785,574 bytes. Local byte sizes and Git blob IDs match GitHub’s tree API at the pinned commit. SHA-256 values follow below.
+- Inspected all archive listings (one CSV per vehicle) and streamed every CSV using a temporary `bsdtar` binary extracted under `/tmp`; no project files were changed by extraction. Audit result: **20 vehicles, 16,100,728 rows total**, 11 columns per CSV: row number, `record_time`, `soc`, `pack_voltage (V)`, `charge_current (A)`, `max_cell_voltage (V)`, `min_cell_voltage (V)`, `max_temperature (℃)`, `min_temperature (℃)`, `available_energy (kw)`, and `available_capacity (Ah)`. No missing cells and no within-chunk exact duplicate rows were observed. The row-number/vehicle-file relationship gives unit identity; no official train/validation/test split is provided.
+- The per-vehicle record counts are: #1 854,591; #2 841,810; #3 802,918; #4 844,537; #5 832,189; #6 815,202; #7 808,770; #8 798,496; #9 792,060; #10 728,849; #11 809,470; #12 825,533; #13 818,352; #14 793,132; #15 704,958; #16 819,567; #17 767,868; #18 856,192; #19 778,745; #20 807,489.
+- Timestamps range approximately 2019-07-22/26 through 2021-11-15/16. Raw record sampling is timestamped but irregular; the source code splits charging segments where the next timestamp gap exceeds 10 seconds.
+- Target audit: the maintainer’s `capacity_extract.py` maps fields and calculates charge capacity by integrating charge current over elapsed seconds, then dividing by SOC change. This is a **derived per-charge capacity estimate**, computed from the same charge window; it is not an independently observed failure or end-of-life time. Use only as a candidate for future capacity/SOH forecasting with strict past-to-future cutoffs. It does not currently support a valid observed-RUL baseline or failure classifier.
+- Rights audit: the repository contains an MIT LICENSE, but its text grants rights to the “Software and associated documentation files”; the author README says the data are publicly available but does not provide a separate data license. **Data reuse/redistribution rights remain unverified.** Keep the source files quarantined from training and public redistribution until clarified.
+- No model was trained. A simple RUL baseline is blocked because neither an EOL event nor an agreed EOL threshold/follow-up label is present. Forecasting future capacity would be a different, potentially feasible baseline after data rights and scope are decided.
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `#1.rar` | 12,238,871 | `2e77a7836f441f5f45ae0b2e2116044fa3c4191d67377e89a126562743afc443` |
+| `#10.rar` | 10,508,142 | `cc89ed52f23db5322fccd978cb489826796312c8fa999a6f733d9ebd719f919d` |
+| `#11.rar` | 11,539,660 | `658dff42f3ee690dbe55379887cceffb5be667ecc08136ebba80020f4ef66f0a` |
+| `#12.rar` | 11,883,835 | `f6c8bc2ba4bdc8893cbe2e1a58a6f215ff26aff3f5659bbeb13d9f9e8db1bab4` |
+| `#13.rar` | 11,474,175 | `3ae4e287f051dc718b8c9049b51b5d9ab0debfbe1d8951f02c8aac8795413408` |
+| `#14.rar` | 11,377,770 | `0964797a9574c75f0d93c1c05192a2a406a57330cccbfc88ec0258c1ab70109b` |
+| `#15.rar` | 10,013,220 | `d8b4468bd9199a6d281513d2fedb699456a8ef62a77530c30f3632ae5fbd6aa3` |
+| `#16.rar` | 11,805,417 | `156a3650976c60283e5ad83f9bb6f9c3492c4248ade1a8d172097dff03ab9df2` |
+| `#17.rar` | 10,922,855 | `70da9fc2225519cd26025aeb26a58d603ba310165475a8b054847a6afed57ccb` |
+| `#18.rar` | 12,046,848 | `da97555e3e3f0dbb1adb72b2f846a9bb7c99d52bcfcfa2eb7c87645106fba85d` |
+| `#19.rar` | 11,188,518 | `0527ebd3eb2721bc16a30fbd0731336edd48c49e6ae886ed80289af62f41bd12` |
+| `#2.rar` | 12,088,035 | `52e008eb067e6072016ac98f580e3230480236d67c211404f0d62f44ce3a9421` |
+| `#20.rar` | 11,502,515 | `37b48debf7b89151bd7a01a96e4c870df0c8aafa7ff48d08fcaf42914c239e31` |
+| `#3.rar` | 11,451,253 | `1cb5d824602929662e09cb0a028a43258fa85055865391e906049df28e9a0ea5` |
+| `#4.rar` | 12,084,749 | `df2aa25c7bd471a97d3f997cc8e17f171940138dc161a4e49dc370aaf1257d7c` |
+| `#5.rar` | 11,888,317 | `16b67a98bbdcb8df7f1727ccdf36e68b9eabb209d9bf2707ae921db489bad1ac` |
+| `#6.rar` | 11,663,814 | `847b207bea6d5a60fdd92c208b32c8aff7575257e316de663ea7f9bf63642477` |
+| `#7.rar` | 11,606,222 | `3ac79b584d43d54af1d9583c269fd35d1a5a86bb2ef0af64b61dabdb1528baf6` |
+| `#8.rar` | 11,507,641 | `4603f6ca0405bb6356401060215ac39bda06eb70b35f0dfe1a88cafe4c7a9b52` |
+| `#9.rar` | 11,232,824 | `a3392323136fe7e0ff5e8db9f5a874d19b68693fa7865dc0082f522290a8a70f` |
+| `LICENSE` | 1,069 | `424f4b69ace5e11d273d7be9ac0e714a3c930ff761b2fd276f5c1699b7ba4c15` |
+| `README.md` | 1,092 | `f317feaec92d2f17a51d7a55baa3efd57a96d715552eb0b8165d1ae604d286fa` |
+| `Supplementary materials.pdf` | 758,732 | `75524b7776168a2ffb2842ad9683a156bb2d1029618b99cf26df6e13b150e8f2` |
+
+## Active model-to-dataset assignments after exclusions
+
+Only datasets with at least limited task fit are retained in these assignments. ❌ dataset/model pairs from the previous assessment are omitted. This is a model assignment decision; raw audit evidence is retained pending your decision on file deletion.
+
+| Model | Assigned dataset | Fit and boundary |
+|---|---|---|
+| Anomaly detection | KIT Automotive OBD-II | 🟡 Limited unsupervised novelty baseline on Seat Leon telemetry; not fault detection. |
+| Anomaly detection | On-road EV 20-car capacity history | 🟡 Battery signal novelty exploration only; rights unresolved, no anomaly truth, so not approved for training yet. |
+| Anomaly detection | 347-EV Figshare battery charging records | 🟡 Archive/schema inventory done; EV domain verified, passenger-car body type, count discrepancy and complete joins unresolved; not approved for training. |
+| RUL / health | None currently approved | No dataset has verified car EOL/RUL targets. The 20-car history is for possible future capacity/SOH forecasting only, not RUL. |
+| Failure classification | None currently approved | 347-EV has vehicle-level abnormal/normal labels, but passenger-car body type, 347/348 count discrepancy, complete joins and forward horizon are unresolved. |
+
+Excluded pairings include KIT/carOBD/DieselOBD for RUL; KIT/carOBD for mechanical failure classification; and Scania APS / Component X for every passenger-car claim. These exclusions are reflected in the assignment table above. Raw files remain in the audit inventory so the original evidence is preserved until deletion scope is confirmed.
+
+## Step 5 — Audit the 347-EV Figshare archive and revisit 20-car data rights
+
+**Status: 🟡 Archive and label files audited; passenger-car applicability not established; 20-car data rights remain unresolved.**
+
+- Primary records reviewed: [Nature Communications article](https://www.nature.com/articles/s41467-023-41226-5), its [Figshare data record](https://doi.org/10.6084/m9.figshare.23659323), and [Figshare API metadata](https://api.figshare.com/v2/articles/23659323). The paper describes 690,000+ battery-charging snippets from 347 EVs, with 55 abnormal and 292 normal vehicles. It states vehicle-level abnormalities were based on driver reports and engineer confirmation (including lithium plating, low electric range, high temperature and cell imbalance). Brands are anonymized. Neither the paper nor files reviewed establish passenger-car body type. Thus “EV” is verified; “passenger car” is **unverified** against the cars-only project scope.
+- Figshare metadata identifies v1, CC BY 4.0 and 1,484,381,511 bytes. The three raw archives were downloaded unchanged to `data/automotive_prognostics/ev_fault_347/v1/raw/`; local byte sizes match metadata and all three archive listings completed successfully.
+
+| Raw archive | Bytes | SHA-256 | Archive inventory |
+|---|---:|---|---|
+| `battery_brand1.tar.gz` | 1,191,991,306 | `eed43833f20dc81f943512a639c2a1896f4000f1280972270807ec3b19adb0f6` | 416,640 train PKLs; 60,101 test PKLs; train/test label CSVs; `column.pkl` |
+| `battery_brand2.tar.gz` | 236,920,600 | `9fa79298743de34fb84f75286159ce3678717877034fea05c0306a13979bfb47` | 119,384 train PKLs; 74,863 test PKLs; train/test label CSVs; `column.pkl` |
+| `battery_brand3.tar.gz` | 55,469,605 | `afb5fb2a762cceb5627c112ed2d8d981590274e7f44239321d64384e317b4fd0` | 29,599 PKLs; `all_label.csv`; `column.pkl` |
+
+- Archive totals are 700,587 PKL records. Extracted label CSVs contain respectively 198, 50 and 100 vehicle IDs (348 total), with 55 abnormal and 293 normal labels. The article reports 347 vehicles / 292 normal. The positive count agrees, but the release contains one extra normal ID relative to the article; this discrepancy must be resolved before evaluation. The release labels are per vehicle, not independently documented per charging snippet. Therefore there is a usable binary **vehicle-level abnormal/normal flag**, but no verified snippet-level failure time, prediction horizon, or run-to-failure target. The paper says near-failure data were removed so problems could be detected ahead, but no exact horizon can be established from reviewed metadata. This can support cautious battery anomaly/fault exploration only if vehicle class and label/telemetry joins are confirmed; it cannot support RUL or the intended three-stage chain as-is.
+- The feature list in `column.pkl` is `volt`, `current`, `soc`, `max_single_volt`, `min_single_volt`, `max_temp`, `min_temp`, `timestamp`. One inspected record contains metadata keys `label`, `car`, `charge_segment`, `mileage`, giving a plausible vehicle-ID join path. The extraction did **not** exhaustively verify every pickle’s `car`/label join or numeric payload shape. Pickles are executable serialization formats; do not load arbitrary files with unrestricted `pickle.load`. Use a restricted/safe parser and test joins before modeling.
+- 20-car rights follow-up: the [maintainer repository README](https://github.com/BatICM/battery-charging-data-of-on-road-electric-vehicles) says the charging data for 20 commercial BAIC EU500 EVs are public and asks users to cite the paper. The repository’s [MIT LICENSE](https://github.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/blob/main/LICENSE) grants rights to “the Software and associated documentation files”; it does not identify the vehicle data archives as licensed data. The paper’s data-availability statement points to GitHub but no separate data license/permission was found. **Data reuse rights remain unresolved**; retain the archives for audit only and do not train, redistribute or publish derived data until a data-specific grant or written permission is located.
+- No models were trained. Evidence supports passenger-EV battery telemetry only if car body type is confirmed; the 347-EV target is weak vehicle-level fault status, not a dated outcome. Rights for the 20-car data are not resolved.
+
+### Current task status
+
+1. ✅ Component X v3 terms, targets and joins checked; excluded from passenger-car work as heavy-truck data.
+2. ✅ 347-EV release acquired unchanged and archive/label inventories audited; ⚠️ passenger-car body style, exact 347-vs-348 count, complete sample-to-label join, and target horizon unresolved.
+3. 🟡 Cars-only scope already decided; the data contract remains blocked on first supported subsystem and legally usable car/EV labels.
+4. ⚠️ 20-car EV archive rights not resolved by repository MIT license; obtain a data-specific license or written permission before model work.
+
+Next action: ask the 347-EV authors/publisher to confirm passenger-car body class, explain the 348 released labels versus 347 paper count, and document each sample’s vehicle-label join and prediction cutoff. Separately obtain explicit data rights for the 20-car archive. Do not train on either dataset until its applicable gate is satisfied. No backend/mobile/model-training code has been changed; Step 0 added only `ml/src/reproducibility.py`.
+
+## Workflow Step 1 — formal dataset validation
+
+**Status: ⚠️ Gate failed for a valid three-stage passenger-car chain.**
+
+- Command: `./.venv/bin/python ml/scripts/validate_datasets_step1.py`.
+- Output: `ml/reports/data_validation/step1.json`.
+- The run checked KIT and carOBD CSV schemas, missing cells, duplicate rows and timestamp ordering; Scania APS CSV labels/missingness/duplicates; DieselOBD XLSX row widths/missingness/duplicates; and tar archive inventories for 347-EV. It did not deserialize arbitrary EV pickle payloads.
+- Verified highlights: KIT 81 files/2,693,824 rows/3,653 missing cells/0 duplicates/5 backward timestamp steps; carOBD 129 files/304,299 rows/29,328 duplicates and malformed row widths; DieselOBD 118,477 train and 33,838 test rows with 90,657/26,280 duplicates; APS 60,000 train and 16,000 test rows with 1,000/375 positives and 850,015/228,680 missing tokens; 347-EV tar inventories 476,746/194,253/29,603 members.
+- Per-model verdicts are recorded in `datasets.md`: only limited anomaly exploration is partially valid; passenger-car RUL and forward failure classification are invalid; APS/Component X are truck-only; 20-car rights and 347-EV eligibility remain blocked.
+- Step 2 is now a decision gate. Recommended strategy: separate, explicitly interfaced passenger-car/EV sources, while continuing to seek a unified licensed source. No download or model training was started.
+
+## Workflow Step 2 — confirmed strategy and passenger-EV replacement audit
+
+Date: 2026-11-13. The user confirmed the recommended strategy: separate passenger-car/EV datasets with explicit interfaces, while continuing to seek a unified licensed source. No backend/mobile files were touched.
+
+### Tongji acquisition and audit
+
+- Added reproducible downloader `scripts/download_tongji_rest.py`; it fetched the official Zenodo record 16868546 archive to `data/automotive_prognostics/tongji_rest/v1/raw/data.zip` and verified the expected 129,606,252 bytes and MD5 `88c3832d748c0adf8caa94173aada563`.
+- Verified SHA-256: `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`. The raw archive remains unchanged and ignored by Git. Added provenance at `data/automotive_prognostics/tongji_rest/v1/README.md`.
+- Added `ml/scripts/audit_tongji_rest.py` and generated `ml/reports/data_validation/step2_tongji_rest.json`. It parsed the XLSX XML without installing openpyxl: 154 XLSX files, 28,317 data rows (26,450 train and 1,867 test), 148 train files, 6 test files, 78 car identifiers, 123–184-column schema variants, and fast/slow feature families.
+- Leakage/quality findings: `GE16` and `HQ05` appear in both nominal train and test directories; only `P215` is test-only. The audit counted 39 backward `t_start` steps (30 train-fast, 9 train-slow). `soh`/capacity are health proxies, not a documented run-to-end-of-life or future-failure target. Verdict: candidate SOH/health regression or battery novelty only after a vehicle-disjoint split; not valid RUL or forward failure data.
+
+### Shenzhen metadata verification and blocked acquisition
+
+- Added `scripts/download_shenzhen_ev_fault.py`, `ml/scripts/audit_shenzhen_metadata.py`, and `data/automotive_prognostics/shenzhen_ev_fault/v3/README.md`.
+- Official Mendeley snapshot/API confirmed CC BY 4.0, version 3, two XLSX files, 21,175 charging sequences, 1,547,432 one-minute samples, 10,154 EVs and `label=1` faulty battery / `0` normal. The archive metadata reports 207,174,326 bytes and SHA-256 `6b5c77c331e173ac6cab7a0ff2791320cb4fe4c3ffbe9d90205902dbc703eac3`.
+- The official S3 asset returned HTTP 403 after repeated direct/API attempts. No partial file was retained. Exact URL to fetch manually if access is restored: `https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/c7gg94tmvz-3.zip`. This is a metadata-only candidate until the files are acquired and audited. Its label is contemporaneous battery fault, not RUL/TTE.
+
+### Gate result
+
+Step 2 is **🟡 partial / gate failed for the complete three-stage chain**. The multi-source strategy is recorded, but no passenger-car run-to-failure/TTE source exists and the Shenzhen files are inaccessible. No model training began. The next decision is whether to revise the scope to battery SOH plus contemporaneous fault classification or keep searching for a licensed car/EV EOL/TTE source.
+
+## Local PR-readiness verification — 2026-11-13
+
+The requested PR could not be raised because this environment has no `gh` executable and GitHub HTTPS push returned `fatal: could not read Username` with prompts disabled. Before handoff, every committed change from `origin/main..HEAD` was checked locally:
+
+| Check | Result / evidence |
+|---|---|
+| Changed-file inventory | 21 paths reviewed with `git diff --name-status origin/main..HEAD`: the five status reports; `.gitignore`; Step 1/2 audit scripts and JSON reports; requirements lock; reproducibility helper; two download scripts; two dataset provenance READMEs; and the loader contract files `ml/src/data/loaders.py`, `ml/src/data/__init__.py`, `ml/tests/test_loaders.py`. |
+| Scope protection | `git diff --name-only origin/main..HEAD | rg '^(backend/|mobile/)'` returned no paths. No backend or mobile files changed. |
+| Raw-data protection | `git ls-files 'data/automotive_prognostics/**/raw/**'` returned no tracked raw files. Tongji checksum was revalidated: MD5 `88c3832d748c0adf8caa94173aada563`, SHA-256 `45db6baff6b87312081d7341191ea47f5229480f2ea2c92c208acdc2ddd72acd`, 129,606,252 bytes. |
+| Reproducibility | `scripts/download_tongji_rest.py` reported “already verified”; both audit scripts reran successfully; generated reports produced no working-tree diff; the Tongji loader test passed against the local archive. |
+| Code quality | Ruff check passed for all four new scripts plus the loader/test files; pre-commit hooks passed on every commit; `git diff --check origin/main..HEAD` passed. |
+| Tests | `./.venv/bin/python -m pytest -q ml/tests --disable-warnings --maxfail=1`: **43 passed, 5 warnings in 6.63 seconds**. |
+| Commit scope | `2c5656b`, `3bf3b10`, `ac6b665`, `d3ed5e0`, `b430843`, `aece7eb`, and `592b2b8` are small, ordered commits; no model training, model binaries, secrets, backend/mobile changes, or raw archives were committed. |
+
+## Loader contract implementation — 2026-11-13
+
+- Added `load_tongji_rest` to `ml/src/data/loaders.py` and exported it from `ml/src/data/__init__.py`.
+- The loader accepts the verified Tongji ZIP or extracted XLSX files, parses workbook XML with the standard library, supports `split` and `kind` filters, and returns `source_file`, `split`, `feature_kind`, `asset_id`, and `asset_id_type` fields.
+- Loader metadata records Zenodo version, CC BY 4.0, identity semantics, health-proxy label semantics, official-split status, and the known `GE16`/`HQ05` overlap warning.
+- Existing APS/KIT/carOBD loaders now attach explicit provenance, identity and label semantics through `DataFrame.attrs`; no existing model-training behavior was invoked.
+- Added tests for missing paths and the local Tongji test/slow contract. Result: `43 passed, 5 warnings`.
+- This PR remains data/ingestion focused. Model training, model metrics and end-to-end claims remain intentionally out of scope.
+
+The post-loader diff was rechecked after commit `592b2b8`: 21 changed paths total, `backend/` and `mobile/` still absent, and the full ML test suite remained at 43 passed with 5 warnings.
+
+Historical PR status for `pipeline/data-and-training`: no PR had been created at that point because GitHub authentication was unavailable. PRs #51 and #52 and later PR #53 have since been merged; see the later entries below.
+
+## Change log
+
+- 2026-11-13 — Step 0: recorded branch/environment setup, test evidence, seed helper and MLflow limitation.
+- 2026-11-13 — Workflow Step 1: added reproducible dataset validation evidence, per-model verdicts, leakage findings, and the Step 2 strategy gate.
+- 2026-11-13 — Workflow Step 2: recorded the confirmed multi-source strategy, Tongji acquisition/audit, Shenzhen metadata verification and HTTP 403 block, and the failed complete-chain gate.
+- 2026-11-13 — PR-readiness verification: reviewed all 20 changed paths, reran checks/tests/checksums, confirmed no backend/mobile or raw-data commits, and recorded the GitHub authentication blocker.
+- 2026-11-13 — Loader contract verification: expanded the inventory to 21 paths after `592b2b8`, reran the 43-test suite and Ruff, and confirmed the PR remains data/ingestion-only.
+
+## IVST 300-EV dataset metadata audit — 2026-11-13
+
+- Added a provenance record at `data/automotive_prognostics/ivst_300_ev/v1/README.md` and metadata-only report `ml/reports/data_validation/step2_ivst_300_ev.json`.
+- Official page describes 300 fleet EVs, 0.5–4 years, 0–500,000 km, roughly 850 million 10-second records, and 100 MB sample / 72 GB full archive. The associated paper documents SOH labels derived from telemetry, not direct EOL or failure targets.
+- RUL and future-failure target suitability remains unverified: the public data description does not specify EOL events, failure timestamps, censoring, or horizon. Passenger-car body class and stable file-level vehicle IDs are also pending sample audit.
+- Access requires an application with personal/contact details and agreement to research-only terms (CC BY-NC-SA 4.0; no commercial use/external services; no redistribution without authorization). The user confirmed noncommercial college-project intent and explicitly accepted the terms. Two official form submissions returned HTTP 524; no confirmation or sample arrived. Further automated retries were stopped. No sample was downloaded or raw data committed; the user can apply in a browser.
+- No model training or product-scope change. Current decision: promising SOH candidate; not yet validated for RUL or failure prediction.
+
+## PR work — vehicle-disjoint Tongji evaluation and remaining source gates
+
+- Updated `load_tongji_rest` to derive its evaluation vehicle set from every official test-directory workbook, then assign all rows for those assets—including `GE16` and `HQ05` rows stored under the nominal train directory—to evaluation. `source_split` preserves original directory provenance; `split` now means corrected vehicle-disjoint partition. Kind/split filters apply after global asset assignment so separately loaded feature families use the same grouping.
+- The verified release has 3 identified evaluation vehicles (`GE16`, `HQ05`, `P215`). Rows without `car_identifier` retain their workbook-stem fallback identity and are marked `file_stem`; that is not verified vehicle identity. The loader audit report now records corrected partition sizes and the overlap vehicles moved.
+- Added unit coverage for vehicle grouping plus archive-backed checks that GE16/HQ05 stay wholly in evaluation and resulting train/evaluation asset IDs are disjoint.
+- Retried the official Shenzhen downloader with network access. Mendeley metadata was reachable, but its official archive endpoint again returned HTTP 403. No partial archive was retained; checksum, workbook schemas, vehicle IDs and fault labels remain unaudited.
+- Reviewed primary public records for the 347-EV dataset and 20-car source. Public records still do not establish passenger-car body style, explain the 348 released labels versus 347 in the paper, or grant data-specific reuse rights for the 20-car archive. These require publisher/author/rights-holder responses and remain blocked; no assumptions were added.
+- No model training, backend/mobile changes, or raw-data commits.
+
+## PR #53 merge and alternate battery source downloads — 2026-11-13
+
+- PR #53 passed all six remote checks and was squash-merged to `main` as `251e7ac`. The remote PR branch and its local branch were deleted; local `main` was fast-forwarded. `agent_context.md` remains untracked by request.
+- Downloaded the three Oxford Battery Degradation Dataset 1 source files to the Git-ignored `data/automotive_prognostics/oxford_battery_degradation/v1/raw/`. Verified file sizes and SHA-256 values; parsed the MAT file to confirm eight cells and 519 characterization records. No training/preprocessing performed.
+- Downloaded all seven Zenodo `10.5281/zenodo.10656500` archives (38,063,456,304 bytes) to Git-ignored `data/automotive_prognostics/ev_fault_515/v1/raw/`. All file sizes and source MD5 values match Zenodo. The Zenodo API reports CC BY 4.0.
+- Audited ZIP directory structures: 514 numbered folders (DTI 80, GIS 41, QAS 393), one fewer than the record's 515 claim. DTI and QAS spreadsheets contain 80 and 393 binary labels respectively; their meaning is not documented in the sheets. Paper-reported 1,135 four-fault event labels are not yet joined to folder/tensor records. `.pkl` files were not unpickled.
+- RUL/health/fault findings and explicit blockers are recorded in the two dataset READMEs and `ml/reports/data_validation/step2_oxford_515_battery.json`. No raw archive is tracked.
+
+## Graphify repository map — 2026-11-14
+
+- Generated and reviewed Graphify's root and dated repository maps, manifests,
+  and analysis metadata under `graphify-out/`.
+- Added `docs/graphify.md` and linked it from the README. Documented that inferred
+  edges are leads to verify in source and that dataset/product decisions remain
+  governed by audited records.
+- Kept the generated graph snapshots; excluded the incremental cache through
+  `.gitignore`.
+
+### Step 5 — Identify a stronger labeled source
+
+- Researched the MIT/Stanford/TRI Severson battery-life dataset. The original
+  *Nature Energy* study reports 124 commercial LFP/graphite cells and cycle
+  lives spanning roughly 150–2,300 cycles
+  ([paper](https://doi.org/10.1038/s41560-019-0356-8)); the research data portal is
+  [MATR](https://data.matr.io/1/projects/5c48dd2bc625d700019f3204).
+- This is a materially stronger candidate for cell-level lifetime method
+  development than Oxford's eight cells because it provides many more
+  independent trajectories and published cycle-life labels. It remains a
+  controlled lab dataset and cannot support passenger-EV fleet claims.
+- The portal is a JavaScript app and the web reader did not expose its files or
+  terms. Access, exact target construction, split metadata, and data
+  license/redistribution terms are **unverified**. Do not start acquisition or
+  training until these are checked directly.
+- Updated the EDA report, `remaining.md`, and this record. Next action: audit
+  MATR's current download/metadata and terms, then checksum and inspect files;
+  find another adequately labeled source if access or terms fail.
+## Remove unused ML reproducibility helper — 2026-11-14
+
+- Removed `ml/src/reproducibility.py`: its only public function,
+  `set_global_seed`, had no Python callers or imports in the repository. Current
+  training/evaluation scripts set their own random states where needed, so this
+  orphan helper was not part of an active workflow.
+- Kept the comment-only training placeholders, API placeholders, and scratch
+  notebooks; they contain no superseded executable implementation and were
+  outside this cleanup's evidence-based removal scope.
+- Verified Python-source references before deletion. No model, dataset,
+  evaluation behavior, or runtime dependency was changed.
+## KIT anomaly improvement — baseline audit and method choice
+
+- Audited `ml/reports/modeling/kit_xgb_forecast_baseline.json`: XGBoost's
+  next-window MAE was worse than persistence for coolant temperature, throttle,
+  and ambient temperature on both chronological validation and test dates.
+- Research supports prediction error as one surrogate for selecting among
+  unlabeled time-series anomaly methods ([Goswami et al., ICLR 2023](https://openreview.net/forum?id=gA5W0mOjWvk)); it does not make that surrogate a fault metric.
+- Planned improvement: choose XGBoost or last-window persistence independently
+  per target signal on a validation slice of training dates, refit XGBoost on all
+  designated fit dates, then calibrate the anomaly threshold on the existing
+  later training dates. This addresses known weak forecast channels without
+  looking at final test outcomes.
+- Scope: improve the next-window prediction residual as a novelty signal only.
+  KIT has no verified fault labels, so no accuracy/precision/recall claim will
+  be possible from this experiment.
+
+### KIT anomaly improvement — Step 2: per-signal forecast selection
+
+- Implemented chronological inner selection on the last five model-fit training
+  dates: choose XGBoost or persistence per sensor by lower MAE, refit on all 25
+  fit dates, and keep the separate last seven training dates for calibration.
+  Validation/test dates were not used for selection or threshold setting.
+- Updated `XGBoostForecastAnomalyDetector` to apply/save forecast modes and the
+  training script to report selection dates, per-signal mode, and XGBoost / hybrid
+  / persistence forecast errors.
+- Ran the experiment. On test dates, hybrid selection improves forecast MAE over
+  raw XGBoost on coolant, throttle, ambient temperature, and two pedal channels;
+  it is worse on MAP and intake temperature and ties on the remaining three.
+  It beats persistence only on RPM, speed, and MAF. This is mixed, not a uniform
+  forecasting improvement.
+- Novelty flag rates changed from 1.17% to 1.48% on validation and from 1.24% to
+  2.07% on test. With no fault labels, this cannot be interpreted as improved
+  detection or as false alarms. The revised model-selection report documents
+  this limitation and the five-date selection sample.
+- This step is complete with a mixed result; next evaluate whether sensor-level
+  score aggregation better surfaces sparse injected anomalies. Injected cases
+  will be labeled synthetic sensitivity checks only, never real fault accuracy.
+
+### KIT anomaly improvement — Step 3: sparse-residual scoring
+
+- Added two calibrated score aggregations: existing RMS across normalized sensor
+  residuals and max normalized residual across sensors. Both thresholds are
+  calibrated at the same nominal 99th percentile using the reserved training
+  calibration dates.
+- Compared them with synthetic single-sensor shifts, injected at 2x, 5x, 10x,
+  and 20x each channel's calibration residual scale. Aggregation was selected
+  using validation only: at 10x shift, max flagged 97.6% on average across sensor
+  channels versus 92.2% for RMS. Test sensitivity was 97.7% vs 92.0% after that
+  choice. These are artificial stress checks, not real-world fault detection.
+- Max aggregation's held-out novelty rates were 1.48% validation and 2.29% test;
+  the original RMS baseline rates were 1.17% and 1.24%. The increased test rate
+  may reflect context shift and is not evidence of better/poorer fault recall.
+- The final saved detector uses max aggregation because the intended novelty
+  score should retain a severe one-sensor deviation instead of averaging it
+  away. Keep the score and forecast comparison in the report; no fault claim is
+  supported without verified labels.
+- Updated README, progress, tasks log, model report/JSON, and `agent_context.md`
+  after this step with the method choice and reasons.
+
+## PR #59 conflict resolution — 2026-11-14
+
+- Merged the current `main` into `ml/oxford-rul-eda` to resolve PR #59 conflicts.
+  The conflict was limited to the end of this log: preserved Oxford Step 5 from
+  PR #59 and the already-merged cleanup and KIT anomaly-improvement records from
+  `main`.
+- Preserved the PR #60 deletion of the unused reproducibility helper and the PR
+  #61 KIT model/report changes; did not revert or duplicate their code.
+- Updated this log's historical introduction to note the helper was later
+  removed. The resolved head passed all six PR checks and PR #59 was squash-
+  merged to `main` as `a910e0b7895fdff18a52dc0fb47116cdf286dbcc`.
+
+## Oxford RUL improvement — Step 1: research and comparison protocol
+
+- Reviewed battery capacity-trajectory prediction literature. Linear, polynomial,
+  and exponential functions are used as trajectory models; model choice should
+  be tested against the observed task rather than assuming one family wins
+  ([battery degradation prediction study](https://www.sciencedirect.com/science/article/pii/S2405829722002446)).
+- Because Oxford has no confirmed EOL events under the two-reading rule, planned
+  comparisons use only the explicitly unconfirmed first-crossing proxy. Results
+  will be labeled proxy fit, not validated RUL accuracy.
+- Planned fixed candidates: local OLS linear, Theil–Sen linear, recency-weighted
+  linear, and exponential trend, over preset lookbacks. For each cell, earlier
+  cutoffs select a candidate and later cutoffs are held out temporally. All
+  estimation uses history available by the cutoff; cells and outcomes are never
+  pooled as independent sample rows.
+- Reason: compare model forms and simple hyperparameters without an XGBoost
+  regressor that cannot be trained credibly from only two event cells. Keep the
+  existing Theil–Sen result as a reference.
+
+### Step 2: compare methods and retain an experimental candidate
+
+- Added `ml/scripts/compare_oxford_rul_methods.py` to compare OLS, Theil–Sen,
+  recency-weighted OLS and exponential capacity trends at fixed lookbacks. The
+  split uses earlier cutoffs for selection and later cutoffs for a temporal
+  check; each estimate sees only observations available at that cutoff.
+- Development selection chose an exponential trend with a 2,000-cycle window.
+  On later within-cell cutoffs, macro-cell MAE was 1,368 cycles versus 1,590
+  for the existing Theil–Sen/1,000-cycle baseline. Cell2 MAE fell from 1,012 to
+  561 cycles; Cell5 remained about 2,175 cycles for both methods.
+- Added `ExponentialCapacityTrendRUL` as an experimental candidate. Kept
+  Theil–Sen as the default because the candidate's score is based on two cells
+  with unconfirmed first-crossing labels, temporal origins are correlated, and
+  Cell5 remains poor. This does not establish dependable or new-cell RUL
+  performance.
+- Added a report and full JSON metrics, updated the baseline report, project
+  progress, remaining-work notes and this context with the result and rationale.
+- Checks: the comparison script ran successfully on the locally available
+  processed Oxford table; Ruff lint and formatting checks passed. No broader
+  test suite was run.
