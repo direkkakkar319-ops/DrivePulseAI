@@ -466,4 +466,5 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
 - Preserved the PR #60 deletion of the unused reproducibility helper and the PR
   #61 KIT model/report changes; did not revert or duplicate their code.
 - Updated this log's historical introduction to note the helper was later
-  removed. Recheck the complete merge diff and CI before merging PR #59.
+  removed. The resolved head passed all six PR checks and PR #59 was squash-
+  merged to `main` as `a910e0b7895fdff18a52dc0fb47116cdf286dbcc`.
