@@ -3,7 +3,10 @@
 - Official source: [Oxford Research Archive item](https://ora.ox.ac.uk/objects/uuid:03ba4b01-cfed-46d3-9b1a-7d4a7bdf6fac)
 - Dataset DOI: `10.5287/bodleian:KO2kdmYGg`
 - License: ODC Open Database License 1.0 for the database; Database Contents License 1.0 for individual contents (per the source readme).
-- Local originals: `raw/` (Git-ignored; do not add the binary files to Git).
+- Published source files: `raw_chunks/` contains the large MAT source split into
+  GitHub-sized chunks plus `ExampleDC_C1.mat`. Rebuild and verify the original
+  large file with [`reassemble_source.py`](reassemble_source.py). `raw/` is the
+  local reconstruction directory and remains Git-ignored.
 
 ## Files and integrity
 
@@ -12,6 +15,11 @@
 | `Oxford_Battery_Degradation_Dataset_1.mat` | 266,164,290 | `a8f0b928f4ea77d7ba98b97194b78cc77336f2338fee8b57573d043f0cf26781` |
 | `ExampleDC_C1.mat` | 72,593 | `144cdf5aec7467bcce5445e132495e8477f4e08d9963c221d8ba5d7970a7a97d` |
 | `Readme.txt` | 5,643 | `f04c8bdae97e98632b9daeaa7c71631990dbf5ecbf38711347fc470baefc0def` |
+
+The main MAT source is stored as 64 chunks in `raw_chunks/` to keep each
+repository file below the project's 5 MB size check. The reassembly script verifies that the
+joined file matches the SHA-256 above. Dataset attribution and license details
+are in [`data/DATASET_ATTRIBUTION.md`](../../../DATASET_ATTRIBUTION.md).
 
 The source record supplies sizes but no file checksums; the hashes above identify the local downloaded copies.
 

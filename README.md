@@ -78,10 +78,23 @@ gitignored.
 
 ### Reproduce the KIT experiment
 
-Obtain the KIT source files and place the recordings at the path documented in
-[`data/README.md`](data/README.md). From the repository root:
+The full KIT source archive is published in repository-sized parts under
+[`data/automotive_obd/kit_obd/raw_chunks/`](data/automotive_obd/kit_obd/raw_chunks/).
+Its publisher checksum, citation, license, download link, and reconstruction
+steps are documented in [`data/README.md`](data/README.md). The Oxford source
+dataset is also available in parts; see its [official Oxford source page](https://ora.ox.ac.uk/objects/uuid:03ba4b01-cfed-46d3-9b1a-7d4a7bdf6fac).
+KIT's publisher record is [RADAR4KIT](https://radar.kit.edu/radar/en/dataset/bCtGxdTklQlfQcAq).
+
+From the repository root, reconstruct and unpack KIT before running its
+preprocessing script:
 
 ```bash
+python3 data/automotive_obd/kit_obd/reassemble_source.py
+mkdir -p data/automotive_obd/kit_obd/raw
+tar -xf data/automotive_obd/kit_obd/raw/KIT_Automotive_OBD-II_Dataset.tar \
+  -C data/automotive_obd/kit_obd/raw
+unzip -q data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip \
+  -d data/automotive_obd/kit_obd/raw/recordings
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r ml/requirements.txt
