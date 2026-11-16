@@ -530,3 +530,19 @@ Historical PR status for `pipeline/data-and-training`: no PR had been created at
   the repository MIT software license.
 - No model or application code changed. Reassembly and SHA-256 verification
   passed; CI and PR review remain before any merge.
+
+## Add the complete KIT source archive and source links — 2026-11-16
+
+- Downloaded the official KIT BagIt archive from the [RADAR4KIT record](https://radar.kit.edu/radar/en/dataset/bCtGxdTklQlfQcAq).
+  Its 11,554,816 bytes match the publisher's listed MD5 checksum
+  `22d9aac00d1a2b4c97aa35fd7a103ba4`.
+- Added the full archive as three parts below the repository's 5 MB file-size
+  check and added a reconstruction script that verifies the publisher checksum.
+  This completes the KIT source upload that was unavailable during the first
+  dataset-publication step.
+- Updated the root README and dataset notes with official KIT and Oxford source
+  links, the KIT CC BY 4.0 attribution, and instructions to rebuild the archive
+  and extract the original recordings.
+- Reason: users should be able to retrieve the exact source used for the
+  prepared KIT windows, verify its integrity, and find the publisher records.
+  This changes PR #70 only; the PR remains open for review and is not merged.

@@ -7,9 +7,13 @@ Dataset terms are separate from the repository software license.
 - Citation: Weber, Marc (2023). *Automotive OBD-II Dataset*. Karlsruhe
   Institute of Technology. DOI: [10.35097/1130](https://doi.org/10.35097/1130).
 - License: [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/).
-- This repository copy is the prepared 10-second window table used by the KIT
-  forecasting experiment, not the publisher's complete raw archive. See
-  `automotive_obd/kit_obd/processed/` and `ml/scripts/preprocess_kit_obd.py`.
+- The complete publisher BagIt archive is included in three repository-sized
+  parts under `automotive_obd/kit_obd/raw_chunks/`. Reconstruct it with
+  `automotive_obd/kit_obd/reassemble_source.py`; the script checks the
+  publisher-listed archive MD5 (`22d9aac00d1a2b4c97aa35fd7a103ba4`).
+- The prepared 10-second windows used by the KIT forecasting experiment are
+  also included under `automotive_obd/kit_obd/processed/`. See
+  `ml/scripts/preprocess_kit_obd.py` for the reproducible preparation steps.
 
 ## Oxford Battery Degradation Dataset 1
 
