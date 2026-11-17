@@ -1,0 +1,38 @@
+name: "Render: Deploy ML Service"
+
+on:
+  push:
+    branches:
+      - chore/remove-nissan-leaf-workflow
+      - main
+    paths:
+      - "ml/hf_deployment/**"
+      - ".github/workflows/deploy-ml.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy-ml:
+    name: Trigger ML Model Service Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render ML Deploy Hook
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_ML_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "❌ Error: RENDER_ML_DEPLOY_HOOK secret is not configured in GitHub repository settings."
+            echo "👉 Go to: Settings > Secrets and variables > Actions > Add RENDER_ML_DEPLOY_HOOK"
+            echo "👉 Copy Deploy Hook from Render -> Drive-pulse-ai-ml -> Settings -> Deploy Hook"
+            exit 1
+          fi
+          echo "🚀 Triggering Render ML service deployment..."
+          response=$(curl -s -w "\n%{http_code}" -X POST "$DEPLOY_HOOK")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          echo "Render response: $body"
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "✅ Render ML service deployment successfully triggered (HTTP $http_code)."
+          else
+            echo "❌ Failed to trigger deployment (HTTP $http_code)."
+            exit 1
+          fi
