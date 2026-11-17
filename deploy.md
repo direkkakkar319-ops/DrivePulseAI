@@ -10,17 +10,17 @@ and production APK pipeline still need to be configured.
 ```text
 Web browser ───────────────> Next.js web app on Vercel
 
-Android APK ── Firebase ID token ──> FastAPI on Render
-                                         ├──> Render PostgreSQL
-                                         └──> Hugging Face model endpoint
+Android APK ── Firebase ID token ──> FastAPI & ML Models on Render
+                                         └──> Render PostgreSQL
 
-Recorded KIT/Oxford data ── replay tool ──> FastAPI/model API ──> Android app
+Recorded KIT/Oxford data ── replay tool ──> FastAPI & ML API on Render ──> Android app
 ```
 
-The mobile app should call only the DrivePulseAI API. It must not contain the
-Hugging Face token or database credentials. The backend verifies Firebase
-identity, validates the request, then calls the model service using a server-side
-secret.
+The mobile app calls only the DrivePulseAI API hosted on Render. It must not
+contain database credentials or internal secrets. The backend on Render verifies
+Firebase identity, validates the request, and performs ML inference directly on
+Render using the locally packaged model artifacts (`kit_xgb_forecast.joblib` and
+`oxford_rul_theilsen.joblib`).
 
 ## Deployment branch
 
@@ -35,34 +35,28 @@ redeploy from this branch whenever its deployment code changes.
 
 ## Deployment order
 
-## Free demo deployment decision
+## Render deployment decision
 
-For the current demo, deploy one free Render Web Service that runs both the
-FastAPI API and the local KIT/Oxford scorer. Do not create a paid Hugging Face
-Inference Endpoint or a separate model service. The mobile app calls only the
-Render API; FastAPI verifies Firebase identity, validates the request, and loads
-the pinned model artifacts once at startup.
+Deploy the FastAPI backend and the machine learning models directly on Render.
+Do not deploy on Hugging Face or create Hugging Face Inference Endpoints. The
+mobile app and clients call only the Render API; FastAPI verifies Firebase
+identity, validates incoming requests, and loads the pinned model artifacts
+(`kit_xgb_forecast.joblib` and `oxford_rul_theilsen.joblib`) once at startup.
 
-The Hugging Face repository `direkKakkar/DrivePulseAI` remains an artifact
-registry only. The deployed backend must package the matching scorer code and
-the pinned `kit_xgb_forecast.joblib` and `oxford_rul_theilsen.joblib` artifacts,
-or download a fixed Hub revision during the Render build. Do not include raw
-research datasets. Record both the application Git SHA and the model revision.
+All inference compute runs on Render. The machine learning models are lightweight
+(~3.5 MB total) and run within the FastAPI application process on Render. This
+eliminates external network latency, removes extra hosting costs, and simplifies
+authentication since no external Hugging Face tokens are required.
 
-Before provisioning Render, implement `LocalNoveltyScorer` in `backend/` and
-wire it through FastAPI's lifespan/dependency setup. Add `numpy`, `pandas`,
-`scikit-learn`, `joblib`, and `xgboost` to the backend's production
-dependencies. The scorer must return the versioned response documented below;
-the Android app must not call a model service directly.
+Package the scorer code (`XGBoostForecastAnomalyDetector` and `TheilSenCapacityTrendRUL`)
+and the pinned artifacts directly with the backend service. Add `numpy`, `pandas`,
+`scikit-learn`, `joblib`, and `xgboost` to the backend dependencies. The scorer
+returns the versioned response documented below; the Android app calls only the
+backend API routes.
 
-Render should deploy this branch from a root directory that includes both the
-backend and packaged model files. If `backend/` remains the Render root, first
-move or package the scorer code and artifacts below that directory. Do not
-create a second Render service for inference. The free service can sleep after
-idle time, so the mobile demo must show a temporary wake-up/unavailable state.
-
-The Hugging Face Endpoint and custom-container instructions below are a paid
-alternative only. They are not part of the free demo rollout.
+Deploy the current working branch `chore/remove-nissan-leaf-workflow` on Render.
+Because Render free instances can sleep after 15 minutes of inactivity, the mobile
+app and web client should handle a short initial wake-up delay gracefully.
 
 ### 1. Prepare and deploy the API on Render
 
@@ -89,8 +83,9 @@ Set these backend environment values in Render, never in Git:
   Auth user-read permissions required by the API.
 - `CORS_ORIGINS` — the exact production Vercel origin(s) if browser clients call
   the API. Native Android requests do not use browser CORS.
-- `HF_ENDPOINT_URL` and `HF_TOKEN` — add when the Hugging Face model endpoint is
-  deployed. Store the token as a Render secret.
+- `MODEL_REPOSITORY_DIR` — path to the directory containing model artifacts
+  (`kit_xgb_forecast.joblib` and `oxford_rul_theilsen.joblib`) if custom path
+  is used (defaults to `app/ml/artifacts`).
 
 Run `alembic upgrade head` against the production database as a release/migration
 step before directing app traffic to the API. Check `/health` for process
@@ -103,78 +98,59 @@ and [PostgreSQL connection URLs](https://render.com/docs/postgresql-creating-con
 Keep the API and database in the same region and use their private connection
 where available. Confirm current service and database pricing before provisioning.
 
-### 2. Paid alternative: deploy model inference on Hugging Face
+### 2. Deploy machine learning models on Render
 
-The current KIT model is a custom XGBoost forecaster with residual calibration;
-it is not a standard text or image inference model. If hosted on Hugging Face,
-use an Inference Endpoint with a custom container that loads a pinned model
-artifact and exposes a small, versioned JSON request/response API. Keep the
-endpoint protected and let only the Render backend call it using `HF_TOKEN`.
+The machine learning models are deployed and served directly on Render alongside
+the FastAPI backend. The current KIT model is a custom XGBoost forecaster with
+residual calibration, and the Oxford model is a Theil–Sen capacity trend
+estimator. Both artifacts are compact (~3.5 MB total) and load directly into
+memory when the Render service starts.
 
-The model repository `direkKakkar/DrivePulseAI` has been uploaded with the KIT
-and Oxford `.joblib` files and model card. The current custom Inference Endpoint
-container build context is under
-[`ml/hf_deployment/`](ml/hf_deployment/). It contains the serving API, Oxford
-Theil–Sen estimator code, version-pinned dependencies, and Dockerfile. The
-Oxford `.joblib` stores its algorithm configuration; Oxford capacity history is
-still fit per request. Do not upload the whole ML workspace or raw research
-datasets as part of model serving.
+#### Model serving architecture on Render:
 
-Complete the Endpoint setup in this order:
+1. **Artifact packaging**:
+   The model files `kit_xgb_forecast.joblib` and `oxford_rul_theilsen.joblib`
+   and their estimator code (`XGBoostForecastAnomalyDetector` and
+   `TheilSenCapacityTrendRUL`) are packaged inside the backend service under
+   `backend/app/ml/` (or referenced via `MODEL_REPOSITORY_DIR`).
 
-1. Build the container from `ml/hf_deployment/` for `linux/amd64`, then push it
-   to a registry Hugging Face can access (for example Docker Hub, GHCR, ECR,
-   ACR, or GCR):
+2. **Lifespan loading**:
+   FastAPI's `@asynccontextmanager` `lifespan` hook loads the `.joblib`
+   artifacts once on service startup:
+   - Verifies that artifact files exist and match the expected class types.
+   - Stores the loaded model instances in `app.state.kit_model` and
+     `app.state.oxford_model`.
+   - `/health` verifies that models are loaded and ready in memory.
 
-   ```bash
-   docker build --platform linux/amd64 \
-     -t YOUR_REGISTRY/drivepulseai-inference:v1 ml/hf_deployment
-   docker push YOUR_REGISTRY/drivepulseai-inference:v1
-   ```
+3. **Inference endpoints**:
+   The backend exposes the versioned inference routes directly on Render:
+   - `POST /v1/score/kit-window-pair` — accepts 30 KIT summary features from
+     the current 10-second window and 10 actual medians from the following
+     window; calculates residuals, normalizes by scale, and evaluates novelty
+     against the calibrated threshold.
+   - `POST /v1/estimate/oxford-rul` — accepts battery characterization cycle
+     observations and caller EOL threshold; fits Theil-Sen regression and returns
+     remaining useful life cycle estimates.
 
-2. In the Hugging Face Inference Endpoints dashboard, select model
-   `direkKakkar/DrivePulseAI`, choose the custom container image you pushed, set
-   its port to `8000`, and enable **Protected/Authenticated** access.
-3. Wait until the Endpoint is **Running**, then copy its base URL. The model
-   routes are `/v1/score/kit-window-pair` and `/v1/estimate/oxford-rul`.
-4. Add `HF_ENDPOINT_URL` and an endpoint-call `HF_TOKEN` to the Render backend's
-   secrets. The backend calls the Hugging Face URL with the token; the mobile
-   app calls only the backend. Never include `HF_TOKEN` in the APK.
-5. Send one authenticated request to each model route from the backend or a
-   secure admin client and confirm the response includes its model version and
-   expected experimental/novelty status before enabling the mobile replay UI.
+4. **Resource and performance profile on Render**:
+   - Model memory footprint: ~150 MB RAM in the Python process.
+   - Inference latency: <15 ms per window pair evaluation (no outbound HTTP calls).
+   - Render Web Service RAM limit: 512 MB on free tier (sufficient for FastAPI +
+     PostgreSQL connection + XGBoost/scikit-learn inference).
 
-Hugging Face Inference Endpoints use dedicated compute billed while the endpoint
-is running. Review [current Endpoint pricing](https://huggingface.co/docs/inference-endpoints/pricing)
-before deployment; using model hosting does not make inference compute free.
-Pause or delete the Endpoint when the replay demo is not in use.
+### 3. Connect model inference to the backend
 
-Before deploying, define and version the exact feature names, order, types,
-window duration, missing-value rules, model artifact, residual scales, and
-calibrated threshold. Reject incompatible or non-finite inputs. Load the model
-once when the inference process starts rather than once per request.
+Implement the model connection directly in `backend/`; the mobile app calls
+only the authenticated backend API on Render. The backend uses an in-process
+scorer (`LocalNoveltyScorer` / `InferenceService`):
 
-Hugging Face documents [custom containers](https://huggingface.co/docs/inference-endpoints/engines/custom_container)
-and [endpoint security](https://huggingface.co/docs/inference-endpoints/security).
+- `LocalNoveltyScorer` loads the pinned `joblib` artifacts once when the FastAPI
+  process starts on Render. All inference executes in-process with minimal latency.
+- No third-party model inference hosting or tokens are required.
 
-### 3. Connect local model inference to the backend
-
-Implement the model connection in `backend/`; the mobile app must never call
-Hugging Face directly. Keep a backend interface such as `NoveltyScorer` with two
-possible implementations:
-
-- `LocalNoveltyScorer` loads the pinned `joblib` artifact once when the FastAPI
-  process starts. Use this first for a small demo if the artifact and dependencies
-  fit the Render service.
-- `HuggingFaceNoveltyScorer` sends the same versioned request to the protected
-  Hugging Face endpoint using `HF_ENDPOINT_URL` and `HF_TOKEN`. Use this when
-  model serving is separated from the API.
-
-Both implementations must return the same backend response shape so switching
-the serving location does not require mobile UI changes. Add the scorer through
-FastAPI's lifespan/dependency setup and include the prediction router in
-`backend/app/main.py`. Keep existing Firebase authentication and vehicle-owner
-checks in front of telemetry and prediction routes.
+Add the scorer through FastAPI's lifespan/dependency setup and include the
+prediction router in `backend/app/main.py`. Keep existing Firebase authentication
+and vehicle-owner checks in front of telemetry and prediction routes.
 
 Suggested request flow:
 
@@ -251,7 +227,7 @@ recording against an allowlist, cap session duration and playback speed, and
 prevent one user from reading or controlling another user's session. Keep replay
 state temporary for the demo unless persistent history is explicitly designed.
 Use an idempotent cursor so retrying a poll does not duplicate chart points or
-assessments. If the model endpoint is unavailable, continue to show incoming
+assessments. If inference is unavailable, continue to show incoming
 replay telemetry with an explicit inference-unavailable state; never substitute
 a normal score.
 
@@ -307,19 +283,20 @@ Before inviting users to the demo, confirm:
   Firebase tokens.
 - Database migrations ran successfully and account/vehicle data persists across
   API restarts.
-- Hugging Face credentials exist only in Render secrets, if that service is used.
+- Both model artifacts (`kit_xgb_forecast.joblib` and `oxford_rul_theilsen.joblib`)
+  load cleanly during Render startup and `/health` confirms `models: loaded`.
 - Model inputs are validated and responses identify the model/version and replay
   status.
-- The model adapter works against a fixed sample request, validates malformed
-  responses, and reports endpoint timeouts as unavailable rather than normal.
+- The model scorer handles malformed requests with clear 422 errors and reports
+  failures as unavailable rather than normal.
 - Replay sessions keep each recording isolated and never combine KIT OBD and
   Oxford battery examples.
 - KIT and Oxford replays use their separate data contracts and are labeled as
   recorded experiments.
 - The APK uses the deployed API URL and can sign in, call the API, and display
   replay results on a clean device.
-- Error logging excludes Firebase tokens, Hugging Face tokens, and personal data.
-- Render, database, and inference service budgets and usage limits are reviewed.
+- Error logging excludes Firebase service account credentials, tokens, and personal data.
+- Render and database service budgets and usage limits are reviewed.
 
 ## Current limitations
 

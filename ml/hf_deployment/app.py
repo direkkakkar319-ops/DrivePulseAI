@@ -17,7 +17,7 @@ from ml.src.models.anomaly_detector import XGBoostForecastAnomalyDetector
 from ml.src.models.rul_regressor import TheilSenCapacityTrendRUL
 
 ROOT = Path(__file__).resolve().parent
-MODEL_REPOSITORY_DIR = Path(os.environ.get("MODEL_REPOSITORY_DIR", "/repository"))
+MODEL_REPOSITORY_DIR = Path(os.environ.get("MODEL_REPOSITORY_DIR", ROOT / "model_repository"))
 KIT_ARTIFACT = MODEL_REPOSITORY_DIR / "kit_xgb_forecast.joblib"
 OXFORD_ARTIFACT = MODEL_REPOSITORY_DIR / "oxford_rul_theilsen.joblib"
 
