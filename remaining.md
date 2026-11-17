@@ -18,10 +18,10 @@ The strategy decision is complete: use separate passenger-car/EV sources with ex
 
 | Component | Remaining work | Size / effort |
 |---|---|---:|
-| Scope/data decision | Domain frozen to passenger cars/EVs; choose initial subsystem and intended product claim; reconcile PR #49 two-task proposal and PR #50 battery anomaly demo | S–M, 1–2 days |
+| Scope/data decision | Domain frozen to passenger cars/EVs; choose initial subsystem and intended product claim; reconcile the earlier two-task proposal | S–M, 1–2 days |
 | Dataset acquisition/governance | Request and audit the IVST 300-EV sample after applicant details/terms confirmation; verify car body type, IDs, targets and license. Resolve 347-EV body style/count/joins/horizon; get explicit 20-car data rights; obtain Shenzhen archive or record as inaccessible; find verified car RUL/event labels. Component X v3 is truck-only and excluded. | L, 5–10 days plus external response delay |
 | Preprocessing/loaders | Complete schema-specific loaders, time/ID semantics, windowing, train-only imputation/scaling, trip/asset split protocols; deprecate cross-domain aliases. Tongji vehicle-disjoint split enforcement is implemented; schema-specific loader work remains gated on acquired/audited assets. | L, 3–6 days |
-| Anomaly | Implement component/vehicle anomaly pipeline, calibration and metrics; use KIT/verified Nissan Leaf where suitable; record unsupervised limitation | M, 3–5 days |
+| Anomaly | Implement component/vehicle anomaly pipeline, calibration and metrics; use KIT where suitable; record unsupervised limitation | M, 3–5 days |
 | RUL / health | Oxford's two-reading 75% screen confirms zero events / zero supervised RUL labels. The weaker proxy includes two cells only and cannot support meaningful cell-disjoint evaluation. Retain Oxford for capacity/SOH exploration; audit the MIT/Stanford/TRI Severson 124-cell dataset at MATR as the next battery-cell lifetime candidate. Verify label definition, split, license, and current access before acquisition/use; this lab dataset cannot substantiate passenger-EV fleet claims. Do not model on 20-car data until data rights are granted; Tongji supports SOH, not RUL/TTE. | M, dataset audit and acquisition |
 | Failure classification | Hold 347-EV data until car body type, count discrepancy, complete label joins and cutoff/horizon are clarified; then decide if narrow vehicle-level abnormality classification is valid. Obtain dated car failure events for forward-horizon claims. | L, 5–8 days after clarification |
 | Chained inference | Freeze stage contracts, train with pipeline-generated out-of-fold upstream predictions, orchestrate, version and test end to end | L, 5–8 days |
@@ -50,7 +50,7 @@ See [comparison report](ml/reports/modeling/oxford_rul_method_comparison.md).
 ## Phased plan
 
 ### Phase A — scope and data contract
-Passenger-car/EV domain is settled. Select the first supported subsystem, verify car/EV dataset access and terms, then define RUL unit, failure horizon, health-score mapping, signal eligibility, stage handoff and unsupported-data behavior. Reconcile PR #49 two-task proposal and PR #50 Leaf battery anomaly/replay with the three-stage intent.
+Passenger-car/EV domain is settled. Select the first supported subsystem, verify car/EV dataset access and terms, then define RUL unit, failure horizon, health-score mapping, signal eligibility, stage handoff and unsupported-data behavior. Reconcile the earlier two-task proposal with the three-stage intent.
 
 ### Phase B — data foundation and baselines
 Implement dataset-specific loaders and a source manifest. Use KIT for exploratory passenger-car anomaly detection, clearly limited to the Seat Leon telemetry available. Use only a verified car/EV source for RUL and failure labels. Keep Component X and APS in separate truck benchmark records; they cannot validate car results. Establish official and held-out-vehicle evaluation.
@@ -96,7 +96,7 @@ Per-part detection is appropriate only when signals and labels correspond to tha
 
 ## Mobile plan
 
-The current app already has navigation, auth/profile integration, vehicle forms, sensor/detail/report/insight screens, and deterministic demo state (see [progress.md](progress.md)). Remaining work: add a real API-backed `VehicleDataProvider`; bind Firebase bearer token to vehicle/assessment endpoints; define loading/error/empty/stale state semantics and last-known cache; display timestamp, source and model version; distinguish demo vs live; test offline refresh and stale state; verify Android debug/release builds and Firebase signing configuration; run device acceptance for add/select vehicle, view assessment/history, sign out and retry. The open PR #50 proposes a replay path but is not merged into current `main` and explicitly says backend inference is absent.
+The current app already has navigation, auth/profile integration, vehicle forms, sensor/detail/report/insight screens, and deterministic demo state (see [progress.md](progress.md)). Remaining work: add a real API-backed `VehicleDataProvider`; bind Firebase bearer token to vehicle/assessment endpoints; define loading/error/empty/stale state semantics and last-known cache; display timestamp, source and model version; distinguish demo vs live; test offline refresh and stale state; verify Android debug/release builds and Firebase signing configuration; run device acceptance for add/select vehicle, view assessment/history, sign out and retry.
 
 ## Whole-project definition of done
 

@@ -7,8 +7,8 @@ Current backend inspection
 health. No analysis-history list/detail endpoint is implemented. The files
 `backend/app/api/routes/reports.py`, `backend/app/api/routes/telemetry.py`, and
 `backend/app/models/maintenance_report.py` contain comments, not working history
-routes or a mapped persistence model. Local recorded clips and their frozen
-experimental results are research assets, not account-owned saved analyses.
+routes or a mapped persistence model. Offline research outputs are not
+account-owned saved analyses.
 
 Production behavior
 -------------------
@@ -17,13 +17,12 @@ The existing History tab renders `HistoryScreen` with its explicit
 `not-integrated` resource state. It makes no network request, creates no record,
 and shows no simulated loading/error state. It displays the requested empty text
 and a primary Explore AI Insights action. Navigation occurs only on a press.
-The screen does not depend on Garage, onboarding data, demo mode, or replay state.
+The screen does not depend on Garage, onboarding data, or demo mode.
 Existing parent Firebase verification and onboarding guards still apply.
 
 History has no import from demo fixtures, no local persistence, and no connection
 to Phase 4.4 demo selection. Entering demo mode never creates History entries.
 There is no details route or clickable record in the production empty state.
-The original recorded telemetry/replay/results/detail routes remain separate.
 
 Reusable presentation
 ---------------------

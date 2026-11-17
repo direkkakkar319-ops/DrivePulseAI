@@ -25,22 +25,20 @@ The mobile API client obtains a fresh Firebase token and sends it in the
 `Authorization: Bearer` header. FastAPI verifies the Firebase identity and uses
 the account UID to scope persisted profile, onboarding, and vehicle data. The
 mobile app keeps these saved vehicles separate from simulated vehicles and
-recorded Nissan Leaf research replay.
+illustrative Insights values.
 
-## Current model/replay boundary
+## Current model/application boundary
 
 ```mermaid
 flowchart LR
     Raw[Dataset source] --> Prep[Dataset-specific preparation]
     Prep --> Eval[Offline experiment and report]
-    Eval --> Replay[Recorded research replay]
     UI[Demo Insights] -. illustrative fixtures only .-> App[Mobile UI]
-    Replay --> App
 ```
 
-The ML scripts prepare/evaluate datasets offline. Recorded Leaf replay displays
-precomputed research data and scores. Demo Insights uses illustrative fixtures.
-Neither path calls a model through FastAPI or creates an account assessment.
+The KIT and Oxford scripts prepare/evaluate datasets offline and produce research
+reports and local artifacts. Demo Insights uses illustrative fixtures. It does not
+call a model through FastAPI or create an account assessment.
 The current app factory registers account/onboarding routes and `/health`;
 telemetry, prediction, and report route files are placeholders.
 

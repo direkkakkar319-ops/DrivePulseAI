@@ -12,9 +12,9 @@ production diagnostics or maintenance predictions.
 
 | Area | Implemented | Not implemented |
 | --- | --- | --- |
-| Android app | Firebase sign-in, one-time onboarding, PostgreSQL-backed Garage, five-tab light UI, demo Insights, honest History, Profile/Settings, and separate recorded research replay | Live vehicle data, native CSV upload/processing, persisted analysis history, durable profile photos, and production assessments |
+| Android app | Firebase sign-in, one-time onboarding, PostgreSQL-backed Garage, five-tab light UI, demo Insights, honest History, Profile/Settings | Live vehicle data, native CSV upload/processing, persisted analysis history, durable profile photos, and production assessments |
 | Backend | FastAPI health, Firebase identity verification, PostgreSQL profile/onboarding storage, owner-scoped vehicle APIs, and persistent active selection | Live telemetry ingestion, analysis-history APIs, production prediction services, and report generation |
-| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford battery capacity/RUL target audit and historical trend baseline; audited Nissan Leaf battery preparation and a frozen Isolation Forest research baseline | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
+| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford battery capacity/RUL target audit and historical trend baseline | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
 
 Saved vehicle metadata, profile names, and onboarding completion persist through
 the authenticated backend; the backend must be reachable to restore account state.
@@ -23,9 +23,9 @@ selection is a temporary local preview.
 
 Generic AI Insights uses clearly labeled illustrative fixtures, not actual model
 outputs or measurements from a saved vehicle, and never adds records to History.
-The older session-only simulated Garage and recorded research replay remain
-separate. Recorded experimental results are not production diagnoses or analyses
-of the active Garage vehicle. See [mobile setup](mobile/README.md) and
+The older session-only simulated Garage remains separate from saved account
+vehicles. Demo results are illustrative and are not analyses of the active Garage
+vehicle. See [mobile setup](mobile/README.md) and
 [backend setup](backend/README.md) for details.
 
 ## How the application currently connects
@@ -33,7 +33,6 @@ of the active Garage vehicle. See [mobile setup](mobile/README.md) and
 ```text
 Mobile app ── Firebase ID token ──> FastAPI ──> PostgreSQL
      │
-     ├── Recorded Nissan Leaf replay (precomputed research scores)
      └── Demo Insights (illustrative fixtures)
 
 ML preparation and experiments ──> reports/local artifacts
@@ -108,10 +107,6 @@ the repository's software license.
 
 ## Data and evaluation boundaries
 
-- **Recorded Nissan Leaf battery telemetry:** audited temporal preparation and a
-  frozen Isolation Forest baseline support separate research replay. Unusual
-  scores are not verified faults, battery-health estimates, or future-failure
-  predictions, and are not attached to saved Garage vehicles.
 - **KIT OBD-II:** supports exploratory automotive telemetry novelty scoring; it
   has no verified mechanical fault labels, RUL target, or verified vehicle IDs.
 - **Oxford battery data:** supports capacity/SOH exploration. The historical

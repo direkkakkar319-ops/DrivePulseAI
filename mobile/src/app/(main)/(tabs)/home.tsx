@@ -1,2 +1,2 @@
-// Account dashboard; recorded telemetry remains available through explicitly separate links.
+// Account dashboard backed by saved vehicles and the generic Insights demonstration.
 export { HomeScreen as default } from '@/components/home/home-screen';

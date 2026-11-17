@@ -6,8 +6,7 @@ import type { OnboardingApi, OnboardingState, SavedVehicle } from '../src/api/on
 import { accountState, savedVehicle, secondVehicleId } from './onboarding-fixtures';
 
 const mockNavigate = jest.fn();
-const mockPush = jest.fn();
-jest.mock('expo-router', () => ({ useRouter: () => ({ navigate: mockNavigate, push: mockPush }) }));
+jest.mock('expo-router', () => ({ useRouter: () => ({ navigate: mockNavigate }) }));
 jest.mock('../src/api/auth', () => ({ authService: { getToken: jest.fn() } }));
 
 const secondVehicle: SavedVehicle = { ...savedVehicle(), id: secondVehicleId, nickname: null,
@@ -157,21 +156,16 @@ it('shows honest connection and analysis empty states, and navigates to History'
   expect(mockNavigate).toHaveBeenCalledWith('/(main)/(tabs)/history');
 });
 
-it('opens generic demo Insights without fabricating history and preserves separate recorded tools', async () => {
+it('opens generic demo Insights without fabricating history', async () => {
   const { api } = service();
   await render(<Session api={api} />);
   await screen.findByText('Personal car');
   expect(screen.getByRole('header', { name: 'Explore Demo Data' })).toBeTruthy();
-  expect(screen.queryByText(/Nissan Leaf/i)).toBeNull();
   expect(screen.getByText('No saved analyses yet')).toBeTruthy();
   expect(screen.queryByText('94.2%')).toBeNull();
   await fireEvent.press(screen.getByRole('button', { name: 'Explore Demo Data' }));
   expect(mockNavigate).toHaveBeenCalledWith({ pathname: '/(main)/(tabs)/insights', params: { demo: expect.any(String) } });
   expect(api.selectActive).not.toHaveBeenCalled();
-  await fireEvent.press(screen.getByRole('button', { name: 'View recorded telemetry' }));
-  expect(mockNavigate).toHaveBeenCalledWith('/(main)/(tabs)/telemetry');
-  await fireEvent.press(screen.getByRole('button', { name: 'Open recorded replay' }));
-  expect(mockPush).toHaveBeenCalledWith('/(main)/replay');
 });
 
 it('clears the old account vehicle and ignores its pending selection response after account switching', async () => {

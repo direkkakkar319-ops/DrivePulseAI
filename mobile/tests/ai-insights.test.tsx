@@ -2,8 +2,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react-native';
 import { AIInsightsScreen } from '../src/components/insights/ai-insights-screen';
 import InsightsRoute from '../src/app/(main)/(tabs)/insights';
-import RecordedInsightsRoute from '../src/app/(main)/recorded-insights';
-import { InsightsScreen as OriginalRecordedInsights } from '../src/components/recorded/screens';
 import { demoInsights } from '../src/config/demo-insights';
 import type { CsvFileMetadata } from '../src/types/ai-insights';
 
@@ -26,7 +24,7 @@ it('starts empty and marks the unavailable native CSV control honestly', async (
   expect(screen.queryByText('94.2%')).toBeNull();
 });
 
-it('toggles all illustrative values and labels without requiring a Garage vehicle or recorded provider', async () => {
+it('toggles all illustrative values and labels without requiring a Garage vehicle or ML provider', async () => {
   await render(<AIInsightsScreen />);
   await fireEvent(screen.getByRole('switch'), 'valueChange', true);
   for (const result of demoInsights.results) {
@@ -39,7 +37,7 @@ it('toggles all illustrative values and labels without requiring a Garage vehicl
   for (const value of ['360 V', '42 A', '29°C', '64 km/h', '78%']) expect(screen.getByText(value)).toBeTruthy();
   expect(screen.getByText('Sample telemetry · Demo')).toBeTruthy();
   expect(screen.getByText(/Not from a vehicle or a trained model/)).toBeTruthy();
-  expect(screen.queryByText(/Nissan Leaf|TRIP|Isolation Forest/)).toBeNull();
+  expect(screen.queryByText(/TRIP|model version/i)).toBeNull();
   await fireEvent(screen.getByRole('switch'), 'valueChange', false);
   expect(screen.queryByText('94.2%')).toBeNull();
   expect(screen.queryByText('360 V')).toBeNull();
@@ -123,8 +121,4 @@ it('handles a fresh Home demo request without repeatedly overriding the switch o
   mockParams = { demo: 'request-2' };
   await view.rerender(<InsightsRoute />);
   expect(screen.getByText('94.2%')).toBeTruthy();
-});
-
-it('retains the original recorded results on their dedicated route', () => {
-  expect(RecordedInsightsRoute).toBe(OriginalRecordedInsights);
 });

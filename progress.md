@@ -89,7 +89,7 @@ Top-level directories: `.agents/`, `.aws/`, `.codex/`, `.github/`, `backend/`, `
 
 | Area | Language/framework/package manager | Entry points and evidence |
 |---|---|---|
-| ML | Python, pandas/scikit-learn/XGBoost; `ml/requirements.txt`, `ml/pyproject.toml` | Working APS training script `ml/src/training/train_failure.py`; comment-only `train_anomaly.py`, `train_rul.py`; notebooks `02_eda_cmapss`, `03_anomaly_isolation_forest`, `04_failure_classification_xgboost`, `05_rul_regression` |
+| ML | Python, pandas/scikit-learn/XGBoost; `ml/requirements.txt`, `ml/pyproject.toml` | Working APS training script `ml/src/training/train_failure.py`; comment-only `train_anomaly.py`, `train_rul.py`; historical scratch notebooks (not current implementations) |
 | Backend | Python, FastAPI, SQLAlchemy/Alembic; `backend/pyproject.toml`, `backend/requirements.txt` | `backend/app/main.py`; only `backend/app/api/routes/users.py` contains implemented routes; other route/service files are one-line comments |
 | Mobile | TypeScript/React Native/Expo Router; npm lockfile and `mobile/package.json` | `mobile/src/app/_layout.tsx`, route tree under `mobile/src/app/`; screens include auth, tabs, vehicle, sensor, report and insight routes |
 | Website | TypeScript/Next.js; npm lockfile and `frontend/package.json` | `frontend/src/app/page.tsx`, `layout.tsx` |
@@ -123,7 +123,7 @@ the older milestone percentages as incorporating those later experiments.
 
 ### Anomaly Detection — ❌ Not started
 
-- **Algorithm/features:** README says Isolation Forest on multivariate data (`README.md`, lines 48–54) and notebooks are named accordingly. Current implementation evidence is absent: `ml/src/models/anomaly_detector.py`, `ml/src/training/train_anomaly.py`, and `ml/notebooks/03_anomaly_isolation_forest.ipynb` exist, but source modules are one-line comments; notebook saved outputs were not relied on as execution proof.
+- **Historical algorithm status:** the original audit found only anomaly-model placeholders. Current KIT forecasting code and results are described at the top of this file and in `ml/reports/modeling/kit_xgb_forecast_baseline.md`.
 - **Training data:** no current anomaly model training pipeline. `data/README.md` identifies KIT Automotive OBD-II (real Seat Leon OBD trips, 2,693,824 rows, 11 columns, CC BY 4.0 metadata) and carOBD candidate (304,299 rows, provenance unverified) as exploratory anomaly data only. Neither has fault ground truth. The local data README says current ML loaders do not implement KIT loaders; note the current `ml/src/data/loaders.py` does now contain `load_kit_obd` and `load_carobd`, but this contradicts that older audit text. Source inspection shows these are recent/current implementations and they preserve trips as pseudo IDs; loader existence does not verify source data or anomaly results.
 - **Saved model/metrics/per-part:** no anomaly artifact or metrics found. No code loops or routes per component. Status remains ❌.
 
@@ -155,7 +155,7 @@ No raw-sample-to-all-stages implementation: predictor and backend `inference_ser
 - **Screens/navigation:** authentication welcome/login/email verification; main tabs Home, Vehicles, Insights, Account; dashboard and detail routes for vehicle, sensor, insight, report, and add/edit vehicle (`mobile/src/app/`).
 - **Data:** `mobile/src/store/vehicleDataStore.tsx` directly instantiates `createDemoProvider`; `mobile/src/demo/provider.ts` uses deterministic fixtures and session-only state. No real backend vehicle or prediction provider. The UI explicitly labels prototype scenarios and unavailable/no-data states (`mobile/src/app/(main)/(tabs)/home.tsx`, `mobile/src/components/vehicle-health/data-state.tsx`).
 - **Auth/API:** Firebase client auth and profile API client exist; profile sync only. `mobile/src/api/vehicle-data-provider.ts` defines a future abstraction but no production adapter. `mobile/.env.example` has API URL/Google client settings; `google-services.json` exists locally but config risk warrants normal secret review.
-- **Build:** CI config runs type check/Jest; no independent Android build or physical-device validation was performed for this audit. PR #50 claims its own branch CI pass and physical visual acceptance pending, but is not merged/current `main`.
+- **Build:** CI config runs type check/Jest; no independent Android build or physical-device validation was performed for this audit.
 
 ## Tests, CI, containers, docs, tracking
 
@@ -167,7 +167,7 @@ No raw-sample-to-all-stages implementation: predictor and backend `inference_ser
 
 ## Issues and PR map
 
-GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs marked “closed, unmerged” were abandoned/closed without merge, not shipped. PR #50 is open and not present in local `main`. All records mapped to the milestones in [scope.md](scope.md).
+GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs marked “closed, unmerged” were abandoned/closed without merge, not shipped. All records mapped to the milestones in [scope.md](scope.md).
 
 ### Issues
 
@@ -227,11 +227,10 @@ GitHub public API was queried on 2026-11-13. Issue state is GitHub state; PRs ma
 | #47 | merged | Audit and organize datasets with provenance | M1; local data inventory/provenance documentation |
 | #48 | closed, unmerged | EDA Scania APS classification | M4; proposal and report not merged in PR; current `main` nonetheless has APS training/artifacts as workspace content, but exact merge attribution is not established |
 | #49 | closed, unmerged | Organize passenger-car datasets and define a feasible two-task ML plan | M1/M2/M3/M4; proposed scope reduction to two tasks, not shipped |
-| #50 | open | Build Nissan Leaf ML baseline and recorded mobile replay | M2/M7; latest PR proposal, not merged/current `main`; PR says no verified fault labels, no backend inference, physical Android acceptance pending |
 
 ## Discrepancies and red flags
 
-- **Historical README claims vs code/data (2026-11-13 audit):** the old README described Isolation Forest, XGBoost, RUL, SHAP and automotive mappings. That README was rewritten on 2026-11-14. The KIT XGBoost forecasting novelty baseline is now executable and trained, but it is unlabeled and does not validate fault detection; Oxford RUL target EDA is complete, with no RUL model trained. AI4I and C-MAPSS remain industrial/aircraft benchmarks and do not validate passenger-car health.
+- **Historical README claims vs code/data (2026-11-13 audit):** the old README described multiple ML methods and automotive mappings. That README was rewritten on 2026-11-14. The KIT XGBoost forecasting novelty baseline is now executable and trained, but it is unlabeled and does not validate fault detection; Oxford RUL target EDA is complete, with no RUL model trained. AI4I and C-MAPSS remain industrial/aircraft benchmarks and do not validate passenger-car health.
 - **Data audit contradiction:** `data/README.md` says no dataset-specific KIT/carOBD loaders were found, but current `ml/src/data/loaders.py` contains `load_kit_obd` and `load_carobd`. Treat the loader source as current; the audit document is stale on this point. Conversely, source attribution and label limitations remain unresolved.
 - **Model-target mismatch:** APS `neg` is failure of another component, not a healthy vehicle. Classifier is independent and has no RUL/anomaly inputs. It cannot be directly represented as generic 0=no failure.
 - **Split/leakage:** APS has no vehicle IDs/time; sample independence cannot be verified. Training script imputes on train and keeps official test split. For DieselOBD, local data audit records 173 exact identical rows shared train/test, a direct evaluation contamination concern; the alleged dataset source, label semantics, and unit identities are unverified. Existing loader/preprocessing warnings in `data/README.md` identify whole-input scaling and inappropriate random/time splitting in older loader paths. APS `n_missing` is a strong failure-correlated feature; investigate source/collection mechanism and report ablation before interpreting deployment performance (`ml/src/data/feature_engineering.py`, APS EDA report).

@@ -24,18 +24,14 @@ errors, and source switching. This does not enable native selection in the app.
 Even with that adapter, selecting a file shows **Analysis not available yet**;
 the UI does not read its contents, upload it, parse telemetry, or run ML.
 
-Home retains saved Garage vehicles and empty genuine-history state. Its separate
-recorded telemetry/replay links still work. Recorded experimental results now live
-at `/(main)/recorded-insights`, including links from recorded replay/overview;
-recorded detail routes and source labels remain intact. The five-tab layout,
-authentication, onboarding, and backend APIs are unchanged.
+Home retains saved Garage vehicles and an empty genuine-history state. Its Explore
+Demo Data action opens the generic Insights demonstration without creating saved
+analyses. The five-tab layout, authentication, onboarding, and backend APIs remain
+independent of the offline ML research workflows.
 
-On Android, reload the development app and check both the Insights switch and the
-Home demo entry (including returning to it after turning demo off), large font
-sizes, safe areas, scrolling, recorded replay/details, and Android Back. No new
-APK is required for these JS-only changes. The earlier intermittent Garage
-maximum-depth crash still needs physical-device tracing; these changes do not
-claim to fix it.
+On Android, reload the development app and check the Insights switch, the Home
+demo entry, large font sizes, safe areas, scrolling, Garage navigation, and Android
+Back. Physical-device navigation verification remains part of release testing.
 
 ## Implemented
 
@@ -59,10 +55,7 @@ for future genuine records; no history API or persistence exists yet. See
 - Native Firebase session persistence and logout on this device.
 - Protected routes: signed-out users see login; unverified users see verification;
   only verified users enter the account area.
-- Five signed-in tabs: Home, Garage, AI Insights, History and Profile. Home links
-  to recorded Telemetry and Replay, independently of saved account vehicles.
-- Recorded Nissan Leaf replay with 416 real observations and saved Isolation Forest scores.
-  See [recorded replay architecture and API contract](RECORDED_REPLAY.md).
+- Five signed-in tabs: Home, Garage, AI Insights, History and Profile.
 - Garage manages PostgreSQL-backed vehicles: add, edit, confirm removal, and set
   active. The shared account provider synchronizes selection with Home. Removing
   the active vehicle selects the oldest remaining saved vehicle; removing the last
@@ -86,7 +79,7 @@ permission checks.
 
 FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
 Live use requires server credentials and a reachable API. Cloud deployment remains
-a subsequent step. Primary battery screens use a local recorded-data provider; legacy vehicle/report routes use the isolated simulator provider. Backend
+a subsequent step. Legacy vehicle/report routes use the isolated simulator provider. Backend
 report routes remain placeholders; saved vehicle metadata uses authenticated PostgreSQL APIs.
 iOS and web authentication have not been configured; they display a setup message.
 The Firebase Auth config plugin only adds iOS setup in the installed version, so
@@ -256,19 +249,15 @@ are unchanged. The chosen app name is separate from Firebase's display name.
 Account → My Garage shows owned vehicles and the persisted active selection above
 the separate session-only Demo garage. Demo selection never changes the active
 owned vehicle. Add demo vehicle remains available. Owned records have no connected
-telemetry and are never assigned bundled Nissan Leaf recordings.
+telemetry; demo values are not attached to owned records.
 
 Profile photos are temporary local previews only. They are not uploaded, referenced
 in PostgreSQL, or restored across sessions; initials remain the fallback. Profile
 and vehicle steps advance only after server confirmation. There is no local
 completion flag or in-memory substitute for durable storage.
 
-The primary MVP uses a light, restrained battery telemetry interface with genuine saved
-Nissan Leaf measurements and experimental anomaly scores. See [RECORDED_REPLAY.md](RECORDED_REPLAY.md)
-for navigation, provenance, playback semantics, data contracts and Step 3 requirements.
-
-The replay data adapter is local, but the onboarding gate now requires backend
+The main app uses the shared light design system for Home, Garage, generic demo
+Insights, History, and Profile/Settings. The onboarding gate requires backend
 connectivity to restore account state. Existing profile synchronization and account
-retry remain separate. No FastAPI replay endpoints or live inference were added.
-Legacy simulated vehicle, sensor and report routes remain labelled and are not mixed
-into recorded screens. Physical Android verification is still required after this change.
+retry remain separate. No model inference API is connected. Legacy simulated
+vehicle, sensor and report routes remain explicitly labelled as simulated.

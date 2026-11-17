@@ -15,7 +15,6 @@ import Index from '../src/app/index';
 import Dashboard from '../src/app/(main)/dashboard';
 import Account from '../src/app/(main)/(tabs)/account';
 import Insights from '../src/app/(main)/(tabs)/insights';
-import RecordedInsights from '../src/app/(main)/recorded-insights';
 import Settings from '../src/app/(main)/settings';
 import EditProfile from '../src/app/(main)/edit-profile';
 import Security from '../src/app/(main)/security';
@@ -47,7 +46,6 @@ function appContext() {
     explore: () => <Text>Explore</Text>,
     '(main)/dashboard': Dashboard,
     '(main)/account': Account,
-    '(main)/recorded-insights': RecordedInsights,
     '(main)/settings': Settings,
     '(main)/edit-profile': EditProfile,
     '(main)/security': Security,
@@ -58,7 +56,6 @@ function appContext() {
     '(main)/(tabs)/history': History,
     '(main)/(tabs)/insights': Insights,
     '(main)/(tabs)/account': Account,
-    '(main)/(tabs)/telemetry': () => <Text>Telemetry</Text>,
   });
 }
 

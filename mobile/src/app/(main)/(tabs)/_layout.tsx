@@ -1,4 +1,4 @@
-// Five main destinations; recorded Telemetry keeps its existing URL without a tab button.
+// Five main destinations using the shared light-theme design system.
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, type ColorValue } from 'react-native';
 import { AppIcon, type AppIconName } from '@/components/ui/app-icon';
@@ -30,7 +30,6 @@ export default function ProductTabs() {
     <Tabs.Screen name="insights" options={{ title: 'AI Insights', tabBarIcon: props => <TabIcon name="insights" {...props} /> }} />
     <Tabs.Screen name="history" options={{ title: 'History', tabBarIcon: props => <TabIcon name="history" {...props} /> }} />
     <Tabs.Screen name="account" options={{ title: 'Profile', tabBarIcon: props => <TabIcon name="profile" {...props} /> }} />
-    <Tabs.Screen name="telemetry" options={{ href: null }} />
   </Tabs>;
 }
 
