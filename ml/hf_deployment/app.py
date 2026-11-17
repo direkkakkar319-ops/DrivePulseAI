@@ -6,6 +6,7 @@ import math
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -30,9 +31,9 @@ async def lifespan(app: FastAPI):
     kit_model = joblib.load(KIT_ARTIFACT)
     oxford_model = joblib.load(OXFORD_ARTIFACT)
     if not isinstance(kit_model, XGBoostForecastAnomalyDetector):
-        raise RuntimeError("KIT artifact has an unexpected model type")
+        raise TypeError("KIT artifact has an unexpected model type")
     if not isinstance(oxford_model, TheilSenCapacityTrendRUL):
-        raise RuntimeError("Oxford artifact has an unexpected estimator type")
+        raise TypeError("Oxford artifact has an unexpected estimator type")
     if kit_model.threshold is None or kit_model.residual_scale is None:
         raise RuntimeError("KIT artifact must be fitted and calibrated")
     app.state.kit_model = kit_model
