@@ -1,0 +1,48 @@
+name: "Render: Database Migrations"
+
+on:
+  push:
+    branches:
+      - chore/remove-nissan-leaf-workflow
+      - main
+    paths:
+      - "backend/migrations/**"
+      - "backend/alembic/**"
+      - "backend/alembic.ini"
+      - ".github/workflows/deploy-database.yml"
+  workflow_dispatch:
+
+jobs:
+  migrate-database:
+    name: Run Alembic Database Migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "backend/requirements.txt"
+
+      - name: Install Migration Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install alembic psycopg2-binary sqlalchemy pydantic-settings
+
+      - name: Run Alembic Upgrade
+        env:
+          DATABASE_URL: ${{ secrets.RENDER_DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "❌ Error: RENDER_DATABASE_URL secret is not configured in GitHub repository settings."
+            echo "👉 Go to: Settings > Secrets and variables > Actions > Add RENDER_DATABASE_URL"
+            echo "👉 Use your drivepulse-db External Database URL"
+            exit 1
+          fi
+          echo "🚀 Running Alembic migrations against Render PostgreSQL..."
+          cd backend
+          alembic upgrade head
+          echo "✅ Database schema updated to latest head."
