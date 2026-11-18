@@ -31,7 +31,7 @@ SEED = 42
 
 def score_summary(scores: np.ndarray, threshold: float) -> dict:
     return {
-        "rows": int(len(scores)),
+        "rows": len(scores),
         "flagged_rows": int(np.count_nonzero(scores < threshold)),
         "flagged_pct": float(100 * np.mean(scores < threshold)),
         "score_p01": float(np.quantile(scores, 0.01)),

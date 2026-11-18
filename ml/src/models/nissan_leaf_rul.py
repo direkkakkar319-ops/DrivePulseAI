@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import TheilSenRegressor
@@ -17,8 +19,8 @@ class NissanLeafRUL:
     their independent causal effects.
     """
 
-    REQUIRED = {"Timestamp", "Odometer", "SOH"}
-    CONTEXT = ["Pack_Avg_C_Temp", "SOC", "HV_Bat_Voltage"]
+    REQUIRED: ClassVar[set[str]] = {"Timestamp", "Odometer", "SOH"}
+    CONTEXT: ClassVar[list[str]] = ["Pack_Avg_C_Temp", "SOC", "HV_Bat_Voltage"]
 
     def __init__(
         self,
@@ -67,7 +69,7 @@ class NissanLeafRUL:
             "health_score": health["health_score"],
             "health_label": health["label"],
             "eol_threshold_soh_pct": self.eol_threshold_soh_pct,
-            "daily_observations_used": int(len(history)),
+            "daily_observations_used": len(history),
             "context_summary": {
                 column: float(history[column].mean())
                 for column in self.CONTEXT

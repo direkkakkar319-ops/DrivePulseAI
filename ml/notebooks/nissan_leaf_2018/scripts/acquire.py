@@ -9,7 +9,7 @@ import re
 import shutil
 import subprocess
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -116,7 +116,7 @@ def main() -> None:
             if dest.suffix == ".xlsx"
             else "none",
             "download_status": "complete",
-            "verified_at_utc": datetime.now(timezone.utc).isoformat(),
+            "verified_at_utc": datetime.now(UTC).isoformat(),
         }
         if dest.suffix == ".xlsx":
             with zipfile.ZipFile(dest) as archive:

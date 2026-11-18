@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import math
 
-
 HEALTH_SCORE_BANDS = (
     {"minimum_soh_pct": 95.0, "maximum_soh_pct": 100.0, "score": 5},
     {"minimum_soh_pct": 90.0, "maximum_soh_pct": 95.0, "score": 4},

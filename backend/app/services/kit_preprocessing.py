@@ -13,7 +13,7 @@ from .kit_samples import SIGNALS, WINDOW_SECONDS
 
 def parse_time(value: str) -> float | None:
     try:
-        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f")  # noqa: DTZ007
+        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f")
     except ValueError:
         return None
     return (

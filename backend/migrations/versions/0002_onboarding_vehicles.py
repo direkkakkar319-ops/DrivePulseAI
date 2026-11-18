@@ -1,6 +1,7 @@
 """Add owner-scoped vehicle metadata and onboarding state without changing users."""
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "0002_onboarding_vehicles"
