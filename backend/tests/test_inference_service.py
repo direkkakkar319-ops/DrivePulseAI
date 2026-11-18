@@ -1,7 +1,6 @@
 """Mocked HTTP protocol tests plus optional local ASGI/model integration."""
 
 import asyncio
-import importlib
 import json
 import secrets
 from dataclasses import replace
@@ -360,29 +359,3 @@ async def test_unrelated_health_without_ml_settings_and_client_cleanup():
         service = client.app.state.kit_inference
         assert not service._client.is_closed
     assert service._client.is_closed
-
-
-async def test_local_real_ml_asgi_integration(settings, sample, monkeypatch):
-    for package in ("joblib", "numpy", "pandas", "sklearn", "xgboost"):
-        pytest.importorskip(package)
-    root = Path(__file__).resolve().parents[2]
-    if not (
-        root / "ml/hf_deployment/model_repository/kit_xgb_forecast.joblib"
-    ).is_file():
-        pytest.skip("Research service artifacts unavailable in backend-only deployment")
-    monkeypatch.syspath_prepend(str(root))
-    serving = importlib.import_module("ml.hf_deployment.app")
-    monkeypatch.setenv(
-        "ML_INFERENCE_API_KEY", settings.ml_inference_api_key.get_secret_value()
-    )
-    monkeypatch.setenv("KIT_MAX_BATCH_SIZE", "32")
-    async with (
-        serving.lifespan(serving.app),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=serving.app)) as client,
-    ):
-        result = await KITInferenceService(settings, client).score_pairs(
-            sample.pairs[:1]
-        )
-    assert result.results[0].anomaly_score == pytest.approx(3.435043761, abs=1e-6)
-    assert result.threshold == pytest.approx(8.083880991, abs=1e-6)
-    assert result.results[0].is_novel is False

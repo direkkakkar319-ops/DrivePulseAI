@@ -6,4 +6,6 @@
   experiment reports, and the small configured deployment artifact.
 
 The Oxford RUL work is a laboratory-cell proxy experiment, not the active Leaf
-RUL score. Its script paths were updated for this archive location.
+RUL score. Its former route and serving artifact have been retired; deployment
+documentation and the historical service are preserved under
+`../kit/deployment/`. Its script paths were updated for this archive location.

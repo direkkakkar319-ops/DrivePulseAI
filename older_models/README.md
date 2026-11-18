@@ -7,5 +7,6 @@ health scoring and RUL code remains under `ml/src/` and `ml/scripts/`.
 - `kit/`: KIT OBD-II next-window anomaly/novelty research.
 
 Both archived tracks lack verified fault labels suitable for claiming diagnostic
-accuracy. Deployment compatibility copies under `ml/hf_deployment/` are kept
-separately because the existing experimental API still imports those artifacts.
+accuracy. Their former deployment implementation and artifacts are preserved
+inside the corresponding archive folders. The active `ml/hf_deployment/`
+service uses the Nissan Leaf models.

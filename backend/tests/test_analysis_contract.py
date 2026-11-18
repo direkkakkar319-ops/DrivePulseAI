@@ -1,30 +1,19 @@
 """Phase 3C contracts; controlled boundary fixtures are not claimed ML results."""
 
 import copy
-import importlib
 import json
 import math
-import resource
-import secrets
-import time
 from dataclasses import replace
 
-import httpx
 import pytest
 from pydantic import ValidationError
-from test_analysis_api import ANALYZE, AUTH, claims
+from test_analysis_api import ANALYZE, AUTH
 from test_analysis_api import genuine as genuine  # noqa: PLC0414
 from test_analysis_api import harness as harness  # noqa: PLC0414
-from test_csv_analysis import ROOT
-from test_csv_analysis import raw as raw  # noqa: PLC0414
 
-from app.api import deps
-from app.config import Settings
-from app.main import create_app
-from app.schemas.analysis import SampleAnalysis, UploadedAnalysis
+from app.schemas.analysis import SampleAnalysis
 from app.schemas.inference import KitInferenceResult
 from app.services.analysis_service import build_analysis
-from app.services.inference_service import KITInferenceService
 from app.services.kit_samples import SIGNALS, load_sample, make_window_pairs
 
 
@@ -263,109 +252,3 @@ def test_boundary_windows_remain_clock_time_without_utc(genuine):
     assert result.score_series[0].window.start_seconds == 86390
     assert "timezone unknown" in result.time_basis
     assert not any(key in result.model_dump() for key in ("utc", "timestamp"))
-
-
-@pytest.mark.asyncio
-async def test_real_sample_csv_scientific_equivalence(raw, genuine, monkeypatch):
-    for package in ("joblib", "numpy", "pandas", "sklearn", "xgboost"):
-        pytest.importorskip(package)
-    monkeypatch.syspath_prepend(str(ROOT))
-    serving = importlib.import_module("ml.hf_deployment.app")
-    key = secrets.token_urlsafe(32)
-    monkeypatch.setenv("ML_INFERENCE_API_KEY", key)
-    monkeypatch.setattr(deps, "verify_token", claims)
-    settings = Settings(
-        _env_file=None,
-        database_url="postgresql://unit:unit@localhost/unused",
-        ml_service_url="https://local-ml.test",
-        ml_inference_api_key=key,
-    )
-    main = create_app(settings)
-    transport = httpx.ASGITransport(app=serving.app)
-    batches = []
-
-    async def forward(request):
-        assert request.headers["X-ML-API-Key"] == key
-        batches.append(len(json.loads(request.content)["pairs"]))
-        return await transport.handle_async_request(request)
-
-    async with (
-        serving.lifespan(serving.app),
-        main.router.lifespan_context(main),
-        httpx.AsyncClient(transport=httpx.MockTransport(forward)) as upstream,
-    ):
-        main.state.kit_inference = KITInferenceService(settings, upstream)
-        async with httpx.AsyncClient(
-            transport=httpx.ASGITransport(app=main), base_url="https://main.test"
-        ) as client:
-            start = time.perf_counter()
-            sample = await client.post(ANALYZE, headers=AUTH)
-            sample_ms = (time.perf_counter() - start) * 1000
-            start = time.perf_counter()
-            upload = await client.post(
-                "/api/v1/analysis/upload",
-                headers=AUTH,
-                files={"file": ("recording.csv", raw, "text/csv")},
-                data={"recording_date": "2018-03-20"},
-            )
-            csv_ms = (time.perf_counter() - start) * 1000
-    assert sample.status_code == upload.status_code == 200
-    a, b = sample.json(), upload.json()
-    from test_analysis_api import check_complete_result
-
-    check_complete_result(a, genuine)
-    check_complete_result(b, genuine)
-    assert batches == [32, 32, 32, 32, 32, 2] * 2
-    for data in (a, b):
-        assert data["explanation"]["summary"].startswith("2 of 162")
-        assert len(data["flagged_intervals"]) == 2
-        assert key not in json.dumps(data) and data["persisted"] is False
-
-    def normalize(data):
-        if isinstance(data, dict):
-            return {
-                k: normalize(v)
-                for k, v in data.items()
-                if k not in {"recording_id", "split"}
-            }
-        if isinstance(data, list):
-            return [normalize(v) for v in data]
-        return data
-
-    for field in (
-        "summary",
-        "predictions",
-        "flagged_intervals",
-        "score_series",
-        "telemetry",
-        "signals",
-        "explanation",
-        "model",
-    ):
-        assert normalize(a[field]) == normalize(b[field])
-    assert b["source"]["metadata_verification"] == "caller_supplied_unverified"
-    assert "sample" not in b and "source_doi" not in json.dumps(b)
-    UploadedAnalysis.model_validate_json(upload.content)
-    assert serving.app.state.kit_model.score_aggregation == "max"
-    assert serving.app.state.kit_model.threshold_quantile == 0.99
-    parsed = SampleAnalysis.model_validate_json(sample.content)
-    start = time.perf_counter()
-    encoded = parsed.model_dump_json()
-    serialization_ms = (time.perf_counter() - start) * 1000
-    assert json.loads(encoded) == a
-    print(
-        {
-            "sample_bytes": len(sample.content),
-            "csv_bytes": len(upload.content),
-            "sample_ms": round(sample_ms, 3),
-            "csv_ms": round(csv_ms, 3),
-            "serialization_ms": round(serialization_ms, 3),
-            "process_peak_rss_mib": round(
-                resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 2
-            ),
-            "max_score_difference": max(
-                abs(x["anomaly_score"] - y["anomaly_score"])
-                for x, y in zip(a["predictions"], b["predictions"], strict=True)
-            ),
-        }
-    )
