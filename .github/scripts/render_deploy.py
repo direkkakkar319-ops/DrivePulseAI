@@ -10,7 +10,7 @@ import sys
 import time
 from datetime import UTC, datetime
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 from urllib.request import Request, urlopen
 
 POLL_SECONDS = 30
@@ -70,14 +70,21 @@ def service_id_from_hook(hook_url: str) -> str:
 
 def trigger() -> None:
     hook_url = os.environ.get("RENDER_DEPLOY_HOOK", "").strip()
+    deploy_ref = os.environ.get("DEPLOY_REF", "").strip()
     if not os.environ.get("RENDER_API_KEY", "").strip():
         fail("The RENDER_API_KEY repository secret is required to verify deployment status.")
     if not hook_url:
         fail("The required Render deploy-hook secret is not configured.")
+    if not deploy_ref:
+        fail("The workflow did not provide a commit to deploy.")
 
     service_id = service_id_from_hook(hook_url)
     started_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
-    status, response_body = request(hook_url, method="POST")
+    parsed_hook = urlparse(hook_url)
+    query = [(key, value) for key, value in parse_qsl(parsed_hook.query) if key != "ref"]
+    query.append(("ref", deploy_ref))
+    commit_hook_url = urlunparse(parsed_hook._replace(query=urlencode(query)))
+    status, response_body = request(commit_hook_url, method="POST")
     if status not in (200, 202):
         fail(f"Render rejected the deploy-hook request with HTTP {status}.")
 
@@ -88,7 +95,7 @@ def trigger() -> None:
             deploy_id = payload["deploy"]["id"]
         except (json.JSONDecodeError, KeyError, TypeError):
             fail("Render accepted the request but did not return the expected deploy ID.")
-        print(f"Render accepted deployment {deploy_id} for {service_id}.")
+        print(f"Render accepted deployment {deploy_id} for {service_id} at {deploy_ref}.")
     else:
         print("Render queued the deployment behind another in-progress deployment.")
 

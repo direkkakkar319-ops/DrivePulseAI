@@ -12,7 +12,9 @@ permissions:
 jobs:
   detect-deploy-changes:
     name: Detect Render deploy changes
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.paths.outputs.backend }}
@@ -24,13 +26,13 @@ jobs:
       - name: Detect changed service files
         id: paths
         env:
-          BEFORE_SHA: ${{ github.event.before }}
-          HEAD_SHA: ${{ github.sha }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: |
-          if [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
             changed_files="$(git ls-tree -r --name-only "$HEAD_SHA")"
           else
-            changed_files="$(git diff --name-only "$BEFORE_SHA" "$HEAD_SHA")"
+            changed_files="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
           fi
 
           if grep -Eq '^(backend/|\.github/scripts/render_deploy.py$|\.github/workflows/ci\.yml$)' <<< "$changed_files"; then
@@ -199,7 +201,9 @@ jobs:
   trigger-backend-deployment:
     name: Trigger backend deployment
     if: >-
-      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+       (github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository)) &&
       needs.detect-deploy-changes.outputs.backend == 'true'
     needs:
       - detect-deploy-changes
@@ -225,12 +229,15 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          DEPLOY_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: python .github/scripts/render_deploy.py trigger
 
   trigger-ml-deployment:
     name: Trigger ML deployment
     if: >-
-      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+       (github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository)) &&
       needs.detect-deploy-changes.outputs.ml == 'true'
     needs:
       - detect-deploy-changes
@@ -256,6 +263,7 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_ML_DEPLOY_HOOK }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          DEPLOY_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: python .github/scripts/render_deploy.py trigger
 
   verify-backend-deployment:
@@ -276,7 +284,7 @@ jobs:
           RENDER_SERVICE_ID: ${{ needs.trigger-backend-deployment.outputs.service_id }}
           RENDER_DEPLOY_ID: ${{ needs.trigger-backend-deployment.outputs.deploy_id }}
           DEPLOY_STARTED_AT: ${{ needs.trigger-backend-deployment.outputs.deploy_started_at }}
-          EXPECTED_COMMIT: ${{ github.sha }}
+          EXPECTED_COMMIT: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           HEALTH_URLS: https://drivepulse-backend-91fz.onrender.com/health,https://drivepulse-backend-91fz.onrender.com/health/db
         run: python .github/scripts/render_deploy.py verify
 
@@ -298,6 +306,6 @@ jobs:
           RENDER_SERVICE_ID: ${{ needs.trigger-ml-deployment.outputs.service_id }}
           RENDER_DEPLOY_ID: ${{ needs.trigger-ml-deployment.outputs.deploy_id }}
           DEPLOY_STARTED_AT: ${{ needs.trigger-ml-deployment.outputs.deploy_started_at }}
-          EXPECTED_COMMIT: ${{ github.sha }}
+          EXPECTED_COMMIT: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           HEALTH_URLS: https://drivepulseai.onrender.com/health
         run: python .github/scripts/render_deploy.py verify
