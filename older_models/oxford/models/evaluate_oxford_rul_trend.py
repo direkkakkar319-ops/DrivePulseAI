@@ -13,14 +13,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from ml.src.models.rul_regressor import TheilSenCapacityTrendRUL
+from older_models.oxford.models.rul_regressor import TheilSenCapacityTrendRUL
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 DATA_PATH = (
-    ROOT / "data/automotive_prognostics/oxford_battery_degradation/v1/processed/"
+    ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/processed/"
     "cell_cycle_features.csv"
 )
-OUTPUT_PATH = ROOT / "ml/reports/modeling/oxford_rul_trend_baseline.json"
+OUTPUT_PATH = ROOT / "older_models/oxford/models/oxford_rul_trend_baseline.json"
 RUL_COLUMN = "rul_drive_cycles_threshold_derived"
 
 

@@ -14,14 +14,14 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import TheilSenRegressor
 
-from ml.src.models.rul_regressor import ExponentialCapacityTrendRUL
+from older_models.oxford.models.rul_regressor import ExponentialCapacityTrendRUL
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 DATA_PATH = (
-    ROOT / "data/automotive_prognostics/oxford_battery_degradation/v1/processed/"
+    ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/processed/"
     "cell_cycle_features.csv"
 )
-REPORT_PATH = ROOT / "ml/reports/modeling/oxford_rul_method_comparison.json"
+REPORT_PATH = ROOT / "older_models/oxford/models/oxford_rul_method_comparison.json"
 RUL_COLUMN = "rul_drive_cycles_threshold_derived"
 LOOKBACKS = (500, 1000, 2000, None)
 FAMILIES = ("ols", "theil_sen", "weighted_ols", "exponential")

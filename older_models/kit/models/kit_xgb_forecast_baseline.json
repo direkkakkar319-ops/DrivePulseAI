@@ -1191,5 +1191,5 @@
     "A high novelty score can reflect normal context or operating-regime changes.",
     "No RUL, future-failure, or supervised fault claim is supported."
   ],
-  "artifact": "ml/artifacts/kit_xgb_forecast.joblib"
+  "artifact": "older_models/kit/models/kit_xgb_forecast.joblib"
 }

@@ -15,12 +15,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from ml.src.models.anomaly_detector import XGBoostForecastAnomalyDetector
+from older_models.kit.models.anomaly_detector import XGBoostForecastAnomalyDetector
 
-ROOT = Path(__file__).resolve().parents[2]
-DATA_PATH = ROOT / "data/automotive_obd/kit_obd/processed/windows_10s.csv.gz"
-ARTIFACT_PATH = ROOT / "ml/artifacts/kit_xgb_forecast.joblib"
-REPORT_PATH = ROOT / "ml/reports/modeling/kit_xgb_forecast_baseline.json"
+ROOT = Path(__file__).resolve().parents[3]
+DATA_PATH = ROOT / "older_models/kit/data/kit_obd/processed/windows_10s.csv.gz"
+ARTIFACT_PATH = ROOT / "older_models/kit/models/kit_xgb_forecast.joblib"
+REPORT_PATH = ROOT / "older_models/kit/models/kit_xgb_forecast_baseline.json"
 METADATA_COLUMNS = {
     "split",
     "recording_date",

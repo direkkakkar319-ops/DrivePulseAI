@@ -1,7 +1,7 @@
 {
   "dataset": "Oxford Battery Degradation Dataset 1",
   "source_doi": "10.5287/bodleian:KO2kdmYGg",
-  "input": "data/automotive_prognostics/oxford_battery_degradation/v1/processed/cell_cycle_features.csv",
+  "input": "older_models/oxford/data/oxford_battery_degradation/v1/processed/cell_cycle_features.csv",
   "rows": 519,
   "cells": 8,
   "duplicate_cell_cycle_rows": 0,

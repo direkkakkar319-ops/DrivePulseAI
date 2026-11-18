@@ -40,6 +40,18 @@ For target auditability, the project keeps 75% as an exploratory cutoff and now 
 - **Failure classification / future failure:** no fault-class or future-event labels are provided in the released files.
 - Reproducible local preprocessing and EDA: from the repository root run `python3 ml/scripts/preprocess_oxford_battery.py` and `python3 ml/scripts/eda_oxford_battery.py` after installing `ml/requirements.txt`. Preprocessed data stay local and ignored by Git; checked-in reports are in `ml/reports/eda/` and `ml/reports/modeling/`. The separate trend evaluation reproduces only the historical first-crossing experiment, not confirmed EOL RUL. Keep cells disjoint and do not use measured capacity to predict SOH derived from that same capacity.
 
+### Generated EV context columns
+
+The preprocessor supplements each characterization record with deterministic
+EV-context scenarios: `ambient_temperature_c`, `battery_pack_temperature_c`,
+`state_of_charge_pct`, `average_speed_kph`, `energy_consumption_wh_per_km`,
+`dc_fast_charge_share_pct`, `charge_power_kw`, and `estimated_odometer_km`.
+They have production-style column names so they are convenient for pipeline
+development, but they are generated—not measurements supplied by Oxford. Their
+definitions are recorded in `preprocessing_summary.json`. They may support
+schema, feature-engineering, and what-if experiments only; do not use them to
+claim improved real-world RUL accuracy.
+
 Raw source files are retained unchanged and ignored by Git. The per-cell trend prototype is an exploratory rule-based regression baseline, not a trained transferable model. It produced large errors in the rolling-origin evaluation; see `ml/reports/modeling/oxford_rul_trend_baseline.md`. Resolve the target definition and threshold-crossing quality before further RUL modeling.
 
 ## Citation

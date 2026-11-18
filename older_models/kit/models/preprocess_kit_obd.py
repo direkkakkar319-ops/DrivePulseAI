@@ -16,9 +16,9 @@ from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-RAW_DIR = ROOT / "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset"
-OUTPUT_DIR = ROOT / "data/automotive_obd/kit_obd/processed"
+ROOT = Path(__file__).resolve().parents[3]
+RAW_DIR = ROOT / "older_models/kit/data/kit_obd/raw/recordings/OBD-II-Dataset"
+OUTPUT_DIR = ROOT / "older_models/kit/data/kit_obd/processed"
 # Keep the backend deployable from backend/ while the offline recipe reuses the
 # exact same standard-library kernel. No FastAPI/ML runtime is imported here.
 if str(ROOT) not in sys.path:

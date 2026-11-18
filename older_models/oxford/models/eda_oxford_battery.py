@@ -12,12 +12,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 DATA_PATH = (
-    ROOT / "data/automotive_prognostics/oxford_battery_degradation/v1/processed/"
+    ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/processed/"
     "cell_cycle_features.csv"
 )
-REPORT_PATH = ROOT / "ml/reports/eda/oxford_battery_eda.json"
+REPORT_PATH = ROOT / "older_models/oxford/models/oxford_battery_eda.json"
 RUL_COLUMN = "rul_drive_cycles_threshold_derived"
 PERSISTENT_RUL_COLUMN = "rul_drive_cycles_persistent_75pct"
 

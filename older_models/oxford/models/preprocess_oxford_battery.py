@@ -9,23 +9,63 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import re
 from pathlib import Path
 
 import numpy as np
 from scipy.io import loadmat
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 RAW_FILE = (
-    ROOT / "data/automotive_prognostics/oxford_battery_degradation/v1/raw/"
+    ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/raw/"
     "Oxford_Battery_Degradation_Dataset_1.mat"
 )
 OUTPUT_DIR = (
-    ROOT / "data/automotive_prognostics/oxford_battery_degradation/v1/processed"
+    ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/processed"
 )
 EOL_FRACTION = 0.75
 EOL_CONFIRMATION_RECORDS = 2
 CYCLE_PATTERN = re.compile(r"^cyc(\d+)$")
+
+
+def generated_ev_context(cell_id: str, cycle: int) -> dict[str, float]:
+    """Create deterministic EV-operating-context columns for prototyping.
+
+    Oxford Dataset 1 contains controlled cell characterization data, not vehicle
+    telemetry.  These values are generated scenario inputs that make the local
+    table compatible with multivariate EV-model experiments; they are not source
+    measurements and must not be used for real-world performance claims.
+    """
+    cell_number = int(cell_id.removeprefix("Cell"))
+    phase = cell_number * 0.71
+    seasonal = math.sin((2 * math.pi * cycle / 2400) + phase)
+    daily = math.sin((2 * math.pi * cycle / 340) + (phase * 1.7))
+
+    ambient_temperature_c = 16.0 + (7.5 * seasonal) + (1.5 * daily)
+    average_speed_kph = 43.0 + (8.0 * math.sin((2 * math.pi * cycle / 900) + phase))
+    energy_consumption_wh_per_km = (
+        157.0
+        + (1.7 * max(ambient_temperature_c - 20.0, 0.0))
+        + (2.3 * max(15.0 - ambient_temperature_c, 0.0))
+        + (0.55 * (average_speed_kph - 43.0))
+    )
+    dc_fast_charge_share_pct = 14.0 + (9.0 * math.sin((2 * math.pi * cycle / 1500) + phase))
+    charge_power_kw = 7.2 + (0.35 * dc_fast_charge_share_pct)
+    state_of_charge_pct = 62.0 + (18.0 * math.sin((2 * math.pi * cycle / 470) + phase))
+    pack_temperature_c = ambient_temperature_c + 9.0 + (0.045 * average_speed_kph)
+    estimated_odometer_km = cycle * (30.0 + (cell_number * 0.8))
+
+    return {
+        "ambient_temperature_c": round(ambient_temperature_c, 3),
+        "battery_pack_temperature_c": round(pack_temperature_c, 3),
+        "state_of_charge_pct": round(state_of_charge_pct, 3),
+        "average_speed_kph": round(average_speed_kph, 3),
+        "energy_consumption_wh_per_km": round(energy_consumption_wh_per_km, 3),
+        "dc_fast_charge_share_pct": round(dc_fast_charge_share_pct, 3),
+        "charge_power_kw": round(charge_power_kw, 3),
+        "estimated_odometer_km": round(estimated_odometer_km, 3),
+    }
 
 
 def curve_summary(curve) -> dict[str, float]:
@@ -119,6 +159,7 @@ def build_rows(mat: dict) -> tuple[list[dict], dict]:
                     "cell_id": cell_id,
                     "characterization_cycle": cycle,
                     **values,
+                    **generated_ev_context(cell_id, cycle),
                     "soh_relative_to_first_capacity": (
                         values["capacity_1c_discharge_mah"] / baseline
                     ),
@@ -176,6 +217,16 @@ def main() -> None:
                 "this is a project screening convention, not an Oxford-provided EOL rule"
             ),
         },
+        "generated_ev_context_columns": {
+            "ambient_temperature_c": "generated ambient scenario temperature",
+            "battery_pack_temperature_c": "generated pack-temperature scenario",
+            "state_of_charge_pct": "generated state-of-charge scenario",
+            "average_speed_kph": "generated trip-average speed scenario",
+            "energy_consumption_wh_per_km": "generated energy-use scenario",
+            "dc_fast_charge_share_pct": "generated share of charging from DC fast charging",
+            "charge_power_kw": "generated representative charging-power scenario",
+            "estimated_odometer_km": "generated cumulative-distance scenario",
+        },
         "limitations": [
             "75% is an explicit exploratory convention, not an official source EOL rule.",
             "Only threshold-crossing cells receive RUL values; other cells are right-censored.",
@@ -183,6 +234,7 @@ def main() -> None:
             "Only eight laboratory cells are available; do not claim robust EV-fleet RUL performance.",
             "Only two cells cross the threshold, so a meaningful cell-disjoint RUL train/validation/test evaluation is unsupported.",
             "Rows are characterization observations, not independent samples; split by cell before modeling.",
+            "EV context columns are generated, deterministic scenarios rather than Oxford source measurements.",
             "Do not use capacity_1c_discharge_mah as a predictor when predicting SOH derived from that same capacity.",
             "No failure-classification labels are available.",
         ],

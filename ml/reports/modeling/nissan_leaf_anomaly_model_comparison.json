@@ -1,0 +1,109 @@
+{
+  "dataset": "Nissan Leaf 2018 publisher-preprocessed telemetry",
+  "source": "data/automotive_prognostics/nissan_leaf_2018/v1/processed/Dataset_Preprocessed.csv",
+  "source_rows": 1918299,
+  "retained_rows": 1918296,
+  "excluded_rows": 3,
+  "retained_pct": 99.99984361144952,
+  "features": [
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "split_policy": "chronological 70/15/15 after timestamp sorting",
+  "candidate_evaluation": "20k evenly spaced training rows; up to 20k rows from each chronological holdout; training-only 0.5th percentile threshold",
+  "candidate_results": {
+    "isolation_forest": {
+      "fit_rows": 20000,
+      "fit_seconds": 0.27097460000004503,
+      "score_seconds_for_40k_holdout_rows": 0.1310139099996377,
+      "threshold": -0.6670610513826253,
+      "threshold_quantile": 0.005,
+      "validation": {
+        "rows": 20000,
+        "flagged_rows": 34,
+        "flagged_pct": 0.16999999999999998,
+        "score_p01": -0.6600430560887929,
+        "score_median": -0.4921792984722877,
+        "score_p99": -0.44472843725843164
+      },
+      "test": {
+        "rows": 20000,
+        "flagged_rows": 172,
+        "flagged_pct": 0.86,
+        "score_p01": -0.6652734595130964,
+        "score_median": -0.4944989433269833,
+        "score_p99": -0.441428495959354
+      }
+    },
+    "local_outlier_factor": {
+      "fit_rows": 20000,
+      "fit_seconds": 0.1178696619999755,
+      "score_seconds_for_40k_holdout_rows": 0.19162407600015285,
+      "threshold": -3.277596204209332,
+      "threshold_quantile": 0.005,
+      "validation": {
+        "rows": 20000,
+        "flagged_rows": 1652,
+        "flagged_pct": 8.260000000000002,
+        "score_p01": -4.334575705632356,
+        "score_median": -1.2584343989005058,
+        "score_p99": -0.9719108694740514
+      },
+      "test": {
+        "rows": 20000,
+        "flagged_rows": 2302,
+        "flagged_pct": 11.51,
+        "score_p01": -17.758632171070712,
+        "score_median": -1.2379050203777506,
+        "score_p99": -0.976833272187462
+      }
+    },
+    "one_class_svm_rbf": {
+      "fit_rows": 20000,
+      "fit_seconds": 0.07297431500046514,
+      "score_seconds_for_40k_holdout_rows": 0.08270316100060882,
+      "threshold": 91.9364272793583,
+      "threshold_quantile": 0.005,
+      "validation": {
+        "rows": 20000,
+        "flagged_rows": 53,
+        "flagged_pct": 0.265,
+        "score_p01": 92.02286145791305,
+        "score_median": 94.78975891755886,
+        "score_p99": 95.52066221234114
+      },
+      "test": {
+        "rows": 20000,
+        "flagged_rows": 93,
+        "flagged_pct": 0.46499999999999997,
+        "score_p01": 92.01943976072114,
+        "score_median": 94.55817847848644,
+        "score_p99": 95.55898475507279
+      }
+    }
+  },
+  "selected_model": "isolation_forest",
+  "selection_reason": "Best practical fit for this large, potentially multimodal telemetry table: scalable tree-based scoring. No labels exist to establish fault-detection accuracy or rank models by accuracy.",
+  "final_fit_rows": 1342807,
+  "final_threshold": -0.6698465412747806,
+  "final_threshold_quantile": 0.005,
+  "final_validation": {
+    "rows": 287744,
+    "flagged_rows": 2663,
+    "flagged_pct": 0.9254754225978647,
+    "score_p01": -0.6690150097006473,
+    "score_median": -0.49562703772767025,
+    "score_p99": -0.44486163658310257
+  },
+  "final_test": {
+    "rows": 287745,
+    "flagged_rows": 754,
+    "flagged_pct": 0.26203756798554273,
+    "score_p01": -0.6616829060024662,
+    "score_median": -0.4939699174473796,
+    "score_p99": -0.438128940623445
+  },
+  "label_status": "Unsupervised flags identify unusual telemetry only; they do not confirm vehicle faults.",
+  "artifact": "ml/artifacts/nissan_leaf_2018/anomaly_detector.joblib"
+}

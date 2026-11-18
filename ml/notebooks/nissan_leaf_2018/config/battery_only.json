@@ -1,0 +1,65 @@
+{
+  "purpose": "Phase 1.1 battery-only view; frozen original trips, battery eligibility, separate metadata and feature matrices.",
+  "source_version": "raw",
+  "chunk_rows": 75000,
+  "features": [
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC"
+  ],
+  "missing_policy": "exclude",
+  "scaling": "robust",
+  "gap_seconds": 1.0,
+  "gap_reason": "Median row interval is 0.25s, p99 about 0.75s; break at >1s conservatively. This is row continuity, not sensor refresh frequency.",
+  "voltage_review_max": 500.0,
+  "voltage_reason": "Existing EDA review threshold against nominal 360V documentation, not a manufacturer validity limit.",
+  "temperature_sentinel_band": [
+    -1.01,
+    -0.99
+  ],
+  "temperature_reason": "Raw pack fields cluster at -1 while other channels use unavailable codes. Treat this narrow band as unresolved, not physically impossible; retain in audit and exclude from conditional experiments.",
+  "odometer_jump_km": 1.0,
+  "odometer_jump_interval_seconds": 1.0,
+  "formula_atol": 1e-08,
+  "formula_rtol": 1e-08,
+  "split_fractions": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "split_embargo_seconds": 90.5,
+  "split_reason": "Closest cumulative-row boundaries between whole trips on different UTC dates with at least lookback+horizon+tolerance separation; same-vehicle temporal evaluation only.",
+  "duplicate_round_decimals": {
+    "HV_Bat_Voltage": 2,
+    "Pack_1_C_Temp": 2,
+    "SOC": 2
+  },
+  "duplicate_reason": "Conservative cross-split rounded-vector screen; later matches to any earlier split are withheld. It is not proof of independent states or an exhaustive near-neighbor search.",
+  "temperature": {
+    "target": "Pack_1_C_Temp",
+    "lookback_seconds": 30.0,
+    "horizon_seconds": 60.0,
+    "tolerance_seconds": 0.5,
+    "stride_seconds": 10.0,
+    "review_horizons_seconds": [
+      30.0,
+      60.0,
+      120.0
+    ]
+  },
+  "energy": {
+    "status": "blocked",
+    "reason": "Current polarity, charging/regeneration identification and independently verified energy accounting remain unresolved; no energy labels exported."
+  },
+  "typical_interval_band_seconds": [
+    0.2,
+    0.3
+  ],
+  "typical_interval_reason": "Descriptive \u00b10.05s band around observed 0.25s median; flagged only, not excluded.",
+  "view": "battery_only_v1",
+  "parent_run_id": "d7e9e32e1ff2981a",
+  "parent_manifest_sha256": "9a61285afe5e6caf596fbab278dd7c5194c81f3f542c88894657bc7dcd6bf6a8",
+  "original_config_sha256": "e9824fde7363000a1734626351fbf682bf38c05aea109cf28ddac30fe766a95e",
+  "split_policy": "reuse_parent_membership",
+  "battery_peer_temperature_review": "Preserve existing battery-pack sentinel/absolute-zero checks on sensors 1/2/4; motor temperature never blocks this view."
+}
