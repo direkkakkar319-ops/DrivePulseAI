@@ -254,13 +254,11 @@ warm local run, not throughput benchmarks or Render guarantees.
 
 ## Deployment checklist — not executed
 
-- Review diffs and test results before any commit/push. Existing
-  `.github/workflows/deploy-ml.yml` can automatically trigger the Render deploy
-  hook for pushes to `main` or `chore/remove-nissan-leaf-workflow` when
-  `ml/hf_deployment/**` or that workflow changes. It uses
-  `RENDER_ML_DEPLOY_HOOK`. Actual GitHub secret availability and Render dashboard
-  auto-deploy settings were not inspected. `deploy-backend.yml` is currently
-  empty; do not assume a backend deployment gate/sequence is enforced by CI.
+- Review diffs and test results before any commit/push. The GitHub Actions deploy
+  workflow for the legacy KIT/Oxford ML serving app has been removed; do not use
+  that app as the Nissan Leaf production deployment. Render dashboard auto-deploy
+  settings were not inspected. No backend deploy workflow is defined; do not assume
+  a backend deployment gate/sequence is enforced by CI.
 - Inventory existing ML callers before enforcing authentication. Configure the
   **same private** `ML_INFERENCE_API_KEY` on ML and backend, outside source/mobile.
   Deploy the secured batch-capable ML service first; migrate old callers to the

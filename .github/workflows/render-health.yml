@@ -1,0 +1,39 @@
+name: render-health
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-check:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      contains(github.event.deployment.environment_url, '.onrender.com')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Render service health
+        env:
+          DEPLOYMENT_URL: ${{ github.event.deployment.environment_url }}
+        run: |
+          case "$DEPLOYMENT_URL" in
+            https://*.onrender.com) ;;
+            *)
+              echo "Unexpected Render deployment URL: $DEPLOYMENT_URL"
+              exit 1
+              ;;
+          esac
+
+          HEALTH_URL="${DEPLOYMENT_URL%/}/health"
+          for attempt in $(seq 1 18); do
+            if curl --fail --silent --show-error --max-time 10 "$HEALTH_URL"; then
+              echo "✅ Render deployment health check passed."
+              exit 0
+            fi
+            echo "Waiting for Render health endpoint ($attempt/18)..."
+            sleep 10
+          done
+
+          echo "❌ Render deployment did not become healthy within 3 minutes."
+          exit 1
