@@ -7,33 +7,68 @@ permissions:
   contents: read
 
 jobs:
-  smoke-check:
+  backend-health:
     if: >-
       github.event.deployment_status.state == 'success' &&
-      contains(github.event.deployment.environment_url, '.onrender.com')
+      contains(github.event.deployment_status.environment_url, 'drivepulse-backend')
     runs-on: ubuntu-latest
     steps:
-      - name: Check Render service health
+      - name: Check backend and database health
         env:
-          DEPLOYMENT_URL: ${{ github.event.deployment.environment_url }}
+          SERVICE_URL: ${{ github.event.deployment_status.environment_url }}
         run: |
-          case "$DEPLOYMENT_URL" in
+          case "$SERVICE_URL" in
             https://*.onrender.com) ;;
             *)
-              echo "Unexpected Render deployment URL: $DEPLOYMENT_URL"
+              echo "Unexpected backend deployment URL: $SERVICE_URL"
               exit 1
               ;;
           esac
 
-          HEALTH_URL="${DEPLOYMENT_URL%/}/health"
+          check_endpoint() {
+            local url="$1"
+            for attempt in $(seq 1 18); do
+              if curl --fail --silent --show-error --max-time 10 "$url"; then
+                echo "✅ Healthy: $url"
+                return 0
+              fi
+              echo "Waiting for $url ($attempt/18)..."
+              sleep 10
+            done
+            echo "❌ Health check timed out: $url"
+            return 1
+          }
+
+          check_endpoint "${SERVICE_URL%/}/health"
+          check_endpoint "${SERVICE_URL%/}/health/db"
+
+  ml-health:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      contains(github.event.deployment_status.environment_url, 'drivepulseai')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check ML service health
+        env:
+          SERVICE_URL: ${{ github.event.deployment_status.environment_url }}
+        run: |
+          case "$SERVICE_URL" in
+            https://*.onrender.com) ;;
+            *)
+              echo "Unexpected ML deployment URL: $SERVICE_URL"
+              exit 1
+              ;;
+          esac
+
+          HEALTH_URL="${SERVICE_URL%/}/health"
           for attempt in $(seq 1 18); do
             if curl --fail --silent --show-error --max-time 10 "$HEALTH_URL"; then
-              echo "✅ Render deployment health check passed."
+              echo "✅ ML service is healthy."
               exit 0
             fi
-            echo "Waiting for Render health endpoint ($attempt/18)..."
+            echo "Waiting for ML health endpoint ($attempt/18)..."
             sleep 10
           done
 
-          echo "❌ Render deployment did not become healthy within 3 minutes."
+          echo "❌ ML service did not become healthy within 3 minutes."
           exit 1
