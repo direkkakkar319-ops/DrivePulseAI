@@ -1,18 +1,22 @@
 """FastAPI entrypoint with protected profiles and explicit database availability errors."""
 
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.routes.analysis import router as analysis_router
 from app.api.routes.onboarding import router as onboarding_router
 from app.api.routes.users import router
 from app.config import Settings, get_settings
 from app.database import build_engine
+from app.services.inference_service import KITInferenceService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -21,8 +25,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.engine = build_engine(settings)
-        yield
-        app.state.engine.dispose()
+        app.state.kit_upload_slots = asyncio.Semaphore(
+            settings.kit_upload_max_concurrent
+        )
+        try:
+            async with httpx.AsyncClient(
+                follow_redirects=False,
+                trust_env=False,
+                limits=httpx.Limits(max_connections=2, max_keepalive_connections=2),
+            ) as client:
+                app.state.kit_inference = KITInferenceService(settings, client)
+                yield
+        finally:
+            app.state.engine.dispose()
 
     application = FastAPI(title="DrivePulseAI API", lifespan=lifespan)
     application.state.settings = settings
@@ -40,6 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
     application.include_router(router)
     application.include_router(onboarding_router)
+    application.include_router(analysis_router)
 
     @application.get("/health")
     def health() -> dict[str, str]:

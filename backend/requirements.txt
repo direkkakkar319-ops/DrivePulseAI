@@ -17,3 +17,4 @@ ruff>=0.1.0
 # Firebase managed authentication and API testing
 firebase-admin>=7,<8
 httpx>=0.28,<1
+python-multipart>=0.0.34,<1

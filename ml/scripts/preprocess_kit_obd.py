@@ -11,28 +11,25 @@ import gzip
 import json
 import math
 import re
-import statistics
+import sys
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = ROOT / "data/automotive_obd/kit_obd/raw/recordings/OBD-II-Dataset"
 OUTPUT_DIR = ROOT / "data/automotive_obd/kit_obd/processed"
-WINDOW_SECONDS = 10
+# Keep the backend deployable from backend/ while the offline recipe reuses the
+# exact same standard-library kernel. No FastAPI/ML runtime is imported here.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from backend.app.services.kit_preprocessing import (
+    KitWindowAccumulator,
+    parse_time,
+)
+from backend.app.services.kit_samples import SIGNALS, WINDOW_SECONDS
+
 DATE_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})_")
-SIGNALS = [
-    "coolant_temp_c",
-    "map_kpa",
-    "engine_rpm",
-    "speed_kmph",
-    "intake_air_temp_c",
-    "maf_gs",
-    "throttle_pct",
-    "ambient_air_temp_c",
-    "pedal_d_pct",
-    "pedal_e_pct",
-]
 EXPECTED_WIDTH = 1 + len(SIGNALS)
 
 
@@ -60,29 +57,10 @@ def date_partitions(dates: list[str]) -> dict[str, str]:
     }
 
 
-def parse_time(value: str) -> float | None:
-    try:
-        # KIT supplies a clock time, not a zoned instant. Preserve seconds since
-        # midnight without assigning a timezone absent from the source.
-        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f")  # noqa: DTZ007
-    except ValueError:
-        return None
-    return (
-        parsed.hour * 3600
-        + parsed.minute * 60
-        + parsed.second
-        + parsed.microsecond / 1_000_000
-    )
-
-
 def process_file(path: Path, split: str) -> tuple[list[dict], dict]:
     day = recording_date(path.name)
     recording_id = f"KIT-{path.stem}"
-    # Each bucket keeps only one 10-second window's values in memory.
-    buckets: dict[tuple[int, int], dict] = {}
-    previous_time = None
-    segment_id = 0
-    backward_jumps = 0
+    accumulator = KitWindowAccumulator()
     invalid_timestamp_rows = 0
     with path.open("r", encoding="utf-8-sig", newline="") as raw:
         reader = csv.reader(raw)
@@ -98,50 +76,30 @@ def process_file(path: Path, split: str) -> tuple[list[dict], dict]:
             if timestamp is None:
                 invalid_timestamp_rows += 1
                 continue
-            if previous_time is not None and timestamp < previous_time:
-                segment_id += 1
-                backward_jumps += 1
-            previous_time = timestamp
-            elapsed = timestamp
-            window_id = math.floor(elapsed / WINDOW_SECONDS)
-            key = (segment_id, window_id)
-            bucket = buckets.setdefault(
-                key, {"values": [[] for _ in SIGNALS], "rows": 0}
-            )
-            bucket["rows"] += 1
-            for index, raw_value in enumerate(row[1:]):
+            values = []
+            for raw_value in row[1:]:
                 try:
                     value = float(raw_value.strip())
                 except ValueError:
-                    continue
-                if math.isfinite(value):
-                    bucket["values"][index].append(value)
-
-    result = []
-    for (segment, window), bucket in sorted(buckets.items()):
-        values = bucket["values"]
-        # Require at least one actual observation for each signal; do not fill.
-        if any(not signal_values for signal_values in values):
-            continue
-        output = {
+                    value = float("nan")
+                values.append(value if math.isfinite(value) else None)
+            accumulator.add(timestamp, values)
+    result = [
+        {
             "split": split,
             "recording_date": day,
             "recording_id": recording_id,
             "segment_id": segment,
-            "window_start_seconds": window * WINDOW_SECONDS,
+            "window_start_seconds": start,
+            **features,
         }
-        for name, signal_values in zip(SIGNALS, values):
-            output[f"{name}__median"] = statistics.median(signal_values)
-            output[f"{name}__std"] = statistics.pstdev(signal_values)
-            output[f"{name}__missing_fraction"] = (
-                1 - len(signal_values) / bucket["rows"]
-            )
-        result.append(output)
+        for segment, start, features in accumulator.windows()
+    ]
     return result, {
         "recording_id": recording_id,
         "date": day,
         "invalid_timestamp_rows": invalid_timestamp_rows,
-        "backward_jumps": backward_jumps,
+        "backward_jumps": accumulator.backward_jumps,
         "window_count": len(result),
     }
 

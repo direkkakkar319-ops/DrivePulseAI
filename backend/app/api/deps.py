@@ -9,6 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.core.firebase import verify_token
+from app.services.inference_service import KITInferenceService
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -50,3 +51,8 @@ def require_identity(
 def get_db(request: Request) -> Generator[Session, None, None]:
     with Session(request.app.state.engine) as session:
         yield session
+
+
+def get_inference_service(request: Request) -> KITInferenceService:
+    """Service access only; future routes must also require verified identity."""
+    return request.app.state.kit_inference

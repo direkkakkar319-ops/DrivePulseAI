@@ -51,3 +51,27 @@ jobs:
       - name: Run Pytest
         run: |
           pytest backend/tests
+
+  kit-integration:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql+psycopg2://unit:unit@127.0.0.1/unused
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: |
+            backend/requirements.txt
+            ml/hf_deployment/requirements.txt
+      - name: Install backend and pinned model runtime for integration tests
+        run: pip install -r backend/requirements.txt -r ml/hf_deployment/requirements.txt
+      - name: Test packaged sample through both apps and real model
+        run: |
+          python -m pytest -c backend/pyproject.toml \
+            backend/tests/test_analysis_api.py \
+            backend/tests/test_analysis_contract.py \
+            backend/tests/test_csv_analysis.py \
+            backend/tests/test_inference_service.py \
+            backend/tests/test_kit_samples.py -q

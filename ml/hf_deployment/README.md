@@ -1,105 +1,139 @@
-# DrivePulseAI Hugging Face Inference Endpoint
+# KIT inference service on Render
 
-This folder contains the **custom inference container build context** for a
-Hugging Face Inference Endpoint. The KIT fitted artifact and Oxford estimator
-configuration are stored under `model_repository/` and are uploaded to the
-Hugging Face model repo. For each Oxford request, the estimator fits a trend to
-the supplied capacity history; its `.joblib` stores configuration, not learned
-weights.
+This directory is the Docker build context for the existing research inference
+service. This change adds secured, bounded KIT batch transport; it does not
+retrain, replace or recalibrate the model. The existing legacy Oxford route is
+not integrated with the application and only receives the same authentication
+guard as the other inference routes. Its algorithm/artifact remain unchanged.
 
-This is not a Docker Space. Build the image from this folder and push it to a
-container registry that Hugging Face Inference Endpoints can access. Select the
-model repo and custom container image when creating the Endpoint.
+## Server configuration
 
-## Endpoints
+| Variable | Behavior |
+| --- | --- |
+| `ML_INFERENCE_API_KEY` | Required for inference. Supply a high-entropy server-managed secret of at least 32 UTF-8 bytes, without surrounding whitespace. No default or bypass. |
+| `KIT_MAX_BATCH_SIZE` | Default 32; integer from 1 through 256. Invalid settings fail startup. The ceiling is an input bound, not a measured Render capacity guarantee. |
+| `MODEL_REPOSITORY_DIR` | Defaults to `model_repository/` next to `app.py`; the Docker image sets `/app/model_repository`. |
+| `PORT` | Render listening port; Docker command falls back to 8000. |
 
-- `GET /health` reports whether both model interfaces loaded.
-- `POST /v1/score/kit-window-pair` scores one adjacent pair of prepared KIT
-  windows. Send the current window's 30 summaries and the next window's 10
-  actual medians. It returns the scale-normalized novelty score, calibrated
-  threshold, `is_novel`, and per-signal errors. It cannot score until the next
-  window exists.
-- `POST /v1/estimate/oxford-rul` estimates cycles to the supplied 75%-capacity
-  threshold using the existing Theil–Sen capacity trend estimator.
+Read configuration at startup; changing a credential or limit requires process
+restart/redeployment. Never commit, log, print, embed in an image, or put an
+inference credential in the Android app. No production secret is provided here.
 
-Configure the Endpoint as **Protected/Authenticated**. The backend calls its
-URL with a Hugging Face token stored only as a backend secret. Do not place the
-token in the container image, model repository, or Android APK.
+Every inference request must include the header `X-ML-API-Key` with the configured
+secret. Comparison uses `hmac.compare_digest` on UTF-8 bytes. Missing or incorrect
+caller credentials return generic HTTP 401. Missing, blank, short or
+whitespace-padded server configuration disables inference with generic HTTP 503.
+Neither error includes credentials. There is no unauthenticated inference mode.
 
-## Model status and limits
+`GET /health` remains public and returns the existing model-readiness response.
+It deliberately does not certify authentication configuration. Check both health
+and an authenticated inference request before directing caller traffic.
+Swagger/OpenAPI remain available and declare API-key authorization; they do not
+expose the configured credential. All validation responses omit raw input values.
 
-The KIT artifact is a fitted XGBoost/persistence next-window forecaster with
-stored residual scales and a training-calibrated 99th-percentile novelty
-threshold. KIT has no verified fault labels. A novelty flag is not a fault
-diagnosis or fault probability.
+## API contracts
 
-The Oxford endpoint loads a `.joblib` configuration for the project's
-Theil–Sen trend baseline, then fits the trend per request. It is not a model
-trained once on pooled Oxford rows. Its 75%-capacity first-crossing target is
-ambiguous and supported by only two cells. Results are experimental RUL
-estimates, not dependable battery-life predictions.
+### Existing single-pair route
 
-Use these endpoints for recorded-data replay demonstrations, clearly labeled
-as such. Do not present their output as validated production predictions.
+`POST /v1/score/kit-window-pair` retains its original body and response:
 
-## Hugging Face setup
+- `schema_version`: 1.
+- `current_window_features`: exactly the 30 fitted feature names and finite values.
+- `next_window_medians`: exactly the ten fitted target names and finite values.
 
-1. Create a model repository, for example `direkKakkar/DrivePulseAI`.
-2. Upload all three files from `model_repository/`—`README.md`,
-   `kit_xgb_forecast.joblib`, and `oxford_rul_theilsen.joblib`—to the model
-   repository root. The container expects both artifacts under `/repository/`.
-3. Build and push the custom container image from this folder, for example:
+Authentication is now required. JSON object order is irrelevant; the service
+constructs columns in saved model order. Scores, threshold comparison and signal
+errors use the unchanged maximum normalized forecast-error calculation.
 
-   ```bash
-   docker build --platform linux/amd64 -t YOUR_REGISTRY/drivepulseai-inference:v1 .
-   docker push YOUR_REGISTRY/drivepulseai-inference:v1
-   ```
+### New batch route
 
-4. In the Inference Endpoints dashboard, deploy the model repository with the
-   custom container image. Set container port `8000` and choose protected access.
-5. Put the Endpoint URL and a Hugging Face token with endpoint-call permission
-   into the Render backend's secrets. Keep the token out of this folder and the
-   APK.
+`POST /v1/score/kit-window-pairs` accepts:
 
-The Docker image contains only the serving code and runtime dependencies; both
-model artifacts are mounted from the selected model repository at `/repository`.
-The endpoint is dedicated compute and is billed while running; review the
-[current pricing](https://huggingface.co/docs/inference-endpoints/pricing) and
-pause/delete it when it is not needed.
+- `schema_version`: 1.
+- `pairs`: a nonempty array, limited by `KIT_MAX_BATCH_SIZE` (hard ceiling 256).
+- Each item: `pair_id`, `current_window_features`, `next_window_medians`.
+- `pair_id`: unique within the request, 1–128 ASCII characters; first character
+  alphanumeric, subsequent characters alphanumeric or `.`, `_`, `:`, `-`.
+- Feature dictionaries follow the same contract as the single route. Do not
+  include `schema_version` inside an item. Extra envelope/item fields are rejected.
 
-The artifact is a trusted `joblib` pickle and must only be loaded from this
-project's checked-in package. Do not replace it with an untrusted upload.
+The response has `schema_version`, `model_version`, `assessment_type`, `threshold`,
+`label_status`, and `results`. Each result has the submitted `pair_id` plus the
+complete existing single-pair response fields: score, threshold, novelty flag,
+per-signal normalized errors and model metadata. Result order matches input order.
+The whole batch is validated before inference; invalid input yields no partial
+results. An empty/oversized/duplicate-ID/incompatible-feature request returns 422.
+Inference failure or nonfinite output returns generic 503.
 
-## Local run
+The loaded model is reused. A batch creates one ordered feature matrix and makes
+one model forecast call, then computes normalized residuals and scores across all
+rows. No model loading, fitting or calibration occurs per request.
+
+KIT novelty is not mechanical fault diagnosis. `is_novel` is strictly
+`anomaly_score > threshold`; scores are not probabilities. The request contains
+prepared windows, not raw CSV, and the caller remains responsible for real source,
+segment, unit and ten-second adjacency validation. No history is persisted here.
+
+The existing `/v1/estimate/oxford-rul` route also requires the shared credential,
+preventing an unprotected compute endpoint. No new Oxford capability was added.
+
+## Deployment and coordinated authentication rollout
+
+Do not deploy this change until all existing callers are inventoried. It changes
+unauthenticated single-pair calls into authenticated calls intentionally.
+
+1. Generate/store the shared secret through the operational secret manager, not
+   this repository. Configure it in both the ML service and authorized backend.
+2. Prepare callers to send `X-ML-API-Key` before enforcing it. The old service
+   ignores the additional header, allowing this caller-first rollout. Main-backend
+   integration is a later step and is not implemented by this change.
+3. Review and deploy the secured ML service with `KIT_MAX_BATCH_SIZE=32` initially.
+4. Verify public health, missing/wrong-key rejection, correct-key single inference,
+   and a small real batch. Verify the known score around 3.435043761.
+5. Measure on the actual Render instance before raising batch limits or concurrency.
+   Coordinate credential rotation/restarts with every caller; only one key is
+   active per process. Do not roll back to public inference to resolve a mismatch.
+
+The existing Dockerfile remains valid: it installs the same pinned requirements,
+loads both existing artifacts, runs non-root and uses Render's `PORT`. No new
+runtime dependency or Docker change is needed. Artifact paths and model code
+copies are unchanged. Sample datasets are not added to the image.
+
+The current main backend does not call this service yet. Later it must verify
+Firebase identity, resolve validated samples, chunk pairs into bounded requests,
+add the server credential over HTTPS, and validate returned IDs/versions/counts.
+It must never pass this credential to mobile clients or treat it as a Firebase token.
+
+## Capacity and operational limits
+
+Default 32 is a conservative initial bound, not a proven safe production load.
+The model uses up to four XGBoost threads. Concurrent requests can oversubscribe a
+small instance; additional workers duplicate scientific-runtime/model memory.
+Matrix size grows with batch rows, as do Python/Pydantic/DataFrame/response objects.
+A 3.46 MB artifact does not represent total process memory. Cold starts, peak RSS,
+latency, repeated requests and concurrent load require Render measurements.
+
+A full 162-pair recording is not approved as one request by the default limit;
+it needs six requests of at most 32 pairs. Future callers should bound concurrent
+requests, use timeouts and avoid retry storms. This change does not add rate
+limiting, a global inference concurrency cap, or an HTTP body-byte limit; configure
+edge limits and evaluate these before broad public traffic. The batch ceiling
+limits validated items, not JSON parser allocation for an arbitrarily large body.
+
+## Local verification
+
+Use the existing environment with the inference runtime, pytest and httpx available:
 
 ```bash
-cd ml/hf_deployment
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-MODEL_REPOSITORY_DIR=./model_repository uvicorn app:app --host 0.0.0.0 --port 8000
+PYTHONPATH=. python -m pytest ml/hf_deployment/tests -q
+PYTHONPATH=ml python -m pytest ml/tests -q
+ruff check ml/
 ```
 
-## Rebuild the Oxford estimator artifact
+CI has a separate serving test job using `requirements.txt` from this directory,
+plus pytest/httpx, so artifact tests run with the pinned deployment environment.
+Local environments with newer NumPy/scikit-learn can produce persistence warnings;
+a passing local test does not replace testing the pinned runtime.
 
-From this directory, with the pinned dependencies installed, run:
-
-```bash
-python build_oxford_rul_artifact.py
-```
-
-This serializes the default estimator configuration. It does not train or
-validate an Oxford RUL model.
-
-## Request shapes
-
-KIT request: `schema_version` must be `1`; `current_window_features` must
-contain exactly the 30 named fields used by the training artifact, and
-`next_window_medians` must contain exactly its 10 target fields. Their names
-and order are validated against the loaded artifact.
-
-Oxford request: `schema_version` must be `1`; send `as_of_cycle`,
-`eol_threshold_capacity_mah`, and at least four `observations`, each with
-`characterization_cycle` and `capacity_1c_discharge_mah`. The caller must use the
-same target convention as the Oxford preprocessing/audit and must not describe
-the unconfirmed first crossing as a confirmed end-of-life label.
+Tests use real prepared KIT test windows and the trusted existing artifact. They
+never contact Render, retrain models, write artifacts or generate analysis files.

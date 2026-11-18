@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "samples": [
+    {
+      "id": "kit-20180320-normal",
+      "display_name": "KIT recorded OBD sample — 20 March 2018",
+      "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+      "original_filename": "2018-03-20_Seat_Leon_KA_KA_Normal.csv",
+      "recording_date": "2018-03-20",
+      "dataset": "KIT Automotive OBD-II",
+      "creator": "Marc Weber",
+      "publisher": "Karlsruhe Institute of Technology",
+      "source_doi": "10.35097/1130",
+      "citation": "Weber, Marc (2023). Automotive OBD-II Dataset. Karlsruhe Institute of Technology. DOI: 10.35097/1130.",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "source_split": "test",
+      "segment_ids": [
+        0
+      ],
+      "window_seconds": 10,
+      "window_count": 163,
+      "valid_pair_count": 162,
+      "asset_file": "kit-20180320-normal.csv.gz",
+      "asset_sha256": "3f24c1fcfd54538cf1b081515085045751c9ebe025e731fb17598cdbfc3795d9",
+      "feature_names": [
+        "coolant_temp_c__median",
+        "coolant_temp_c__std",
+        "coolant_temp_c__missing_fraction",
+        "map_kpa__median",
+        "map_kpa__std",
+        "map_kpa__missing_fraction",
+        "engine_rpm__median",
+        "engine_rpm__std",
+        "engine_rpm__missing_fraction",
+        "speed_kmph__median",
+        "speed_kmph__std",
+        "speed_kmph__missing_fraction",
+        "intake_air_temp_c__median",
+        "intake_air_temp_c__std",
+        "intake_air_temp_c__missing_fraction",
+        "maf_gs__median",
+        "maf_gs__std",
+        "maf_gs__missing_fraction",
+        "throttle_pct__median",
+        "throttle_pct__std",
+        "throttle_pct__missing_fraction",
+        "ambient_air_temp_c__median",
+        "ambient_air_temp_c__std",
+        "ambient_air_temp_c__missing_fraction",
+        "pedal_d_pct__median",
+        "pedal_d_pct__std",
+        "pedal_d_pct__missing_fraction",
+        "pedal_e_pct__median",
+        "pedal_e_pct__std",
+        "pedal_e_pct__missing_fraction"
+      ],
+      "target_names": [
+        "coolant_temp_c__median",
+        "map_kpa__median",
+        "engine_rpm__median",
+        "speed_kmph__median",
+        "intake_air_temp_c__median",
+        "maf_gs__median",
+        "throttle_pct__median",
+        "ambient_air_temp_c__median",
+        "pedal_d_pct__median",
+        "pedal_e_pct__median"
+      ],
+      "compatible_model_version": "kit-xgb-forecast-v1",
+      "provenance": {
+        "prepared_source": "data/automotive_obd/kit_obd/processed/windows_10s.csv.gz",
+        "prepared_source_sha256": "18ee9ebfcfb08207aa25b6bd2053bac0904fc42be81e2b8806b7247ea1c7a039",
+        "original_csv_sha256": "9a3c7c8285cb4dc6d4dc49443d27406070dc3d6ca756630a2d0f60c3d9da9774",
+        "preprocessing_version": "kit-10s-window-recipe-v1",
+        "preprocessing_source": "ml/scripts/preprocess_kit_obd.py",
+        "preprocessing_source_sha256": "665d12030cd9ba956f6a9d76bf9e9d55688d08d0ea9240257dc63e3de58f37fb",
+        "pairing_source": "ml/scripts/train_kit_xgb_forecast.py:make_next_window_pairs",
+        "transformation": "Selected original prepared rows only; UTF-8 CSV with LF line endings; original cell strings and ordering preserved; gzip level 9, empty filename, mtime 0.",
+        "timestamp_policy": "Source clock seconds since midnight; timezone unknown. Segments preserve backward timestamp boundaries.",
+        "aggregation": "Per-signal median, population standard deviation, missing fraction. No imputation; windows with a fully absent signal discarded."
+      },
+      "limitations": [
+        "Research recording, not the user's Garage vehicle or live telemetry.",
+        "Filename Normal is recording context, not a verified healthy or fault-free label.",
+        "KIT has no verified mechanical fault labels; novelty is not a fault diagnosis.",
+        "Combustion-engine OBD data, not EV traction-battery measurements.",
+        "Held out from fitting/calibration but already included in historical test evaluation; not a new independent evaluation.",
+        "Recording IDs are not verified independent vehicle IDs."
+      ]
+    }
+  ]
+}
