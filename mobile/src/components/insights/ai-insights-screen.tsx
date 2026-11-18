@@ -12,31 +12,43 @@ import { colors, layout, spacing } from '@/theme/tokens';
 import type { PickCsv } from '@/types/ai-insights';
 import { AnalysisResultCard } from './analysis-result-card';
 import { CsvSourceControl } from './csv-source-control';
+import type { AnalysisController } from '@/hooks/use-analysis';
+import { KitAnalysisControls } from './kit-analysis-controls';
+import { KitAnalysisVisualization } from './kit-analysis-visualization';
+import { KitAnalysisFeedback } from './kit-analysis-feedback';
 
-export function AIInsightsScreen({ initialDemo = false, pickCsv }: { initialDemo?: boolean; pickCsv?: PickCsv }) {
+export function AIInsightsScreen({ initialDemo = false, pickCsv, analysis }: { initialDemo?: boolean; pickCsv?: PickCsv; analysis?: AnalysisController }) {
   const data = useInsightsSource(initialDemo, pickCsv);
-  const demo = data.source.kind === 'demo';
+  const source = analysis?.source ?? data.source;
+  const selecting = analysis?.selecting ?? data.selecting;
+  const demo = source.kind === 'demo';
   return <AppScreen edges={['top', 'left', 'right']}>
     <AppHeader title="AI Insights" />
     <AppText variant="subtitle" accessibilityRole="header">Choose Data Source</AppText>
     <AppCard>
-      <CsvSourceControl available={Boolean(pickCsv)} selecting={data.selecting}
-        file={data.source.kind === 'csv' ? data.source.file : undefined} error={data.error}
-        onSelect={() => { void data.selectCsv(); }} onClear={data.clearCsv} />
+      {analysis && <KitAnalysisControls analysis={analysis} />}
+      <CsvSourceControl available={analysis ? analysis.canPickCsv : Boolean(pickCsv)} selecting={selecting}
+        file={source.kind === 'csv' ? source.file : undefined} error={analysis?.selectionError ?? data.error}
+        selectionLabel={analysis ? analysis.result.status === 'ready' && analysis.result.data.source_type === 'uploaded_csv'
+          ? 'CSV analysis received · Not saved' : 'Selected CSV · Not saved' : undefined}
+        onSelect={() => { void (analysis ?? data).selectCsv(); }} onClear={(analysis ?? data).clearCsv} />
       <View style={styles.switchRow}>
         <AppText variant="label" style={styles.switchLabel}>Use Demo Data</AppText>
-        <Switch accessible accessibilityRole="switch" accessibilityLabel="Use Demo Data" value={demo} disabled={data.selecting}
-          accessibilityState={{ checked: demo, disabled: data.selecting }}
-          onValueChange={data.useDemo} trackColor={{ false: colors.borderStrong, true: colors.accent }}
+        <Switch accessible accessibilityRole="switch" accessibilityLabel="Use Demo Data" value={demo} disabled={selecting}
+          accessibilityState={{ checked: demo, disabled: selecting }}
+          onValueChange={(analysis ?? data).useDemo} trackColor={{ false: colors.borderStrong, true: colors.accent }}
           thumbColor={colors.background} style={styles.switch} />
       </View>
       <AppText variant="caption" tone="secondary">{demoInsights.description}</AppText>
-      <AppText variant="caption" tone="secondary">Selecting demo data replaces a CSV selection. Nothing is added to saved analysis history.</AppText>
+      <AppText variant="caption" tone="secondary">Selecting demo data replaces a real data selection. Nothing is added to saved analysis history.</AppText>
       {demo && <AppStatus label="Demo data selected" tone="info" />}
     </AppCard>
 
     <AppText variant="subtitle" accessibilityRole="header">Analysis Results</AppText>
     {demo ? demoInsights.results.map(result => <AnalysisResultCard key={result.id} result={result} />)
+      : analysis && analysis.result.status !== 'idle' ? <KitAnalysisFeedback analysis={analysis} />
+      : analysis ? <AppCard><AppDataState status="empty" title="No analysis results yet"
+        message="Select a prerecorded KIT sample or a compatible CSV, then start analysis." /></AppCard>
       : <AppCard><AppDataState status="empty" title={data.source.kind === 'csv' ? 'Analysis not available yet' : 'No analysis results yet'}
         message={data.source.kind === 'csv' ? 'The selected CSV has not been uploaded or analysed. ML inference is not integrated.'
           : 'Enable Use Demo Data to preview illustrative results.'} /></AppCard>}
@@ -49,7 +61,7 @@ export function AIInsightsScreen({ initialDemo = false, pickCsv }: { initialDemo
         <AppText tone="secondary" style={styles.switchLabel}>{item.label}</AppText>
         <AppText variant="label">{item.value}{item.unit === '%' || item.unit === '°C' ? '' : ' '}{item.unit}</AppText>
       </View>)}
-    </AppCard> : <AppCard><AppDataState status="empty" title="No telemetry data selected"
+    </AppCard> : analysis?.result.status === 'ready' ? <KitAnalysisVisualization data={analysis.result.data} section="telemetry" /> : <AppCard><AppDataState status="empty" title="No telemetry data selected"
       message={data.source.kind === 'csv' ? 'CSV telemetry preview is not available yet. The selected file has not been read.'
         : 'Enable Use Demo Data to view sample telemetry.'} /></AppCard>}
   </AppScreen>;

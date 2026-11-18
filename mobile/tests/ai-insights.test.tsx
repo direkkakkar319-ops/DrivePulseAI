@@ -7,6 +7,8 @@ import type { CsvFileMetadata } from '../src/types/ai-insights';
 
 let mockParams: { demo?: string } = {};
 jest.mock('expo-router', () => ({ useLocalSearchParams: () => mockParams }));
+jest.mock('../src/store/authStore', () => ({ useAuthStore: () => ({ user: { uid: 'insights-test', emailVerified: true } }) }));
+jest.mock('../src/api/auth', () => ({ authService: { getToken: jest.fn(), subscribe: jest.fn() } }));
 beforeEach(() => { mockParams = {}; });
 const csv: CsvFileMetadata = { name: 'my-drive.csv', sizeBytes: 1200, mimeType: 'text/csv' };
 

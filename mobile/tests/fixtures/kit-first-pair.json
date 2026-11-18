@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "analysis_type": "kit_telemetry_novelty",
+  "model": {
+    "schema_version": 1,
+    "model_version": "kit-xgb-forecast-v1",
+    "assessment_type": "novelty",
+    "threshold": 8.083880990992366,
+    "label_status": "unlabeled_dataset_not_fault_diagnosis"
+  },
+  "window_count": 2,
+  "pair_count": 1,
+  "window_seconds": 10,
+  "summary": {
+    "evaluated_pairs": 1,
+    "novel_pairs": 0,
+    "not_novel_pairs": 1,
+    "novel_percentage": 0.0,
+    "max_anomaly_score": 3.4350437611685285,
+    "mean_anomaly_score": 3.4350437611685285,
+    "threshold": 8.083880990992366
+  },
+  "predictions": [
+    {
+      "pair_id": "pair-000000",
+      "current_window": {
+        "id": "window-000000",
+        "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+        "recording_date": "2018-03-20",
+        "split": "test",
+        "segment_id": 0,
+        "start_seconds": 30480,
+        "end_seconds": 30490,
+        "relative_start_seconds": 0
+      },
+      "next_window": {
+        "id": "window-000001",
+        "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+        "recording_date": "2018-03-20",
+        "split": "test",
+        "segment_id": 0,
+        "start_seconds": 30490,
+        "end_seconds": 30500,
+        "relative_start_seconds": 10
+      },
+      "anomaly_score": 3.4350437611685285,
+      "threshold": 8.083880990992366,
+      "is_novel": false,
+      "normalized_signal_errors": {
+        "coolant_temp_c": 1.4148030227234043,
+        "map_kpa": 0.0,
+        "engine_rpm": 3.4350437611685285,
+        "speed_kmph": 0.19998863630410724,
+        "intake_air_temp_c": 0.0,
+        "maf_gs": 0.9324217461072069,
+        "throttle_pct": 0.0,
+        "ambient_air_temp_c": 0.0,
+        "pedal_d_pct": 3.306972062409628e-08,
+        "pedal_e_pct": 0.0
+      },
+      "top_signal_deviations": [
+        {
+          "signal": "engine_rpm",
+          "normalized_error": 3.4350437611685285
+        },
+        {
+          "signal": "coolant_temp_c",
+          "normalized_error": 1.4148030227234043
+        },
+        {
+          "signal": "maf_gs",
+          "normalized_error": 0.9324217461072069
+        }
+      ]
+    }
+  ],
+  "flagged_intervals": [],
+  "score_series": [
+    {
+      "pair_id": "pair-000000",
+      "window": {
+        "id": "window-000001",
+        "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+        "recording_date": "2018-03-20",
+        "split": "test",
+        "segment_id": 0,
+        "start_seconds": 30490,
+        "end_seconds": 30500,
+        "relative_start_seconds": 10
+      },
+      "anomaly_score": 3.4350437611685285,
+      "threshold": 8.083880990992366,
+      "is_novel": false
+    }
+  ],
+  "signals": [
+    {
+      "name": "coolant_temp_c",
+      "unit": "\u00b0C",
+      "display_name": "Engine coolant temperature"
+    },
+    {
+      "name": "map_kpa",
+      "unit": "kPa",
+      "display_name": "Intake manifold absolute pressure"
+    },
+    {
+      "name": "engine_rpm",
+      "unit": "RPM",
+      "display_name": "Engine RPM"
+    },
+    {
+      "name": "speed_kmph",
+      "unit": "km/h",
+      "display_name": "Vehicle speed"
+    },
+    {
+      "name": "intake_air_temp_c",
+      "unit": "\u00b0C",
+      "display_name": "Intake air temperature"
+    },
+    {
+      "name": "maf_gs",
+      "unit": "g/s",
+      "display_name": "Mass air flow"
+    },
+    {
+      "name": "throttle_pct",
+      "unit": "%",
+      "display_name": "Throttle position"
+    },
+    {
+      "name": "ambient_air_temp_c",
+      "unit": "\u00b0C",
+      "display_name": "Ambient air temperature"
+    },
+    {
+      "name": "pedal_d_pct",
+      "unit": "%",
+      "display_name": "Accelerator pedal position D"
+    },
+    {
+      "name": "pedal_e_pct",
+      "unit": "%",
+      "display_name": "Accelerator pedal position E"
+    }
+  ],
+  "telemetry": [
+    {
+      "window": {
+        "id": "window-000000",
+        "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+        "recording_date": "2018-03-20",
+        "split": "test",
+        "segment_id": 0,
+        "start_seconds": 30480,
+        "end_seconds": 30490,
+        "relative_start_seconds": 0
+      },
+      "medians": {
+        "coolant_temp_c": 3.0,
+        "map_kpa": 98.0,
+        "engine_rpm": 0.0,
+        "speed_kmph": 0.0,
+        "intake_air_temp_c": -4.0,
+        "maf_gs": 0.86,
+        "throttle_pct": 89.0,
+        "ambient_air_temp_c": -3.0,
+        "pedal_d_pct": 14.1,
+        "pedal_e_pct": 14.5
+      },
+      "missing_fractions": {
+        "map_kpa": 0.014285714285714235,
+        "engine_rpm": 0.02857142857142858,
+        "speed_kmph": 0.042857142857142816,
+        "intake_air_temp_c": 0.05714285714285716,
+        "maf_gs": 0.0714285714285714,
+        "throttle_pct": 0.08571428571428574,
+        "ambient_air_temp_c": 0.09999999999999998,
+        "pedal_d_pct": 0.11428571428571432,
+        "pedal_e_pct": 0.12857142857142856
+      }
+    },
+    {
+      "window": {
+        "id": "window-000001",
+        "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+        "recording_date": "2018-03-20",
+        "split": "test",
+        "segment_id": 0,
+        "start_seconds": 30490,
+        "end_seconds": 30500,
+        "relative_start_seconds": 10
+      },
+      "medians": {
+        "coolant_temp_c": 2.0,
+        "map_kpa": 98.0,
+        "engine_rpm": 0.0,
+        "speed_kmph": 0.0,
+        "intake_air_temp_c": -4.0,
+        "maf_gs": 0.86,
+        "throttle_pct": 89.0,
+        "ambient_air_temp_c": -3.0,
+        "pedal_d_pct": 14.1,
+        "pedal_e_pct": 14.5
+      },
+      "missing_fractions": {}
+    }
+  ],
+  "explanation": {
+    "summary": "None of 1 evaluated window pairs exceeded the model's novelty threshold. No novel intervals were detected. This does not rule out faults.",
+    "signal_summary": "Largest normalized forecast deviations across evaluated pairs: Engine RPM, Engine coolant temperature, Mass air flow. Each listed value is that signal's maximum over this scope, not a cause.",
+    "signal_scope": "all_evaluated_pairs",
+    "strongest_signal_deviations": [
+      {
+        "signal": "engine_rpm",
+        "normalized_error": 3.4350437611685285
+      },
+      {
+        "signal": "coolant_temp_c",
+        "normalized_error": 1.4148030227234043
+      },
+      {
+        "signal": "maf_gs",
+        "normalized_error": 0.9324217461072069
+      }
+    ],
+    "score_definition": "Maximum absolute observed-minus-forecast target-median residual divided by its saved per-signal calibration scale; dimensionless, not a probability.",
+    "threshold_definition": "Saved calibration 99th-percentile score; a pair is novel only when score > threshold. Equality is not novel.",
+    "signal_definition": "Ranked normalized forecast deviations, not causal feature importance or evidence that a component is broken. Ties follow fitted signal order.",
+    "measurement_definition": "Telemetry contains observed ten-second medians, not forecasts. Sparse missing_fractions report partial missingness; omitted entries mean zero missingness. Entirely missing required signals make a window ineligible. No zero filling, interpolation or UTC timezone inference is performed.",
+    "limitations": "KIT is unlabeled combustion-engine research telemetry. Novelty is not confirmed mechanical fault diagnosis, model accuracy, vehicle health, EV battery health or remaining useful life. Unflagged data does not establish the absence of faults."
+  },
+  "time_basis": "source clock seconds since midnight; timezone unknown",
+  "relative_time_basis": "seconds from first retained window of each recording/date/segment/split",
+  "interval_definition": "[start, end); consecutive flagged target windows only; no gap bridging",
+  "contribution_definition": "largest normalized forecast errors; not causal fault attribution",
+  "persisted": false,
+  "source_type": "packaged_sample",
+  "sample": {
+    "id": "kit-first-pair-excerpt",
+    "display_name": "KIT first-pair test excerpt",
+    "recording_id": "KIT-2018-03-20_Seat_Leon_KA_KA_Normal",
+    "recording_date": "2018-03-20",
+    "dataset": "KIT Automotive OBD-II",
+    "creator": "Marc Weber",
+    "source_doi": "10.35097/1130",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "source_split": "test",
+    "window_count": 2,
+    "valid_pair_count": 1,
+    "window_seconds": 10,
+    "compatible_model_version": "kit-xgb-forecast-v1",
+    "limitations": [
+      "Research recording, not the user's Garage vehicle or live telemetry.",
+      "Filename Normal is recording context, not a verified healthy or fault-free label.",
+      "KIT has no verified mechanical fault labels; novelty is not a fault diagnosis.",
+      "Combustion-engine OBD data, not EV traction-battery measurements.",
+      "Held out from fitting/calibration but already included in historical test evaluation; not a new independent evaluation.",
+      "Recording IDs are not verified independent vehicle IDs."
+    ]
+  },
+  "limitations": [
+    "Research recording, not the user's Garage vehicle or live telemetry.",
+    "Filename Normal is recording context, not a verified healthy or fault-free label.",
+    "KIT has no verified mechanical fault labels; novelty is not a fault diagnosis.",
+    "Combustion-engine OBD data, not EV traction-battery measurements.",
+    "Held out from fitting/calibration but already included in historical test evaluation; not a new independent evaluation.",
+    "Recording IDs are not verified independent vehicle IDs."
+  ]
+}

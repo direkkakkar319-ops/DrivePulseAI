@@ -1,11 +1,31 @@
 # DrivePulseAI Android app
 
+## Main-backend KIT analysis integration (Phase 4.1)
+
+The protected Insights route now loads the real sample catalog and runs authenticated
+sample analysis through the existing main backend, with transient results, safe
+errors, cancellation and minimal summary feedback. Demo mode remains separate.
+Native CSV selection uses the installed SDK-compatible `expo-document-picker`
+57.0.3 and submits one native file reference plus its explicit recording date.
+An older development client missing the native module needs a separately approved
+rebuild; no Android rebuild or backend changes were performed here. See the
+[integration and Android verification guide](ANALYSIS_INTEGRATION.md).
+
 Vehicle onboarding and Garage Add/Edit share a small local demo catalog, dependent
 manufacturer/model/year selectors, explicit engine/type and conditional fuel
 selection, and manual fallback. No external catalog is called by the form.
 See [demo coverage, sources and one-time onboarding](VEHICLE_CATALOG.md).
 
 React Native + Expo frontend with Firebase email/password and Android Google authentication.
+
+## KIT graphs and detailed results (Phase 4.2)
+
+Real sample and compatible CSV results now include anomaly score/threshold plots,
+observed-telemetry line plots, signal and segment selectors, point inspection,
+flagged intervals, normalized deviations and model limitations. Plots page through
+original values without interpolation. Forecast medians are absent from the API,
+so actual-versus-predicted comparison is explicitly unavailable. No dependencies
+were added. See [visualization contract and device checks](ANALYSIS_VISUALIZATION.md).
 
 ## AI Insights demonstration (Phase 4.4)
 
@@ -16,13 +36,12 @@ explanations, and never enter account analysis history. Fixed typed fixtures in
 `src/config/demo-insights.ts` are UI samples, unrelated to saved vehicles,
 recordings, training datasets, or actual model output. No charts or inference run.
 
-This build has no compatible CSV picker: selection/upload is explicitly unavailable
-and the select-file button is disabled. No dependency was added. An optional
-metadata-only picker contract is provided for a future integration; its component
-tests inject a picker to verify filename/size/type, cancellation, replacement,
-errors, and source switching. This does not enable native selection in the app.
-Even with that adapter, selecting a file shows **Analysis not available yet**;
-the UI does not read its contents, upload it, parse telemetry, or run ML.
+The original demo presentation can still run independently with an injected
+metadata-only picker and unavailable inference. The production Insights route now
+supplies the Phase 4.1 controller and real native picker: compatible CSVs can be
+selected and explicitly submitted for backend analysis. File selection alone
+never runs inference; demo values are never relabeled as uploaded-file results.
+The backend, not the Android UI, parses and preprocesses the CSV.
 
 Home retains saved Garage vehicles and an empty genuine-history state. Its Explore
 Demo Data action opens the generic Insights demonstration without creating saved
