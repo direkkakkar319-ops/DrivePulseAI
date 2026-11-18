@@ -77,7 +77,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff -r backend/requirements.txt
       - name: Ruff
-        run: ruff check backend/
+        run: python -m ruff check backend/
 
   lint-frontend:
     name: Frontend lint
