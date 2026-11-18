@@ -9,11 +9,24 @@ permissions:
 jobs:
   backend-health:
     if: >-
-      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment_status.state == 'success' ||
+       github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error') &&
       contains(github.event.deployment_status.environment_url, 'drivepulse-backend')
     runs-on: ubuntu-latest
     steps:
+      - name: Fail when Render reports a backend deployment failure
+        if: >-
+          github.event.deployment_status.state == 'failure' ||
+          github.event.deployment_status.state == 'error'
+        env:
+          DEPLOYMENT_STATE: ${{ github.event.deployment_status.state }}
+        run: |
+          echo "❌ Render backend deployment ended with state: $DEPLOYMENT_STATE"
+          exit 1
+
       - name: Check backend and database health
+        if: github.event.deployment_status.state == 'success'
         env:
           SERVICE_URL: ${{ github.event.deployment_status.environment_url }}
         run: |
@@ -44,11 +57,24 @@ jobs:
 
   ml-health:
     if: >-
-      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment_status.state == 'success' ||
+       github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error') &&
       contains(github.event.deployment_status.environment_url, 'drivepulseai')
     runs-on: ubuntu-latest
     steps:
+      - name: Fail when Render reports an ML deployment failure
+        if: >-
+          github.event.deployment_status.state == 'failure' ||
+          github.event.deployment_status.state == 'error'
+        env:
+          DEPLOYMENT_STATE: ${{ github.event.deployment_status.state }}
+        run: |
+          echo "❌ Render ML deployment ended with state: $DEPLOYMENT_STATE"
+          exit 1
+
       - name: Check ML service health
+        if: github.event.deployment_status.state == 'success'
         env:
           SERVICE_URL: ${{ github.event.deployment_status.environment_url }}
         run: |
