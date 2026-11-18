@@ -55,7 +55,9 @@ def request(url: str, *, method: str = "GET", api_key: str | None = None):
     except HTTPError as error:
         return error.code, error.read()
     except (TimeoutError, URLError) as error:
-        fail(f"Render request failed: {error.reason if isinstance(error, URLError) else error}")
+        fail(
+            f"Render request failed: {error.reason if isinstance(error, URLError) else error}"
+        )
 
 
 def service_id_from_hook(hook_url: str) -> str:
@@ -72,7 +74,9 @@ def trigger() -> None:
     hook_url = os.environ.get("RENDER_DEPLOY_HOOK", "").strip()
     deploy_ref = os.environ.get("DEPLOY_REF", "").strip()
     if not os.environ.get("RENDER_API_KEY", "").strip():
-        fail("The RENDER_API_KEY repository secret is required to verify deployment status.")
+        fail(
+            "The RENDER_API_KEY repository secret is required to verify deployment status."
+        )
     if not hook_url:
         fail("The required Render deploy-hook secret is not configured.")
     if not deploy_ref:
@@ -81,7 +85,9 @@ def trigger() -> None:
     service_id = service_id_from_hook(hook_url)
     started_at = datetime.now(UTC).isoformat().replace("+00:00", "Z")
     parsed_hook = urlparse(hook_url)
-    query = [(key, value) for key, value in parse_qsl(parsed_hook.query) if key != "ref"]
+    query = [
+        (key, value) for key, value in parse_qsl(parsed_hook.query) if key != "ref"
+    ]
     query.append(("ref", deploy_ref))
     commit_hook_url = urlunparse(parsed_hook._replace(query=urlencode(query)))
     status, response_body = request(commit_hook_url, method="POST")
@@ -94,8 +100,12 @@ def trigger() -> None:
             payload = json.loads(response_body)
             deploy_id = payload["deploy"]["id"]
         except (json.JSONDecodeError, KeyError, TypeError):
-            fail("Render accepted the request but did not return the expected deploy ID.")
-        print(f"Render accepted deployment {deploy_id} for {service_id} at {deploy_ref}.")
+            fail(
+                "Render accepted the request but did not return the expected deploy ID."
+            )
+        print(
+            f"Render accepted deployment {deploy_id} for {service_id} at {deploy_ref}."
+        )
     else:
         print("Render queued the deployment behind another in-progress deployment.")
 
@@ -107,14 +117,18 @@ def trigger() -> None:
 def api_get(url: str, api_key: str):
     status, body = request(url, api_key=api_key)
     if status != 200:
-        fail(f"Render API request failed with HTTP {status}; check RENDER_API_KEY permissions.")
+        fail(
+            f"Render API request failed with HTTP {status}; check RENDER_API_KEY permissions."
+        )
     try:
         return json.loads(body)
     except json.JSONDecodeError:
         fail("Render API returned an invalid JSON response.")
 
 
-def find_queued_deploy(service_id: str, api_key: str, started_at: str, expected_commit: str):
+def find_queued_deploy(
+    service_id: str, api_key: str, started_at: str, expected_commit: str
+):
     params = urlencode({"limit": "20", "createdAfter": started_at})
     url = f"https://api.render.com/v1/services/{service_id}/deploys?{params}"
     for item in api_get(url, api_key):
@@ -127,7 +141,9 @@ def find_queued_deploy(service_id: str, api_key: str, started_at: str, expected_
 
 def check_health(url: str) -> bool:
     try:
-        with urlopen(Request(url, headers={"Accept": "application/json"}), timeout=15) as response:
+        with urlopen(
+            Request(url, headers={"Accept": "application/json"}), timeout=15
+        ) as response:
             return 200 <= response.status < 300
     except (HTTPError, TimeoutError, URLError):
         return False
@@ -139,10 +155,16 @@ def verify() -> None:
     deploy_id = os.environ.get("RENDER_DEPLOY_ID", "").strip()
     started_at = os.environ.get("DEPLOY_STARTED_AT", "").strip()
     expected_commit = os.environ.get("EXPECTED_COMMIT", "").strip()
-    health_urls = [url.strip() for url in os.environ.get("HEALTH_URLS", "").split(",") if url.strip()]
+    health_urls = [
+        url.strip()
+        for url in os.environ.get("HEALTH_URLS", "").split(",")
+        if url.strip()
+    ]
 
     if not api_key:
-        fail("The RENDER_API_KEY repository secret is required to verify deployment status.")
+        fail(
+            "The RENDER_API_KEY repository secret is required to verify deployment status."
+        )
     if not service_id or not started_at or not expected_commit or not health_urls:
         fail("Deployment verification is missing required workflow inputs.")
 
@@ -154,7 +176,9 @@ def verify() -> None:
         if deploy_id:
             deploy = api_get(f"{deploy_url}/{deploy_id}", api_key)
         else:
-            deploy = find_queued_deploy(service_id, api_key, started_at, expected_commit)
+            deploy = find_queued_deploy(
+                service_id, api_key, started_at, expected_commit
+            )
 
         if deploy:
             actual_commit = (deploy.get("commit") or {}).get("id")

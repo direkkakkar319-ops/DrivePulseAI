@@ -50,17 +50,27 @@ def main() -> None:
     finite = np.isfinite(frame[["Timestamp", *FEATURES]].to_numpy()).all(axis=1)
     valid = finite & frame.SOC.between(0, 100) & frame.HV_Bat_Voltage.gt(0)
     valid &= frame.HV_Bat_Voltage.le(500)
-    frame = frame.loc[valid].sort_values("Timestamp", kind="stable").reset_index(drop=True)
+    frame = (
+        frame.loc[valid].sort_values("Timestamp", kind="stable").reset_index(drop=True)
+    )
     x = frame[FEATURES]
     n = len(x)
     train_end, val_end = int(n * 0.70), int(n * 0.85)
-    train, validation, test = x.iloc[:train_end], x.iloc[train_end:val_end], x.iloc[val_end:]
+    train, validation, test = (
+        x.iloc[:train_end],
+        x.iloc[train_end:val_end],
+        x.iloc[val_end:],
+    )
 
     # Small chronological sample keeps quadratic/dense alternatives tractable.
     sample_n = min(20_000, len(train))
     train_sample = train.iloc[np.linspace(0, len(train) - 1, sample_n, dtype=int)]
-    validation_sample = validation.iloc[np.linspace(0, len(validation) - 1, min(20_000, len(validation)), dtype=int)]
-    test_sample = test.iloc[np.linspace(0, len(test) - 1, min(20_000, len(test)), dtype=int)]
+    validation_sample = validation.iloc[
+        np.linspace(0, len(validation) - 1, min(20_000, len(validation)), dtype=int)
+    ]
+    test_sample = test.iloc[
+        np.linspace(0, len(test) - 1, min(20_000, len(test)), dtype=int)
+    ]
     candidates = {
         "isolation_forest": IsolationForest(
             n_estimators=200,
@@ -141,7 +151,9 @@ def main() -> None:
         "final_fit_rows": len(train),
         "final_threshold": threshold,
         "final_threshold_quantile": THRESHOLD_QUANTILE,
-        "final_validation": score_summary(final_model.score_samples(validation), threshold),
+        "final_validation": score_summary(
+            final_model.score_samples(validation), threshold
+        ),
         "final_test": score_summary(final_model.score_samples(test), threshold),
         "label_status": "Unsupervised flags identify unusual telemetry only; they do not confirm vehicle faults.",
         "artifact": str(ARTIFACT_PATH.relative_to(ROOT)),

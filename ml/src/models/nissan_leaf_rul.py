@@ -31,7 +31,9 @@ class NissanLeafRUL:
         if not 0 < eol_threshold_soh_pct < 100:
             raise ValueError("eol_threshold_soh_pct must be between 0 and 100")
         if lookback_days <= 0 or min_daily_observations < 3:
-            raise ValueError("lookback_days must be positive and minimum observations >= 3")
+            raise ValueError(
+                "lookback_days must be positive and minimum observations >= 3"
+            )
         self.eol_threshold_soh_pct = float(eol_threshold_soh_pct)
         self.lookback_days = int(lookback_days)
         self.min_daily_observations = int(min_daily_observations)
@@ -44,13 +46,17 @@ class NissanLeafRUL:
         frame = observations.copy()
         for column in self.REQUIRED | (set(self.CONTEXT) & set(frame.columns)):
             frame[column] = pd.to_numeric(frame[column], errors="coerce")
-        valid = np.isfinite(frame[["Timestamp", "Odometer", "SOH"]].to_numpy()).all(axis=1)
+        valid = np.isfinite(frame[["Timestamp", "Odometer", "SOH"]].to_numpy()).all(
+            axis=1
+        )
         valid &= frame.SOH.between(0, 100) & frame.Odometer.ge(0)
         frame = frame.loc[valid].copy()
         if frame.empty:
             return {"status": "no_valid_history", "rul_km": None}
 
-        frame["date"] = pd.to_datetime(frame.Timestamp, unit="us", utc=True).dt.floor("D")
+        frame["date"] = pd.to_datetime(frame.Timestamp, unit="us", utc=True).dt.floor(
+            "D"
+        )
         daily_agg = {"SOH": "median", "Odometer": "median"}
         for column in self.CONTEXT:
             if column in frame:
@@ -101,7 +107,9 @@ class NissanLeafRUL:
         return {
             **base,
             "rul_km": float(distance),
-            "estimated_days_to_threshold": float(distance / km_per_day) if km_per_day > 0 else None,
+            "estimated_days_to_threshold": float(distance / km_per_day)
+            if km_per_day > 0
+            else None,
             "median_daily_distance_km": km_per_day if km_per_day > 0 else None,
             "validation_status": "unvalidated_extrapolation_single_vehicle_no_threshold_crossing",
         }

@@ -56,7 +56,8 @@ def main() -> None:
     ]
     frame = pd.read_parquet(artifact / "row_ledger.parquet", columns=columns)
     raw = pd.read_csv(
-        ROOT / "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv",
+        ROOT
+        / "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv",
         usecols=["Timestamp", "Gear"],
     )
     assert np.array_equal(frame.Timestamp, raw.Timestamp)
@@ -153,7 +154,8 @@ def main() -> None:
     trip_table = pd.DataFrame(trips)
     trip_table.to_csv(OUT / "negative_trips.csv", index=False)
     processed = pd.read_csv(
-        ROOT / "data/automotive_prognostics/nissan_leaf_2018/v1/processed/Dataset_Preprocessed.csv",
+        ROOT
+        / "data/automotive_prognostics/nissan_leaf_2018/v1/processed/Dataset_Preprocessed.csv",
         usecols=["Timestamp", "Trip", "Speed"],
     )
     matched = frame.loc[negative, ["Timestamp", "Trip", "Speed"]].merge(

@@ -90,5 +90,7 @@ def companion_metadata(frame: pd.DataFrame) -> pd.DataFrame:
         out.quality_flags.eq(0), "no_configured_row_flags", "retained_with_review_flags"
     )
     out["source_dataset"] = "raw"
-    out["source_file"] = "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv"
+    out["source_file"] = (
+        "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv"
+    )
     return out.reset_index(drop=True)

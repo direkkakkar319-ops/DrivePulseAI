@@ -224,8 +224,10 @@ def prepare(config_path: Path) -> dict:
     directory = Path(tempfile.mkdtemp(prefix=f"{run_id}.incomplete-", dir=parent))
     print(f"Preparation {run_id}: source hashes verified", flush=True)
     source_paths = {
-        "raw": ROOT / "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv",
-        "processed": ROOT / "data/automotive_prognostics/nissan_leaf_2018/v1/processed/Dataset_Preprocessed.csv",
+        "raw": ROOT
+        / "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv",
+        "processed": ROOT
+        / "data/automotive_prognostics/nissan_leaf_2018/v1/processed/Dataset_Preprocessed.csv",
     }
     audit = {}
     for version in ("raw",) if battery else ("processed", "raw"):

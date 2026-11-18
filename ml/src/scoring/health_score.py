@@ -18,7 +18,17 @@ def battery_health_score(soh_pct: float) -> dict:
     soh = float(soh_pct)
     if not math.isfinite(soh) or not 0 <= soh <= 100:
         raise ValueError("soh_pct must be finite and within [0, 100]")
-    score = 5 if soh >= 95 else 4 if soh >= 90 else 3 if soh >= 85 else 2 if soh >= 80 else 1
+    score = (
+        5
+        if soh >= 95
+        else 4
+        if soh >= 90
+        else 3
+        if soh >= 85
+        else 2
+        if soh >= 80
+        else 1
+    )
     labels = {
         5: "very_healthy",
         4: "healthy",

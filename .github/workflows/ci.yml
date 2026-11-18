@@ -77,7 +77,8 @@ jobs:
       - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff -r backend/requirements.txt
+          python -m pip install -r backend/requirements.txt
+          python -m ruff --version
       - name: Ruff
         run: python -m ruff check backend/
 
@@ -169,7 +170,7 @@ jobs:
       - name: Install backend and test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff pytest pytest-asyncio -r backend/requirements.txt
+          python -m pip install pytest pytest-asyncio -r backend/requirements.txt
       - name: Pytest
         run: pytest backend/tests
 

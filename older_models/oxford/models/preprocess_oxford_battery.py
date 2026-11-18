@@ -21,9 +21,7 @@ RAW_FILE = (
     ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/raw/"
     "Oxford_Battery_Degradation_Dataset_1.mat"
 )
-OUTPUT_DIR = (
-    ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/processed"
-)
+OUTPUT_DIR = ROOT / "older_models/oxford/data/oxford_battery_degradation/v1/processed"
 EOL_FRACTION = 0.75
 EOL_CONFIRMATION_RECORDS = 2
 CYCLE_PATTERN = re.compile(r"^cyc(\d+)$")
@@ -50,7 +48,9 @@ def generated_ev_context(cell_id: str, cycle: int) -> dict[str, float]:
         + (2.3 * max(15.0 - ambient_temperature_c, 0.0))
         + (0.55 * (average_speed_kph - 43.0))
     )
-    dc_fast_charge_share_pct = 14.0 + (9.0 * math.sin((2 * math.pi * cycle / 1500) + phase))
+    dc_fast_charge_share_pct = 14.0 + (
+        9.0 * math.sin((2 * math.pi * cycle / 1500) + phase)
+    )
     charge_power_kw = 7.2 + (0.35 * dc_fast_charge_share_pct)
     state_of_charge_pct = 62.0 + (18.0 * math.sin((2 * math.pi * cycle / 470) + phase))
     pack_temperature_c = ambient_temperature_c + 9.0 + (0.045 * average_speed_kph)
