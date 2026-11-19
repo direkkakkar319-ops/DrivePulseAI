@@ -30,7 +30,7 @@ from .core import (
     validate_schema,
 )
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 REPORT = ROOT / "ml/reports/nissan_leaf_2018"
 DEFAULT_CONFIG = ROOT / "ml/notebooks/nissan_leaf_2018/config/preparation.json"
 

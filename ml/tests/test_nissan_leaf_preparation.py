@@ -7,8 +7,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ml.src.nissan_leaf_preparation.battery import inherit_splits, sorted_membership
-from ml.src.nissan_leaf_preparation.core import (
+from ml.src.data.nissan_leaf_preparation.battery import (
+    inherit_splits,
+    sorted_membership,
+)
+from ml.src.data.nissan_leaf_preparation.core import (
     FLAGS,
     audit_trip,
     chronological_split,

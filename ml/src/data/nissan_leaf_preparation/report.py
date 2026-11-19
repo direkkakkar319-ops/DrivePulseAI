@@ -27,7 +27,7 @@ def markdown(frame: pd.DataFrame) -> str:
 
 
 def write_report(summary: dict, directory: Path) -> None:
-    root = Path(__file__).resolve().parents[3]
+    root = Path(__file__).resolve().parents[4]
     base = root / "ml/reports/nissan_leaf_2018"
     tables = base / "tables/preparation"
     tables.mkdir(parents=True, exist_ok=True)
@@ -176,7 +176,7 @@ Both releases overlap in 1,886,696 exact timestamps. They are never pooled or us
 
 ## 2. Preparation architecture
 
-`ml/src/nissan_leaf_preparation/` contains reusable quality, temporal, split, transformation, window, export and independent validation functions. `ml/notebooks/nissan_leaf_2018/scripts/prepare_data.py` is the CLI. JSON configuration lives at `ml/notebooks/nissan_leaf_2018/config/preparation.json`.
+`ml/src/data/nissan_leaf_preparation/` contains reusable quality, temporal, split, transformation, window, export and independent validation functions. `ml/notebooks/nissan_leaf_2018/scripts/prepare_data.py` is the CLI. JSON configuration lives at `ml/notebooks/nissan_leaf_2018/config/preparation.json`.
 
 CSV scans read {c["chunk_rows"]:,} rows per chunk and carry one incomplete trip. Audit Parquet writes one trip per row group. Exact robust statistics load only retained training input columns; independent output validation reads a selected-column ledger, not the full 92-column source. No dense sliding-window tensors are duplicated: sequence indices reference existing feature rows. Output source/config/code/library fingerprints determine the run ID. Re-execution builds a separate temporary result and requires identical output hashes before reusing an existing run directory; incomplete runs are not published as complete.
 
@@ -277,7 +277,7 @@ From repository root, using existing dependencies (pandas, NumPy, PyArrow; no in
 ```bash
 .venv/bin/python ml/notebooks/nissan_leaf_2018/scripts/prepare_data.py
 .venv/bin/python -m pytest ml/tests -q
-.venv/bin/ruff check ml/src/nissan_leaf_preparation ml/notebooks/nissan_leaf_2018/scripts/prepare_data.py ml/tests/test_nissan_leaf_preparation.py
+.venv/bin/ruff check ml/src/data/nissan_leaf_preparation ml/notebooks/nissan_leaf_2018/scripts/prepare_data.py ml/tests/test_nissan_leaf_preparation.py
 ```
 
 Optional configuration: `--config path/to/reviewed.json`. Repeating the first command independently recomputes and compares output hashes. The run will stop on schema/hash drift, unsafe boundaries, empty usable tasks or reproducibility failure, leaving incomplete artifacts for investigation. Only generated intermediate files in that run's private directory are removed. Original downloads and earlier EDA/readiness outputs remain unchanged.

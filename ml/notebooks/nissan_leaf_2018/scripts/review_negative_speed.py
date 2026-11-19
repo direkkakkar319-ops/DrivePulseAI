@@ -11,7 +11,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / "ml/src"))
-from nissan_leaf_preparation.core import (
+from data.nissan_leaf_preparation.core import (
     FLAGS,
     digest,
     fingerprints,
@@ -19,7 +19,7 @@ from nissan_leaf_preparation.core import (
     make_windows,
     save_json,
 )
-from nissan_leaf_preparation.report import markdown
+from data.nissan_leaf_preparation.report import markdown
 
 BASE = ROOT / "ml/reports/nissan_leaf_2018"
 OUT = BASE / "tables/negative_speed"

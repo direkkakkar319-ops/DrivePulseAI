@@ -13,7 +13,7 @@ from .report import markdown
 
 
 def write_report(summary: dict, directory: Path) -> None:
-    root = Path(__file__).resolve().parents[3]
+    root = Path(__file__).resolve().parents[4]
     base = root / "ml/reports/nissan_leaf_2018"
     tables = base / "tables/battery_only"
     tables.mkdir(parents=True, exist_ok=True)
@@ -217,7 +217,7 @@ Executed tests, Ruff, parent/source checksum verification and independent rerun 
 ```bash
 .venv/bin/python ml/notebooks/nissan_leaf_2018/scripts/prepare_data.py --config ml/notebooks/nissan_leaf_2018/config/battery_only.json
 .venv/bin/python -m pytest ml/tests -q
-.venv/bin/ruff check ml/src/nissan_leaf_preparation ml/tests/test_nissan_leaf_battery.py
+.venv/bin/ruff check ml/src/data/nissan_leaf_preparation ml/tests/test_nissan_leaf_battery.py
 ```
 
 Repeat the first command for an independent complete rerun; every generated artifact checksum and manifest must match. A new configuration/code fingerprint creates a different directory. Existing completed runs are verified and never overwritten. No model training/evaluation, dependency installation, commits or pushes occur in this phase.
