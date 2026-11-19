@@ -101,3 +101,32 @@ it('aborts an upload on account change and cannot publish its late response', as
   expect(screen.queryByText('Real KIT analysis received')).toBeNull();
   expect(screen.getByText('No analysis results yet')).toBeTruthy();
 });
+
+it('shows a sanitized upload failure and retries through the real multipart client to charts', async () => {
+  jest.mocked(fetch).mockResolvedValueOnce({ ok: false, status: 503, json: async () => ({ detail: 'private upstream secret' }) } as Response)
+    .mockResolvedValueOnce(response(uploadResult()));
+  await render(<InsightsRoute />);
+  await fireEvent.press(screen.getByRole('button', { name: 'Select CSV file' }));
+  await fireEvent.changeText(screen.getByLabelText('Recording date'), '2018-03-20');
+  await fireEvent.press(screen.getByRole('button', { name: 'Upload and analyze CSV' }));
+  expect(screen.getByText('The analysis service is unavailable. Please try again later.')).toBeTruthy();
+  expect(screen.queryByText(/private upstream/)).toBeNull(); expect(screen.queryByTestId('kit-scores-visualization')).toBeNull();
+  await fireEvent.press(screen.getByRole('button', { name: 'Retry analysis' }));
+  expect(await screen.findByTestId('kit-scores-visualization')).toBeTruthy();
+  expect(screen.getByTestId('kit-telemetry-visualization')).toBeTruthy(); expect(fetch).toHaveBeenCalledTimes(2);
+});
+it('does not display late upload charts after cancellation and switching to demo', async () => {
+  let finish!: (value: Response) => void;
+  jest.mocked(fetch).mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+  await render(<InsightsRoute />);
+  await fireEvent.press(screen.getByRole('button', { name: 'Select CSV file' }));
+  await fireEvent.changeText(screen.getByLabelText('Recording date'), '2018-03-20');
+  await fireEvent.press(screen.getByRole('button', { name: 'Upload and analyze CSV' }));
+  expect(screen.getByText('Running KIT analysis')).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: 'Cancel analysis' }));
+  expect(jest.mocked(fetch).mock.calls[0][1]?.signal?.aborted).toBe(true);
+  await fireEvent(screen.getByRole('switch'), 'valueChange', true);
+  await act(async () => { finish(response(uploadResult())); });
+  expect(screen.getByText('94.2%')).toBeTruthy(); expect(screen.queryByTestId('kit-scores-visualization')).toBeNull();
+  expect(screen.queryByTestId('kit-telemetry-visualization')).toBeNull();
+});

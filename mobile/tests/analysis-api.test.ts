@@ -144,3 +144,35 @@ it('rejects malformed/duplicate catalogs and unsafe sample IDs', async () => {
   expect(() => parseKitCatalog({ schema_version: 1, samples: [{ ...sample, window_count: '2' }] })).toThrow();
   await expect(analysisApi.sample('../secret', context)).rejects.toThrow('available KIT sample'); expect(fetch).not.toHaveBeenCalled();
 });
+
+it('applies the upload deadline to response decoding and cleans up the session listener', async () => {
+  jest.useFakeTimers();
+  jest.mocked(fetch).mockResolvedValue({ ...reply(200), json: () => new Promise(() => {}) } as unknown as Response);
+  const pending = analysisApi.upload(csvFile, '2018-03-20', context);
+  const assertion = expect(pending).rejects.toMatchObject({ status: 504 });
+  await jest.advanceTimersByTimeAsync(analysisTimeouts.upload); await assertion;
+  expect(fetch).toHaveBeenCalledTimes(1); expect(unsubscribe).toHaveBeenCalledTimes(1);
+  expect(jest.mocked(fetch).mock.calls[0][1]?.signal?.aborted).toBe(true);
+});
+it('never sends a refreshed credential after logout during 401 recovery', async () => {
+  let refresh!: (value: string) => void;
+  jest.mocked(authService.getToken).mockResolvedValueOnce('first-token').mockImplementationOnce(() => new Promise(resolve => { refresh = resolve; }));
+  jest.mocked(fetch).mockResolvedValue(reply(401) as Response);
+  const pending = analysisApi.samples(context);
+  const assertion = expect(pending).rejects.toBeInstanceOf(AnalysisCancelled);
+  // Settle the first response and enter the pending refresh without sleeping.
+  for (let i = 0; i < 20 && !refresh; i++) await Promise.resolve();
+  expect(authService.getToken).toHaveBeenLastCalledWith(true);
+  listener(null); refresh('obsolete-refreshed-token'); await assertion;
+  expect(fetch).toHaveBeenCalledTimes(1); expect(unsubscribe).toHaveBeenCalledTimes(1);
+});
+it('cancels pending JSON decoding on logout even when the decoder ignores abort', async () => {
+  let decode!: (value: unknown) => void;
+  jest.mocked(fetch).mockResolvedValue({ ...reply(200), json: () => new Promise(resolve => { decode = resolve; }) } as unknown as Response);
+  const pending = analysisApi.samples(context);
+  const assertion = expect(pending).rejects.toBeInstanceOf(AnalysisCancelled);
+  for (let i = 0; i < 20 && !decode; i++) await Promise.resolve();
+  expect(decode).toBeDefined(); listener(null);
+  decode({ schema_version: 1, samples: [sampleResult().sample] }); await assertion;
+  expect(unsubscribe).toHaveBeenCalledTimes(1);
+});

@@ -1,5 +1,8 @@
 # DrivePulseAI Android app
 
+Phase 5.1 verification and pending device acceptance are documented in the
+[application testing report and Android checklist](TESTING_PHASE_5_1.md).
+
 ## Main-backend KIT analysis integration (Phase 4.1)
 
 The protected Insights route now loads the real sample catalog and runs authenticated

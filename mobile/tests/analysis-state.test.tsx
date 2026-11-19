@@ -136,3 +136,50 @@ it('submits the explicit recording date from the minimal CSV form and labels tra
   expect(screen.getByText('CSV analysis received · Not saved')).toBeTruthy();
   expect(screen.queryByText('94.2%')).toBeNull();
 });
+
+it('ignores a document picker result arriving after account switching', async () => {
+  const { api } = setup(), pending = deferred<typeof csvFile>();
+  const pick = jest.fn(() => pending.promise);
+  const hook = await renderHook(({ uid }: { uid: string }) => useAnalysis(uid, false, pick, api), { initialProps: { uid: 'alice' } });
+  let request!: Promise<void>; await act(() => { request = hook.result.current.selectCsv(); });
+  expect(hook.result.current.selecting).toBe(true);
+  await hook.rerender({ uid: 'bob' });
+  await act(async () => { pending.resolve(csvFile); await request; });
+  expect(hook.result.current.source.kind).toBe('none');
+  expect(hook.result.current.selecting).toBe(false);
+  expect(hook.result.current.recordingDate).toBe(''); expect(api.upload).not.toHaveBeenCalled();
+});
+it('ignores an obsolete picker after clearing and selecting a replacement', async () => {
+  const { api } = setup(), pending = deferred<typeof csvFile>();
+  const replacement = { ...csvFile, name: 'replacement.csv', uri: 'content://replacement.csv' };
+  const pick = jest.fn().mockReturnValueOnce(pending.promise).mockResolvedValueOnce(replacement);
+  const hook = await renderHook(() => useAnalysis('alice', false, pick, api));
+  let request!: Promise<void>; await act(() => { request = hook.result.current.selectCsv(); });
+  await act(() => hook.result.current.clearCsv()); await act(() => hook.result.current.selectCsv());
+  await act(async () => { pending.resolve(csvFile); await request; });
+  expect(hook.result.current.source).toEqual({ kind: 'csv', file: replacement });
+  expect(hook.result.current.selecting).toBe(false);
+});
+it('discards a pending CSV response when its recording date changes', async () => {
+  const { api, pick } = setup(), pending = deferred<ReturnType<typeof uploadResult>>();
+  api.upload.mockImplementationOnce(() => pending.promise);
+  const hook = await renderHook(() => useAnalysis('alice', false, pick, api));
+  await act(() => hook.result.current.selectCsv()); await act(() => hook.result.current.setRecordingDate('2018-03-20'));
+  let request!: Promise<void>; await act(() => { request = hook.result.current.run(); });
+  const signal = (api.upload.mock.calls[0] as unknown as [unknown, unknown, { signal: AbortSignal }])[2].signal;
+  await act(() => hook.result.current.setRecordingDate('2018-03-21'));
+  await act(async () => { pending.resolve(uploadResult()); await request; });
+  expect(signal.aborted).toBe(true); expect(hook.result.current.result.status).toBe('idle');
+  expect(hook.result.current.recordingDate).toBe('2018-03-21');
+});
+it('does not restore an old catalog after logout while the transport ignores abort', async () => {
+  const { api, pick } = setup(), pending = deferred<Awaited<ReturnType<typeof api.samples>>>();
+  api.samples.mockImplementationOnce(() => pending.promise);
+  const hook = await renderHook(({ uid }: { uid: string | null }) => useAnalysis(uid, false, pick, api), { initialProps: { uid: 'alice' as string | null } });
+  let request!: Promise<void>; await act(() => { request = hook.result.current.loadSamples(); });
+  const signal = (api.samples.mock.calls[0] as unknown as [{ signal: AbortSignal }])[0].signal;
+  await hook.rerender({ uid: null });
+  await act(async () => { pending.resolve({ schema_version: 1, samples: [sampleResult().sample] }); await request; });
+  expect(signal.aborted).toBe(true); expect(hook.result.current.catalog.status).toBe('idle');
+  expect(hook.result.current.source.kind).toBe('none');
+});
