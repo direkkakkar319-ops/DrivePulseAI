@@ -1,8 +1,8 @@
 # Nissan Leaf battery model service
 
 This Docker build context serves the Nissan Leaf anomaly, RUL, and battery
-health scoring logic. The previous KIT/Oxford serving bundle and its artifacts
-are archived under `older_models/`. The service uses the Nissan Leaf 2018
+health scoring logic. The previous KIT/Oxford serving bundle and datasets have
+been removed from the working tree. The service uses the Nissan Leaf 2018
 publisher-preprocessed telemetry. This represents one vehicle and has no
 verified fault labels; its anomaly output identifies unusual telemetry, not
 confirmed faults.
