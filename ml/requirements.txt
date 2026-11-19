@@ -1,12 +1,11 @@
-# Shared dependencies for KIT/Oxford experiments and the remaining research tools.
+# Dependencies for the Nissan Leaf models and data preparation.
 # Keep existing package versions stable; fitted artifacts are obtained separately.
 numpy==2.5.1
 pandas==2.3.3
-scipy==1.18.0  # Also reads the Oxford MATLAB source files.
+scipy==1.18.0
 matplotlib==3.11.1
 scikit-learn==1.9.0
 joblib==1.5.3
-xgboost>=2.0.0
 shap==0.52.0
 mlflow>=2.8.0
 
