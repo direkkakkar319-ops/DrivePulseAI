@@ -26,14 +26,24 @@ All three inference routes require the shared API key and `schema_version: 1`.
 ### `POST /v1/score/nissan-leaf-anomaly`
 
 Accepts `observations`, a list of 1–256 objects with `HV_Bat_Voltage`,
-`Pack_1_C_Temp`, and `SOC`. Results include an Isolation Forest score and
+`Pack_1_C_Temp`, `SOC`, `HV_Bat_Current_2`, `Pack_2_C_Temp`, and
+`Pack_4_C_Temp`. Results include an Isolation Forest score and
 `is_unusual`, based on the fixed 0.5th-percentile training threshold. Scores
-are not probabilities or fault diagnoses.
+are not probabilities or fault diagnoses. Unusual rows include the top three
+absolute SHAP contributions to `score_samples`, ranked strongest first. Negative
+contributions push the score toward the unusual threshold; positive ones push
+toward typical training scores. Contributions describe the model's score, not
+physical causes. The explainer uses a fixed 64-row background sample from the
+chronological training split and SHAP's model-agnostic permutation explainer.
 
 ### `POST /v1/estimate/nissan-leaf-rul`
 
 Accepts 1–10,000 observations with `Timestamp` (Unix microseconds), `Odometer`,
-and `SOH`; `Pack_Avg_C_Temp`, `SOC`, and `HV_Bat_Voltage` are optional context.
+and `SOH`; average and per-sensor pack temperatures, battery current, SOC, and
+voltage are optional context. An estimate requires at least 30 observed days
+spanning 90 calendar days. The days-to-threshold estimate uses net odometer
+change over elapsed calendar days, so days without driving count as zero-use
+days.
 `eol_threshold_soh_pct` defaults to 80. The robust Theil–Sen trend estimates
 kilometers until the reported SOH reaches that threshold. Context features are
 summarized but do not change the SOH slope. This is not remaining driving range

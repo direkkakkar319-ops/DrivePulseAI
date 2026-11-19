@@ -24,7 +24,14 @@ DATA_PATH = (
 )
 ARTIFACT_PATH = ROOT / "ml/artifacts/nissan_leaf_2018/anomaly_detector.joblib"
 REPORT_PATH = ROOT / "ml/reports/modeling/nissan_leaf_anomaly_model_comparison.json"
-FEATURES = ["HV_Bat_Voltage", "Pack_1_C_Temp", "SOC"]
+FEATURES = [
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC",
+    "HV_Bat_Current_2",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp",
+]
 THRESHOLD_QUANTILE = 0.005
 SEED = 42
 
@@ -128,6 +135,12 @@ def main() -> None:
             "features": FEATURES,
             "threshold": threshold,
             "threshold_quantile": THRESHOLD_QUANTILE,
+            "shap_background": train_sample.iloc[
+                np.linspace(
+                    0, len(train_sample) - 1, min(64, len(train_sample)), dtype=int
+                )
+            ].to_numpy(dtype=np.float64),
+            "shap_background_policy": "64 evenly spaced rows from chronological training split",
             "threshold_direction": "score_samples below threshold is flagged",
             "source": str(DATA_PATH.relative_to(ROOT)),
             "split_policy": "chronological 70/15/15 after timestamp sorting",

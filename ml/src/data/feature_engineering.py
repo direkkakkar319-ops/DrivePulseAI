@@ -7,9 +7,24 @@ from collections.abc import Sequence
 import numpy as np
 import pandas as pd
 
-NISSAN_LEAF_ANOMALY_FEATURES = ("HV_Bat_Voltage", "Pack_1_C_Temp", "SOC")
+NISSAN_LEAF_ANOMALY_FEATURES = (
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC",
+    "HV_Bat_Current_2",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp",
+)
 NISSAN_LEAF_RUL_FEATURES = ("Timestamp", "Odometer", "SOH")
-NISSAN_LEAF_RUL_CONTEXT = ("Pack_Avg_C_Temp", "SOC", "HV_Bat_Voltage")
+NISSAN_LEAF_RUL_CONTEXT = (
+    "Pack_Avg_C_Temp",
+    "Pack_1_C_Temp",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp",
+    "HV_Bat_Current_2",
+    "SOC",
+    "HV_Bat_Voltage",
+)
 
 
 def _numeric_columns(

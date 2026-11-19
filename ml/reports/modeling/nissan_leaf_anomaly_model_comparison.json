@@ -8,101 +8,104 @@
   "features": [
     "HV_Bat_Voltage",
     "Pack_1_C_Temp",
-    "SOC"
+    "SOC",
+    "HV_Bat_Current_2",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp"
   ],
   "split_policy": "chronological 70/15/15 after timestamp sorting",
   "candidate_evaluation": "20k evenly spaced training rows; up to 20k rows from each chronological holdout; training-only 0.5th percentile threshold",
   "candidate_results": {
     "isolation_forest": {
       "fit_rows": 20000,
-      "fit_seconds": 0.27097460000004503,
-      "score_seconds_for_40k_holdout_rows": 0.1310139099996377,
-      "threshold": -0.6670610513826253,
+      "fit_seconds": 0.2637990329999411,
+      "score_seconds_for_40k_holdout_rows": 0.13296700399996553,
+      "threshold": -0.62332985603728,
       "threshold_quantile": 0.005,
       "validation": {
         "rows": 20000,
-        "flagged_rows": 34,
-        "flagged_pct": 0.16999999999999998,
-        "score_p01": -0.6600430560887929,
-        "score_median": -0.4921792984722877,
-        "score_p99": -0.44472843725843164
+        "flagged_rows": 299,
+        "flagged_pct": 1.4949999999999999,
+        "score_p01": -0.6278782908129956,
+        "score_median": -0.4828917381575369,
+        "score_p99": -0.43224865960873043
       },
       "test": {
         "rows": 20000,
-        "flagged_rows": 172,
-        "flagged_pct": 0.86,
-        "score_p01": -0.6652734595130964,
-        "score_median": -0.4944989433269833,
-        "score_p99": -0.441428495959354
+        "flagged_rows": 833,
+        "flagged_pct": 4.165,
+        "score_p01": -0.6427332486252552,
+        "score_median": -0.4884494479149193,
+        "score_p99": -0.42413348961955316
       }
     },
     "local_outlier_factor": {
       "fit_rows": 20000,
-      "fit_seconds": 0.1178696619999755,
-      "score_seconds_for_40k_holdout_rows": 0.19162407600015285,
-      "threshold": -3.277596204209332,
+      "fit_seconds": 0.12579552800002602,
+      "score_seconds_for_40k_holdout_rows": 0.27012313800014454,
+      "threshold": -4.830909360391692,
       "threshold_quantile": 0.005,
       "validation": {
         "rows": 20000,
-        "flagged_rows": 1652,
-        "flagged_pct": 8.260000000000002,
-        "score_p01": -4.334575705632356,
-        "score_median": -1.2584343989005058,
-        "score_p99": -0.9719108694740514
+        "flagged_rows": 198,
+        "flagged_pct": 0.9900000000000001,
+        "score_p01": -4.8071480227963015,
+        "score_median": -1.1324572885039674,
+        "score_p99": -0.9782978959567232
       },
       "test": {
         "rows": 20000,
-        "flagged_rows": 2302,
-        "flagged_pct": 11.51,
-        "score_p01": -17.758632171070712,
-        "score_median": -1.2379050203777506,
-        "score_p99": -0.976833272187462
+        "flagged_rows": 666,
+        "flagged_pct": 3.3300000000000005,
+        "score_p01": -18.618984258435024,
+        "score_median": -1.1366683756136107,
+        "score_p99": -0.9787886417750564
       }
     },
     "one_class_svm_rbf": {
       "fit_rows": 20000,
-      "fit_seconds": 0.07297431500046514,
-      "score_seconds_for_40k_holdout_rows": 0.08270316100060882,
-      "threshold": 91.9364272793583,
+      "fit_seconds": 0.05629267700010132,
+      "score_seconds_for_40k_holdout_rows": 0.07519070900002589,
+      "threshold": 71.27170122895619,
       "threshold_quantile": 0.005,
       "validation": {
         "rows": 20000,
-        "flagged_rows": 53,
-        "flagged_pct": 0.265,
-        "score_p01": 92.02286145791305,
-        "score_median": 94.78975891755886,
-        "score_p99": 95.52066221234114
+        "flagged_rows": 133,
+        "flagged_pct": 0.6649999999999999,
+        "score_p01": 72.17612182077126,
+        "score_median": 77.02615084538624,
+        "score_p99": 78.47436360348105
       },
       "test": {
         "rows": 20000,
-        "flagged_rows": 93,
-        "flagged_pct": 0.46499999999999997,
-        "score_p01": 92.01943976072114,
-        "score_median": 94.55817847848644,
-        "score_p99": 95.55898475507279
+        "flagged_rows": 118,
+        "flagged_pct": 0.59,
+        "score_p01": 72.07398464896161,
+        "score_median": 76.95150590606042,
+        "score_p99": 78.48517279601246
       }
     }
   },
   "selected_model": "isolation_forest",
   "selection_reason": "Best practical fit for this large, potentially multimodal telemetry table: scalable tree-based scoring. No labels exist to establish fault-detection accuracy or rank models by accuracy.",
   "final_fit_rows": 1342807,
-  "final_threshold": -0.6698465412747806,
+  "final_threshold": -0.6297121251428184,
   "final_threshold_quantile": 0.005,
   "final_validation": {
     "rows": 287744,
-    "flagged_rows": 2663,
-    "flagged_pct": 0.9254754225978647,
-    "score_p01": -0.6690150097006473,
-    "score_median": -0.49562703772767025,
-    "score_p99": -0.44486163658310257
+    "flagged_rows": 2499,
+    "flagged_pct": 0.8684803158362989,
+    "score_p01": -0.6275902602147555,
+    "score_median": -0.48286939280321595,
+    "score_p99": -0.4288409579813726
   },
   "final_test": {
     "rows": 287745,
-    "flagged_rows": 754,
-    "flagged_pct": 0.26203756798554273,
-    "score_p01": -0.6616829060024662,
-    "score_median": -0.4939699174473796,
-    "score_p99": -0.438128940623445
+    "flagged_rows": 6815,
+    "flagged_pct": 2.3684164798693286,
+    "score_p01": -0.6437481601848493,
+    "score_median": -0.4832266794896167,
+    "score_p99": -0.41881853127332913
   },
   "label_status": "Unsupervised flags identify unusual telemetry only; they do not confirm vehicle faults.",
   "artifact": "ml/artifacts/nissan_leaf_2018/anomaly_detector.joblib"

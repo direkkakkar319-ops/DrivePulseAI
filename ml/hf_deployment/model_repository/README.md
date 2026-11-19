@@ -1,7 +1,8 @@
 # Nissan Leaf anomaly artifact
 
 `nissan_leaf_anomaly.joblib` contains a fitted scikit-learn Isolation Forest,
-the exact feature order (`HV_Bat_Voltage`, `Pack_1_C_Temp`, `SOC`), and a
+the exact feature order (`HV_Bat_Voltage`, `Pack_1_C_Temp`, `SOC`,
+`HV_Bat_Current_2`, `Pack_2_C_Temp`, `Pack_4_C_Temp`), and a
 training-only 0.5th-percentile novelty threshold. It was trained on
 publisher-preprocessed 2018 Nissan Leaf telemetry using a chronological
 70/15/15 split.

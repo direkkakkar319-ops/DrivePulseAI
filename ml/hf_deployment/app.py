@@ -11,6 +11,7 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
+import shap
 from fastapi import Depends, FastAPI, HTTPException, Request, Security
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -31,6 +32,12 @@ HEALTH_SCORE_VERSION = "nissan-leaf-soh-bands-v1"
 MAX_ANOMALY_BATCH_SIZE = 256
 MAX_RUL_HISTORY_ROWS = 10_000
 inference_key_header = APIKeyHeader(name="X-ML-API-Key", auto_error=False)
+
+
+def anomaly_score_for_shap(values: np.ndarray, model, feature_names: list[str]):
+    """Keep sklearn feature names intact while SHAP masks input rows."""
+    frame = pd.DataFrame(values, columns=feature_names)
+    return model.score_samples(frame)
 
 
 def require_inference_key(
@@ -61,9 +68,18 @@ async def lifespan(app: FastAPI):
     model = artifact.get("model")
     features = artifact.get("features")
     threshold = artifact.get("threshold")
+    background = artifact.get("shap_background")
     if (
         not hasattr(model, "score_samples")
-        or features != ["HV_Bat_Voltage", "Pack_1_C_Temp", "SOC"]
+        or features
+        != [
+            "HV_Bat_Voltage",
+            "Pack_1_C_Temp",
+            "SOC",
+            "HV_Bat_Current_2",
+            "Pack_2_C_Temp",
+            "Pack_4_C_Temp",
+        ]
         or not isinstance(threshold, (float, int))
         or not math.isfinite(threshold)
         or artifact.get("label_status")
@@ -72,9 +88,24 @@ async def lifespan(app: FastAPI):
         raise RuntimeError("Incompatible Nissan Leaf anomaly artifact")
     if getattr(model, "n_features_in_", None) != len(features):
         raise RuntimeError("Nissan Leaf anomaly feature count does not match")
+    background = np.asarray(background, dtype=np.float64)
+    if (
+        background.ndim != 2
+        or background.shape[1] != len(features)
+        or background.shape[0] < 2
+        or not np.isfinite(background).all()
+    ):
+        raise RuntimeError("Nissan Leaf SHAP background data is incompatible")
     app.state.anomaly_model = model
     app.state.anomaly_features = features
     app.state.anomaly_threshold = float(threshold)
+    app.state.anomaly_explainer = shap.Explainer(
+        lambda values: anomaly_score_for_shap(values, model, features),
+        background,
+        algorithm="permutation",
+        feature_names=features,
+        seed=42,
+    )
     app.state.rul_model = NissanLeafRUL(eol_threshold_soh_pct=80.0)
     yield
 
@@ -92,6 +123,9 @@ class AnomalyObservation(BaseModel):
     HV_Bat_Voltage: float = Field(gt=0, le=500, allow_inf_nan=False)
     Pack_1_C_Temp: float = Field(allow_inf_nan=False)
     SOC: float = Field(ge=0, le=100, allow_inf_nan=False)
+    HV_Bat_Current_2: float = Field(allow_inf_nan=False)
+    Pack_2_C_Temp: float = Field(allow_inf_nan=False)
+    Pack_4_C_Temp: float = Field(allow_inf_nan=False)
 
 
 class AnomalyRequest(BaseModel):
@@ -110,6 +144,10 @@ class RULObservation(BaseModel):
     Odometer: float = Field(ge=0, allow_inf_nan=False)
     SOH: float = Field(ge=0, le=100, allow_inf_nan=False)
     Pack_Avg_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Pack_1_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Pack_2_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Pack_4_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    HV_Bat_Current_2: float | None = Field(default=None, allow_inf_nan=False)
     SOC: float | None = Field(default=None, ge=0, le=100, allow_inf_nan=False)
     HV_Bat_Voltage: float | None = Field(
         default=None, gt=0, le=500, allow_inf_nan=False
@@ -177,19 +215,68 @@ def score_nissan_leaf_anomaly(request: AnomalyRequest, http_request: Request) ->
     if not np.isfinite(scores).all():
         raise HTTPException(503, "Anomaly inference unavailable")
     threshold = http_request.app.state.anomaly_threshold
+    anomaly_explainer = http_request.app.state.anomaly_explainer
+    results = []
+    for index, score in enumerate(scores):
+        unusual = bool(score < threshold)
+        explanation = None
+        if unusual:
+            try:
+                shap_result = anomaly_explainer(
+                    frame.iloc[[index]],
+                    max_evals=2 * (len(names) + 1) * 5,
+                    silent=True,
+                )
+                values = np.asarray(shap_result.values, dtype=float).reshape(-1)
+                base_value = float(np.asarray(shap_result.base_values).reshape(-1)[0])
+                if len(values) != len(names) or not np.isfinite(values).all():
+                    raise ValueError("Invalid SHAP values")
+                ranking = sorted(
+                    range(len(names)), key=lambda item: abs(values[item]), reverse=True
+                )[:3]
+                explanation = {
+                    "method": "shap_permutation",
+                    "output": "Isolation Forest score_samples; lower means more unusual",
+                    "baseline_score": base_value,
+                    "contributions": [
+                        {
+                            "rank": rank,
+                            "feature": names[feature_index],
+                            "measured_value": float(
+                                frame.iloc[index][names[feature_index]]
+                            ),
+                            "shap_value": float(values[feature_index]),
+                            "direction": "toward_anomaly"
+                            if values[feature_index] < 0
+                            else "toward_typical",
+                        }
+                        for rank, feature_index in enumerate(ranking, start=1)
+                    ],
+                    "interpretation": "Feature contributions explain this model score; they do not establish physical cause or fault diagnosis.",
+                }
+            except (
+                ValueError,
+                RuntimeError,
+                ArithmeticError,
+                TypeError,
+                shap.utils._exceptions.ExplainerError,
+            ):
+                raise HTTPException(503, "Anomaly explanation unavailable") from None
+        results.append(
+            {
+                "anomaly_score": float(score),
+                "is_unusual": unusual,
+                "explanation": explanation,
+            }
+        )
     return {
         "schema_version": 1,
         "model_version": ANOMALY_MODEL_VERSION,
         "assessment_type": "unsupervised_novelty",
         "label_status": "unlabeled_dataset_unusual_telemetry_not_fault_diagnosis",
         "threshold": threshold,
-        "results": [
-            {
-                "anomaly_score": float(score),
-                "is_unusual": bool(score < threshold),
-            }
-            for score in scores
-        ],
+        "explanation_status": "top_three_shap_contributions_for_unusual_rows",
+        "results": results,
     }
 
 

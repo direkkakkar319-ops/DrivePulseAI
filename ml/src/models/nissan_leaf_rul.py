@@ -20,23 +20,37 @@ class NissanLeafRUL:
     """
 
     REQUIRED: ClassVar[set[str]] = {"Timestamp", "Odometer", "SOH"}
-    CONTEXT: ClassVar[list[str]] = ["Pack_Avg_C_Temp", "SOC", "HV_Bat_Voltage"]
+    CONTEXT: ClassVar[list[str]] = [
+        "Pack_Avg_C_Temp",
+        "Pack_1_C_Temp",
+        "Pack_2_C_Temp",
+        "Pack_4_C_Temp",
+        "HV_Bat_Current_2",
+        "SOC",
+        "HV_Bat_Voltage",
+    ]
 
     def __init__(
         self,
         eol_threshold_soh_pct: float = 80.0,
         lookback_days: int = 365,
-        min_daily_observations: int = 8,
+        min_daily_observations: int = 30,
+        min_history_span_days: int = 90,
     ) -> None:
         if not 0 < eol_threshold_soh_pct < 100:
             raise ValueError("eol_threshold_soh_pct must be between 0 and 100")
-        if lookback_days <= 0 or min_daily_observations < 3:
+        if (
+            lookback_days <= 0
+            or min_daily_observations < 3
+            or min_history_span_days <= 0
+        ):
             raise ValueError(
-                "lookback_days must be positive and minimum observations >= 3"
+                "lookback_days and minimum span must be positive; minimum observations >= 3"
             )
         self.eol_threshold_soh_pct = float(eol_threshold_soh_pct)
         self.lookback_days = int(lookback_days)
         self.min_daily_observations = int(min_daily_observations)
+        self.min_history_span_days = int(min_history_span_days)
 
     def estimate(self, observations: pd.DataFrame) -> dict:
         missing = sorted(self.REQUIRED - set(observations.columns))
@@ -76,6 +90,10 @@ class NissanLeafRUL:
             "health_label": health["label"],
             "eol_threshold_soh_pct": self.eol_threshold_soh_pct,
             "daily_observations_used": len(history),
+            "history_span_days": int((history.date.max() - history.date.min()).days)
+            if len(history) > 1
+            else 0,
+            "minimum_history_span_days": self.min_history_span_days,
             "context_summary": {
                 column: float(history[column].mean())
                 for column in self.CONTEXT
@@ -85,9 +103,17 @@ class NissanLeafRUL:
         }
         if current_soh <= self.eol_threshold_soh_pct:
             return {**base, "status": "threshold_reached", "rul_km": 0.0}
-        if len(history) < self.min_daily_observations:
+        span_days = int((history.date.max() - history.date.min()).days)
+        if (
+            len(history) < self.min_daily_observations
+            or span_days < self.min_history_span_days
+        ):
             return {**base, "status": "insufficient_history", "rul_km": None}
 
+        history_start_date = history.date.iloc[0]
+        history_end_date = history.date.iloc[-1]
+        history_start_odometer = float(history.Odometer.iloc[0])
+        history_end_odometer = float(history.Odometer.iloc[-1])
         history = history.dropna(subset=["Odometer", "SOH"])
         history = history.groupby("Odometer", as_index=False).SOH.median()
         if len(history) < self.min_daily_observations:
@@ -101,15 +127,19 @@ class NissanLeafRUL:
             return {**base, "status": "non_declining_trend", "rul_km": None}
 
         distance = (current_soh - self.eol_threshold_soh_pct) / -slope
-        daily_distance = np.diff(history.Odometer.to_numpy(dtype=float))
-        daily_distance = daily_distance[daily_distance > 0]
-        km_per_day = float(np.median(daily_distance)) if len(daily_distance) else 0.0
+        # Use net odometer change over elapsed calendar days so days without
+        # driving are included in the daily rate.
+        elapsed_days = int((history_end_date - history_start_date).days)
+        odometer_change = history_end_odometer - history_start_odometer
+        km_per_day = odometer_change / elapsed_days if elapsed_days > 0 else 0.0
         return {
             **base,
             "rul_km": float(distance),
             "estimated_days_to_threshold": float(distance / km_per_day)
             if km_per_day > 0
             else None,
-            "median_daily_distance_km": km_per_day if km_per_day > 0 else None,
+            "average_calendar_distance_km_per_day": km_per_day
+            if km_per_day > 0
+            else None,
             "validation_status": "unvalidated_extrapolation_single_vehicle_no_threshold_crossing",
         }
