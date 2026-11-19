@@ -14,7 +14,7 @@ production diagnostics or maintenance predictions.
 | --- | --- | --- |
 | Android app | Firebase sign-in, one-time onboarding, PostgreSQL-backed Garage, five-tab light UI, demo Insights, honest History, Profile/Settings | Live vehicle data, native CSV upload/processing, persisted analysis history, durable profile photos, and production assessments |
 | Backend | FastAPI health, Firebase identity verification, PostgreSQL profile/onboarding storage, owner-scoped vehicle APIs, and persistent active selection | Live telemetry ingestion, analysis-history APIs, production prediction services, and report generation |
-| Machine learning | KIT OBD-II preprocessing, EDA, and an exploratory XGBoost novelty baseline; Oxford battery capacity/RUL target audit and historical trend baseline | Validated fault detection, reliable passenger-EV RUL, future-failure prediction, or app/API model integration |
+| Machine learning | Nissan Leaf anomaly scoring, experimental SOH/odometer RUL estimation, and rule-based battery health score | Verified fault diagnosis, fleet-level RUL accuracy, or completed backend integration |
 
 Saved vehicle metadata, profile names, and onboarding completion persist through
 the authenticated backend; the backend must be reachable to restore account state.
@@ -49,74 +49,27 @@ Docker Compose is optional for ML work and mobile UI development. The current
 Compose file starts local PostgreSQL for backend development; it does not
 containerize FastAPI or model inference. See [backend setup](backend/README.md).
 
-## Current ML experiment: KIT OBD-II
+## Current ML models: Nissan Leaf
 
-The current model uses unlabeled OBD-II recordings of a Seat Leon. It predicts
-the sensor medians in the next 10-second window from the current window's summary
-features. Large forecast errors are marked as statistically novel.
+The active ML service uses the preprocessed Nissan Leaf 2018 telemetry. Its
+Isolation Forest scores six measured battery signals and returns the top three
+SHAP contributions for unusual observations. The RUL estimator fits a robust
+SOH-versus-odometer trend and projects kilometers to a configurable SOH
+threshold; it requires at least 30 observed days across 90 calendar days. The
+battery health score is a rule-based 1–5 mapping from reported SOH.
 
-- It selects XGBoost or a last-window persistence forecast per signal using
-  training dates, then calibrates on later training dates. A maximum normalized
-  per-sensor residual is used to give sparse, single-sensor deviations more
-  influence. It flagged 1.48% of validation and 2.29% of test windows.
-- The selected forecast improves test MAE over XGBoost on five signals but is
-  worse on two and ties three; forecast quality is mixed. Synthetic 10x-scale
-  single-sensor shifts were flagged in about 98% of validation cases, but these
-  are artificial sensitivity checks, not real fault examples.
-- KIT has no verified fault labels or independent vehicle IDs. These figures do
-  not measure fault-detection accuracy, and a novelty flag is not a fault
-  diagnosis. A score is available only after the following 10-second window
-  arrives.
-
-The report is in
-[`ml/reports/modeling/kit_xgb_forecast_baseline.md`](ml/reports/modeling/kit_xgb_forecast_baseline.md),
-with per-signal results in
-[`ml/reports/modeling/kit_xgb_forecast_baseline.json`](ml/reports/modeling/kit_xgb_forecast_baseline.json).
-The trained model artifact and raw/processed KIT data are local-only and
-gitignored.
-
-### Reproduce the KIT experiment
-
-The full KIT source archive is published in repository-sized parts under
-[`data/automotive_obd/kit_obd/raw_chunks/`](data/automotive_obd/kit_obd/raw_chunks/).
-Its publisher checksum, citation, license, download link, and reconstruction
-steps are documented in [`data/README.md`](data/README.md). The Oxford source
-dataset is also available in parts; see its [official Oxford source page](https://ora.ox.ac.uk/objects/uuid:03ba4b01-cfed-46d3-9b1a-7d4a7bdf6fac).
-KIT's publisher record is [RADAR4KIT](https://radar.kit.edu/radar/en/dataset/bCtGxdTklQlfQcAq).
-
-From the repository root, reconstruct and unpack KIT before running its
-preprocessing script:
-
-```bash
-python3 data/automotive_obd/kit_obd/reassemble_source.py
-mkdir -p data/automotive_obd/kit_obd/raw
-tar -xf data/automotive_obd/kit_obd/raw/KIT_Automotive_OBD-II_Dataset.tar \
-  -C data/automotive_obd/kit_obd/raw
-unzip -q data/automotive_obd/kit_obd/raw/10.35097-1130/data/dataset/OBD-II-Dataset.zip \
-  -d data/automotive_obd/kit_obd/raw/recordings
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r ml/requirements.txt
-python3 ml/scripts/preprocess_kit_obd.py
-python3 -m ml.scripts.train_kit_xgb_forecast
-```
-
-Dataset sources, terms, audit findings, and local file paths are documented in
-[`data/README.md`](data/README.md). Dataset rights and terms are separate from
-the repository's software license.
+These are exploratory outputs from data representing one vehicle. The data has
+no verified fault labels and no observed crossing of the configured RUL
+threshold. Novelty flags are not fault diagnoses, SHAP contributions do not
+prove physical causes, and the RUL projection is not validated for unseen
+vehicles. The ML service currently accepts Nissan Leaf-specific inputs; the
+backend still has a legacy KIT request contract and needs a separate integration
+update.
 
 ## Data and evaluation boundaries
 
-- **KIT OBD-II:** supports exploratory automotive telemetry novelty scoring; it
-  has no verified mechanical fault labels, RUL target, or verified vehicle IDs.
-- **Oxford battery data:** supports capacity/SOH exploration. The historical
-  Theil–Sen trend experiment used an unconfirmed first-crossing proxy and had
-  large errors. A stricter two-reading 75% screen confirms no EOL events, so this
-  release currently has no defensible supervised RUL target and is not evidence
-  of passenger-EV fleet performance. A separate exponential trend comparison
-  modestly improved proxy error on later cutoffs within the same two cells, but
-  remains experimental and does not establish new-cell RUL performance; see the
-  [method comparison](ml/reports/modeling/oxford_rul_method_comparison.md).
+- **Nissan Leaf:** current model data is single-vehicle telemetry; use the
+  limits above when interpreting novelty, SHAP, health, or RUL results.
 - **Tongji EV data:** candidate for vehicle-disjoint SOH experiments; SOH is not
   observed RUL or a future-failure label.
 - **Scania APS and Component X:** heavy-truck datasets. They must not support
@@ -134,7 +87,7 @@ end-to-end claim.
 
 - **Android:** Expo, React Native, TypeScript, Firebase Authentication
 - **Backend:** FastAPI, PostgreSQL, Firebase token validation
-- **ML:** Python, pandas, scikit-learn, XGBoost
+- **ML:** Python, pandas, scikit-learn, SHAP
 - **Web frontend:** Next.js and TypeScript
 
 ```text
