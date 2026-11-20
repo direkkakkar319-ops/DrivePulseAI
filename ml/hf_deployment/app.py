@@ -20,6 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from ml.src.models.nissan_leaf_rul import NissanLeafRUL
 from ml.src.scoring.health_score import battery_health_score
+from ml.src.scoring.trend_anomaly import BatteryTrendAnomalyDetector
 
 ROOT = Path(__file__).resolve().parent
 MODEL_REPOSITORY_DIR = Path(
@@ -29,6 +30,7 @@ ANOMALY_ARTIFACT = MODEL_REPOSITORY_DIR / "nissan_leaf_anomaly.joblib"
 ANOMALY_MODEL_VERSION = "nissan-leaf-isolation-forest-v1"
 RUL_MODEL_VERSION = "nissan-leaf-soh-theilsen-v1"
 HEALTH_SCORE_VERSION = "nissan-leaf-soh-bands-v1"
+TREND_ANOMALY_VERSION = "nissan-leaf-rolling-zscore-v1"
 MAX_ANOMALY_BATCH_SIZE = 256
 MAX_RUL_HISTORY_ROWS = 10_000
 inference_key_header = APIKeyHeader(name="X-ML-API-Key", auto_error=False)
@@ -161,7 +163,40 @@ class RULRequest(BaseModel):
     eol_threshold_soh_pct: float = Field(
         default=80.0, gt=0, lt=100, allow_inf_nan=False
     )
+    n_bootstrap: int = Field(default=100, ge=0, le=500)
+    confidence_level_pct: float = Field(default=80.0, gt=0, lt=100, allow_inf_nan=False)
     observations: list[RULObservation] = Field(
+        min_length=1, max_length=MAX_RUL_HISTORY_ROWS
+    )
+
+
+class TrendAnomalyObservation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    Timestamp: int = Field(ge=0)
+    Odometer: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    SOH: float | None = Field(default=None, ge=0, le=100, allow_inf_nan=False)
+    Pack_1_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Pack_2_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Pack_4_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Pack_Avg_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    Ambient_C_Temp: float | None = Field(default=None, allow_inf_nan=False)
+    HV_Bat_Voltage: float | None = Field(
+        default=None, gt=0, le=500, allow_inf_nan=False
+    )
+    HV_Bat_Current_2: float | None = Field(default=None, allow_inf_nan=False)
+
+
+class TrendAnomalyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: int = Field(ge=1, le=1)
+    window_size: int = Field(default=14, ge=3, le=90)
+    min_history_points: int = Field(default=7, ge=3, le=60)
+    warning_z: float = Field(default=2.5, gt=0, le=10, allow_inf_nan=False)
+    critical_z: float = Field(default=3.5, gt=0, le=10, allow_inf_nan=False)
+    consecutive_points: int = Field(default=2, ge=1, le=10)
+    observations: list[TrendAnomalyObservation] = Field(
         min_length=1, max_length=MAX_RUL_HISTORY_ROWS
     )
 
@@ -285,7 +320,11 @@ def estimate_nissan_leaf_rul(request: RULRequest, http_request: Request) -> dict
     observations = pd.DataFrame(
         [row.model_dump(exclude_none=True) for row in request.observations]
     )
-    estimator = NissanLeafRUL(eol_threshold_soh_pct=request.eol_threshold_soh_pct)
+    estimator = NissanLeafRUL(
+        eol_threshold_soh_pct=request.eol_threshold_soh_pct,
+        n_bootstrap=request.n_bootstrap,
+        confidence_level_pct=request.confidence_level_pct,
+    )
     try:
         result = estimator.estimate(observations)
     except (ValueError, RuntimeError, ArithmeticError):
@@ -301,7 +340,35 @@ def estimate_nissan_leaf_rul(request: RULRequest, http_request: Request) -> dict
             "The source represents one vehicle and does not establish fleet accuracy.",
             "Threshold estimates extrapolate beyond observed data when no crossing exists.",
             "Temperature, SOC, and voltage are reported as context; they do not alter the estimated SOH trend.",
+            "Bootstrap confidence intervals capture sample variance and measurement noise; they do not account for unobserved late-life knee acceleration.",
         ],
+    }
+
+
+@app.post(
+    "/v1/score/nissan-leaf-trend-anomaly",
+    dependencies=[Depends(require_inference_key)],
+)
+def score_nissan_leaf_trend_anomaly(request: TrendAnomalyRequest) -> dict:
+    observations = pd.DataFrame(
+        [row.model_dump(exclude_none=True) for row in request.observations]
+    )
+    detector = BatteryTrendAnomalyDetector(
+        window_size=request.window_size,
+        min_history_points=request.min_history_points,
+        warning_z=request.warning_z,
+        critical_z=request.critical_z,
+        consecutive_points=request.consecutive_points,
+    )
+    try:
+        result = detector.analyze(observations)
+    except (ValueError, RuntimeError, ArithmeticError):
+        raise HTTPException(422, "Invalid trend observation telemetry") from None
+    return {
+        "schema_version": 1,
+        "model_version": TREND_ANOMALY_VERSION,
+        "assessment_type": "rolling_zscore_drift_detection",
+        **result,
     }
 
 
