@@ -1,5 +1,6 @@
 // Validate network data before rendering, including identity mapping and score direction.
 import { leafFeatures, type LeafAnalysis, type LeafCatalog } from '@/types/leaf-analysis';
+import { parseLeafTrend } from './leaf-trend';
 function check(value: unknown): asserts value { if (!value) throw new Error('Incompatible Nissan analysis'); }
 function object(value: unknown): Record<string, unknown> { check(value && typeof value === 'object' && !Array.isArray(value)); return value as Record<string, unknown>; }
 function number(value: unknown): asserts value is number { check(typeof value === 'number' && Number.isFinite(value)); }
@@ -81,5 +82,10 @@ export function parseLeafAnalysis(value: unknown): LeafAnalysis {
     } else check(c.result === null);
   }
   Object.values(object(v.units)).forEach(unit => check(typeof unit === 'string')); strings(v.warnings); strings(v.limitations);
+  if (v.trend !== undefined) {
+    const trend = parseLeafTrend(v.trend);
+    check(trend.prepared_readings + trend.skipped_readings === telemetry.length);
+    if (trend.status === 'completed') check(trend.result?.status === 'ok');
+  }
   return value as LeafAnalysis;
 }

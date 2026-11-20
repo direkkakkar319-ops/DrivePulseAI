@@ -72,6 +72,60 @@ def payload(rows, score=-0.5, threshold=-0.6):
     }
 
 
+def trend_payload(rows):
+    """Controlled protocol fixture; not a measured model/evaluation result."""
+    days = len({r["Timestamp"] // 86400000000 for r in rows})
+    common = {
+        "schema_version": 1,
+        "model_version": "nissan-leaf-rolling-zscore-v1",
+        "assessment_type": "rolling_zscore_drift_detection",
+        "is_drift_detected": False,
+        "drift_alerts_count": 0,
+        "alerts": [],
+        "signal_details": {},
+    }
+    if days < 8:
+        return {
+            **common,
+            "status": "insufficient_history",
+            "days_available": days,
+            "min_days_required": 8,
+        }
+    fields = set().union(*(set(row) for row in rows))
+    signals = []
+    if (
+        len(fields.intersection({"Pack_1_C_Temp", "Pack_2_C_Temp", "Pack_4_C_Temp"}))
+        >= 2
+    ):
+        signals.append("pack_temp_spread")
+    if "Pack_Avg_C_Temp" in fields:
+        signals.append("pack_avg_temp")
+    if {"SOH", "Odometer"} <= fields:
+        signals.append("soh_decline_rate_per_kkm")
+    common["signal_details"] = {
+        name: {
+            "label": name,
+            "unit": "test-unit",
+            "status": "normal",
+            "current_value": 0.0,
+            "baseline_mean": 0.0,
+            "baseline_std": 0.1,
+            "z_score": 0.0,
+            "consecutive_abnormal_days": 0,
+            "baseline_window_days": min(days - 1, 14),
+        }
+        for name in signals
+    }
+    return {
+        **common,
+        "status": "ok",
+        "days_evaluated": days,
+        "window_size_days": 14,
+        "warning_z_threshold": 2.5,
+        "critical_z_threshold": 3.5,
+    }
+
+
 @pytest.fixture
 def harness(settings, monkeypatch):
     monkeypatch.setattr(main, "build_engine", lambda _: MagicMock())
@@ -96,10 +150,17 @@ def harness(settings, monkeypatch):
         calls.append((request.url.path, body))
         if "handler" in plan:
             return plan["handler"](request, body)
+        if request.url.path.endswith("trend-anomaly"):
+            return httpx.Response(200, json=trend_payload(body["observations"]))
         if request.url.path.endswith("anomaly"):
             return httpx.Response(200, json=payload(body["observations"]))
         if request.url.path.endswith("health"):
-            from ml.src.scoring.health_score import battery_health_score
+            spec = importlib.util.spec_from_file_location(
+                "leaf_health_rules", ROOT / "ml/src/scoring/health_score.py"
+            )
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            battery_health_score = module.battery_health_score
 
             return httpx.Response(
                 200,
@@ -157,10 +218,12 @@ def test_catalog_and_shared_pipeline(harness):
     assert result.status_code == 200
     sample = result.json()
     uploaded = upload(client, leaf.sample_bytes(leaf.SAMPLE_ID)).json()
-    for key in ("battery", "anomaly", "health", "rul", "telemetry"):
+    for key in ("battery", "anomaly", "health", "rul", "telemetry", "trend"):
         assert sample[key] == uploaded[key]
     assert [
-        len(body["observations"]) for path, body in calls if path.endswith("anomaly")
+        len(body["observations"])
+        for path, body in calls
+        if path == "/v1/score/nissan-leaf-anomaly"
     ] == [32, 8, 32, 8]
     assert sample["battery"]["estimated_range_km"] is None
     assert sample["rul"]["status"] == "insufficient_history"
@@ -299,7 +362,7 @@ def test_failure_no_partial_anomalies(harness, failure):
             raise httpx.ConnectError("private", request=request)
         if failure == "json":
             return httpx.Response(200, content="not json")
-        if not request.url.path.endswith("anomaly"):
+        if request.url.path != "/v1/score/nissan-leaf-anomaly":
             return httpx.Response(503)
         rows = body.get("observations", [])
         result = payload(rows)
@@ -437,7 +500,14 @@ def test_real_ml_sample_and_csv(settings, monkeypatch, capsys):
                     )
                     a, b = sample.json(), uploaded.json()
                     assert a["anomaly"]["status"] == "completed", a
-                    for key in ("anomaly", "health", "rul", "battery", "telemetry"):
+                    for key in (
+                        "anomaly",
+                        "health",
+                        "rul",
+                        "battery",
+                        "telemetry",
+                        "trend",
+                    ):
                         assert a[key] == b[key]
                     assert a["anomaly"]["analyzed_count"] == 40
                     assert (
@@ -448,6 +518,29 @@ def test_real_ml_sample_and_csv(settings, monkeypatch, capsys):
                     assert ci is not None and ci["bootstrap_iterations_valid"] >= 10
                     assert ci["rul_km_p10"] <= ci["rul_km_p50"] <= ci["rul_km_p90"]
                     assert a["rul"]["result"]["rul_km_p50"] == ci["rul_km_p50"]
+                    assert a["trend"]["status"] == "completed"
+                    assert a["trend"]["result"]["status"] == "ok"
+                    assert a["trend"]["result"]["is_drift_detected"] is False
+                    assert set(a["trend"]["result"]["signal_details"]) == {
+                        "pack_temp_spread",
+                        "soh_decline_rate_per_kkm",
+                    }
+                    assert (
+                        a["trend"]["observed_days"] == 40
+                        and a["trend"]["analyzed_readings"] == 40
+                    )
+                    print(
+                        "REAL_TREND_AND_BATTERY",
+                        json.dumps(
+                            {
+                                "trend": a["trend"]["result"],
+                                "battery": a["battery"],
+                                "health": a["health"]["result"]["health_score"],
+                                "rul_point": a["rul"]["result"]["rul_km"],
+                                "rul_interval": ci,
+                            }
+                        ),
+                    )
                     print(
                         "REAL_INTEGRATION",
                         json.dumps(

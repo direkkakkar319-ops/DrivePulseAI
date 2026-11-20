@@ -223,5 +223,29 @@ The reconciled response accepts optional RUL percentile fields and nested
 nonfinite, negative, unordered, partial or inconsistent populated bounds. Results
 show the supplied level, lower/median/upper distance, available calendar bounds,
 and valid bootstrap-fit count with explicit experimental limitations.
-The new rolling Z-score trend detector remains ML-service-only and is deferred
-from mobile integration; Isolation Forest remains the active anomaly detector.
+The follow-up Battery Trend Analysis section now integrates rolling Z-score results
+as a separate capability. Isolation Forest remains the point-anomaly detector;
+trend alerts never replace its scores, flags or SHAP explanations.
+
+## Battery Trend Analysis
+
+`leaf-trend-results.tsx` displays the independent capability status and source
+coverage, actual drift flags/counts, warning/critical alerts, measured daily values,
+rolling baselines, Z-scores and per-signal availability. `lib/leaf-trend.ts` validates
+this optional additive response before rendering. Missing older response fields
+produce an unavailable section without breaking existing point charts or RUL.
+
+Trend data does not share Isolation Forest scores or SHAP semantics. Baselines and
+persistence refer to observed UTC daily points and assess the latest daily point;
+calendar gaps are not interpolated. Missing average/ambient data is never invented.
+The source picker, native URI upload, Firebase refresh, account isolation, request
+cancellation and transient results still use the same controller/client.
+
+RUL retains its original point estimate and separately displays optional lower,
+median and upper bootstrap estimates using the supplied confidence level. Missing
+intervals do not hide a valid point estimate. Uncertainty is experimental, not a
+battery-failure probability or guaranteed lifetime bound.
+
+See `backend/docs/nissan-leaf-analysis.md` for the exact history, signal-availability,
+resource and deployment contract. Physical Android and live Render checks remain
+pending; no APK or native rebuild was generated.

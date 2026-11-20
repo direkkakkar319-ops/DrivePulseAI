@@ -22,6 +22,7 @@ from app.schemas.leaf_analysis import (
     Reading,
     ScoredReading,
 )
+from app.services.leaf_trend import analyze_trend
 from app.services.ml_errors import MLServiceError
 
 SAMPLE_ID = "nissan-leaf-synthetic-integration-v1"
@@ -382,6 +383,7 @@ async def analyze(readings, quality, service, *, source_type, sample_id=None):
                 )
             except MLServiceError as error:
                 rul = Availability(status="failed", reason=str(error))
+    trend = await analyze_trend(readings, service)
     source = {
         "format_version": "leaf-csv-v1",
         "sample_id": sample_id,
@@ -410,6 +412,7 @@ async def analyze(readings, quality, service, *, source_type, sample_id=None):
         anomaly=anomaly,
         health=health,
         rul=rul,
+        trend=trend,
         telemetry=readings,
         units={k: v for k, v in UNITS.items() if k in quality["columns"]},
         warnings=warnings,

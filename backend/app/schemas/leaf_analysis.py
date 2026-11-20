@@ -12,7 +12,15 @@ FEATURES = (
     "Pack_2_C_Temp",
     "Pack_4_C_Temp",
 )
-SIGNALS = (*FEATURES, "SOH", "Odometer", "Speed", "Instant_kW", "kWh_Remaining")
+SIGNALS = (
+    *FEATURES,
+    "SOH",
+    "Odometer",
+    "Speed",
+    "Instant_kW",
+    "kWh_Remaining",
+    "Pack_Avg_C_Temp",
+)
 
 
 class StrictModel(BaseModel):
@@ -92,6 +100,168 @@ class BatteryOverview(StrictModel):
     range_reason: str = "Verified usable energy and a reliable consumption rate are not available. SOC, SOH and nominal capacity alone cannot establish driving range."
 
 
+TrendSignal = Literal[
+    "pack_temp_spread", "pack_temp_rise", "soh_decline_rate_per_kkm", "pack_avg_temp"
+]
+
+
+class TrendSignalDetail(StrictModel):
+    status: Literal[
+        "normal",
+        "warning",
+        "critical",
+        "non_finite_current_reading",
+        "insufficient_baseline_points",
+    ]
+    label: str
+    unit: str | None = None
+    current_value: float | None = None
+    baseline_mean: float | None = None
+    baseline_std: float | None = Field(default=None, gt=0)
+    z_score: float | None = None
+    consecutive_abnormal_days: int | None = Field(default=None, ge=0)
+    baseline_window_days: int | None = Field(default=None, ge=0)
+    baseline_points_available: int | None = Field(default=None, ge=0)
+    baseline_points_required: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode="after")
+    def complete_signal(self):
+        required = (
+            "unit",
+            "current_value",
+            "baseline_mean",
+            "baseline_std",
+            "z_score",
+            "consecutive_abnormal_days",
+            "baseline_window_days",
+        )
+        if self.status in {"normal", "warning", "critical"} and any(
+            getattr(self, name) is None for name in required
+        ):
+            raise ValueError("Incomplete trend signal")
+        if self.status == "insufficient_baseline_points" and (
+            self.baseline_points_available is None
+            or self.baseline_points_required is None
+        ):
+            raise ValueError("Incomplete baseline coverage")
+        return self
+
+
+class TrendAlert(StrictModel):
+    signal: TrendSignal
+    label: str
+    severity: Literal["warning", "critical"]
+    z_score: float
+    current_value: float
+    baseline_mean: float
+    baseline_std: float = Field(gt=0)
+    unit: str
+    consecutive_days: int = Field(ge=1)
+    explanation: str
+
+
+class TrendResponse(StrictModel):
+    schema_version: Literal[1]
+    model_version: Literal["nissan-leaf-rolling-zscore-v1"]
+    assessment_type: Literal["rolling_zscore_drift_detection"]
+    status: Literal["ok", "insufficient_history", "empty_input"]
+    is_drift_detected: bool = Field(strict=True)
+    drift_alerts_count: int = Field(ge=0, le=4, strict=True)
+    alerts: list[TrendAlert] = Field(max_length=4)
+    signal_details: dict[TrendSignal, TrendSignalDetail]
+    days_available: int | None = Field(default=None, ge=0)
+    min_days_required: int | None = Field(default=None, ge=1)
+    days_evaluated: int | None = Field(default=None, ge=1)
+    window_size_days: int | None = Field(default=None, ge=3, le=90)
+    warning_z_threshold: float | None = Field(default=None, gt=0)
+    critical_z_threshold: float | None = Field(default=None, gt=0)
+
+    @model_validator(mode="after")
+    def consistent_trends(self):
+        if self.drift_alerts_count != len(
+            self.alerts
+        ) or self.is_drift_detected != bool(self.alerts):
+            raise ValueError("Invalid trend alert count")
+        signals = [alert.signal for alert in self.alerts]
+        if len(set(signals)) != len(signals):
+            raise ValueError("Duplicate trend alerts")
+        if self.status == "ok":
+            if any(
+                getattr(self, name) is None
+                for name in (
+                    "days_evaluated",
+                    "window_size_days",
+                    "warning_z_threshold",
+                    "critical_z_threshold",
+                )
+            ):
+                raise ValueError("Missing trend metadata")
+            if self.critical_z_threshold <= self.warning_z_threshold:
+                raise ValueError("Invalid trend thresholds")
+        else:
+            if self.alerts or self.signal_details:
+                raise ValueError("Unavailable trend must not contain alerts")
+            if self.status == "insufficient_history" and (
+                self.days_available is None or self.min_days_required is None
+            ):
+                raise ValueError("Missing trend history coverage")
+            if (
+                self.status == "insufficient_history"
+                and self.days_available >= self.min_days_required
+            ):
+                raise ValueError("Inconsistent insufficient history")
+        flagged = {
+            name
+            for name, detail in self.signal_details.items()
+            if detail.status in {"warning", "critical"}
+        }
+        if flagged != set(signals):
+            raise ValueError("Mismatched trend alerts/signals")
+        for alert in self.alerts:
+            detail = self.signal_details[alert.signal]
+            if (
+                detail.status != alert.severity
+                or detail.label != alert.label
+                or detail.unit != alert.unit
+                or detail.consecutive_abnormal_days != alert.consecutive_days
+            ):
+                raise ValueError("Inconsistent trend signal identity")
+            if any(
+                getattr(detail, name) != getattr(alert, name)
+                for name in (
+                    "z_score",
+                    "current_value",
+                    "baseline_mean",
+                    "baseline_std",
+                )
+            ):
+                raise ValueError("Inconsistent trend measurements")
+        return self
+
+
+class SignalAvailability(StrictModel):
+    status: Literal["available", "unavailable"]
+    reason: str | None = None
+
+
+class TrendAnalysis(StrictModel):
+    status: Literal["completed", "unavailable", "insufficient_history", "failed"] = (
+        "unavailable"
+    )
+    reason: str | None = "Trend analysis was not requested"
+    prepared_readings: int = 0
+    analyzed_readings: int = 0
+    skipped_readings: int = 0
+    observed_days: int = 0
+    start_timestamp_us: int | None = None
+    end_timestamp_us: int | None = None
+    source_fields: list[str] = []
+    signal_availability: dict[TrendSignal, SignalAvailability] = {}
+    warnings: list[str] = []
+    limitations: list[str] = []
+    result: TrendResponse | None = None
+
+
 class LeafAnalysis(StrictModel):
     schema_version: Literal[1] = 1
     analysis_type: Literal["nissan_leaf_telemetry"] = "nissan_leaf_telemetry"
@@ -102,6 +272,7 @@ class LeafAnalysis(StrictModel):
     anomaly: AnomalyAnalysis
     health: Availability
     rul: Availability
+    trend: TrendAnalysis = Field(default_factory=TrendAnalysis)
     telemetry: list[Reading]
     units: dict[str, str]
     warnings: list[str]

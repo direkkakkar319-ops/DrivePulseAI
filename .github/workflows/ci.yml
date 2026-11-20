@@ -117,6 +117,9 @@ jobs:
       - name: TypeScript
         working-directory: mobile
         run: npx tsc --noEmit
+      - name: Mobile regression tests
+        working-directory: mobile
+        run: npm test -- --runInBand
 
   test-ml:
     name: ML tests

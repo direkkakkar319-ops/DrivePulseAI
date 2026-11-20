@@ -26,10 +26,36 @@ export interface LeafAnalysis {
   recording: { input_rows: number; valid_timestamp_rows: number; skipped_timestamp_rows: number; missing_or_invalid_cells: number; columns: string[]; issues: string[]; vehicle_identity: string; backward_or_duplicate_timestamps: number; reading_count: number; start_timestamp_us: number; end_timestamp_us: number; timestamp_unit: 'unix_microseconds'; vehicle_compatibility: string };
   battery: { latest_soc: number | null; soc_timestamp_us: number | null; latest_soh: number | null; soh_timestamp_us: number | null; estimated_range_km: null; range_status: 'unavailable'; range_reason: string };
   anomaly: { status: 'completed' | 'unavailable' | 'failed'; reason: string | null; model_version: string | null; threshold: number | null; score_direction: 'lower_is_more_unusual'; analyzed_count: number; skipped_count: number; unusual_count: number; unusual_percentage: number; explanation_status: string | null; results: LeafPrediction[] };
+  trend?: TrendAnalysis;
   health: Capability; rul: Omit<Capability, 'result'> & { result: RulResult | null }; telemetry: LeafReading[]; units: Record<string, string>; warnings: string[]; limitations: string[]; persisted: false;
 }
 export interface LeafApi {
   samples: (context: LeafContext) => Promise<LeafCatalog>;
   sample: (id: string, context: LeafContext) => Promise<LeafAnalysis>;
   upload: (file: LeafCsvFile, context: LeafContext) => Promise<LeafAnalysis>;
+}
+
+export const trendSignals = ['pack_temp_spread', 'pack_temp_rise', 'soh_decline_rate_per_kkm', 'pack_avg_temp'] as const;
+export type TrendSignal = typeof trendSignals[number];
+export interface TrendSignalDetail {
+  status: 'normal' | 'warning' | 'critical' | 'non_finite_current_reading' | 'insufficient_baseline_points';
+  label: string; unit?: string | null; current_value?: number | null; baseline_mean?: number | null;
+  baseline_std?: number | null; z_score?: number | null; consecutive_abnormal_days?: number | null;
+  baseline_window_days?: number | null; baseline_points_available?: number | null; baseline_points_required?: number | null;
+}
+export interface TrendAlert { signal: TrendSignal; label: string; severity: 'warning' | 'critical'; z_score: number; current_value: number;
+  baseline_mean: number; baseline_std: number; unit: string; consecutive_days: number; explanation: string }
+export interface TrendResult {
+  schema_version: 1; model_version: 'nissan-leaf-rolling-zscore-v1'; assessment_type: 'rolling_zscore_drift_detection';
+  status: 'ok' | 'insufficient_history' | 'empty_input'; is_drift_detected: boolean; drift_alerts_count: number;
+  alerts: TrendAlert[]; signal_details: Partial<Record<TrendSignal, TrendSignalDetail>>;
+  days_available?: number | null; min_days_required?: number | null; days_evaluated?: number | null;
+  window_size_days?: number | null; warning_z_threshold?: number | null; critical_z_threshold?: number | null;
+}
+export interface TrendAnalysis {
+  status: 'completed' | 'unavailable' | 'insufficient_history' | 'failed'; reason: string | null;
+  prepared_readings: number; analyzed_readings: number; skipped_readings: number; observed_days: number;
+  start_timestamp_us: number | null; end_timestamp_us: number | null; source_fields: string[];
+  signal_availability: Partial<Record<TrendSignal, { status: 'available' | 'unavailable'; reason: string | null }>>;
+  warnings: string[]; limitations: string[]; result: TrendResult | null;
 }

@@ -169,3 +169,67 @@ def test_shap_failure_is_explicit_and_sanitized(serving):
         assert response.json() == {"detail": "Anomaly explanation unavailable"}
     finally:
         module.app.state.anomaly_explainer = original
+
+
+def test_trend_endpoint_requires_shared_key(serving):
+    _, client, _ = serving
+    response = client.post(
+        "/v1/score/nissan-leaf-trend-anomaly",
+        json={
+            "schema_version": 1,
+            "observations": [{"Timestamp": 1704067200000000, "Pack_Avg_C_Temp": 25}],
+        },
+    )
+    assert response.status_code == 401
+
+
+def test_trend_endpoint_insufficient_observed_days(serving):
+    _, client, headers = serving
+    response = client.post(
+        "/v1/score/nissan-leaf-trend-anomaly",
+        headers=headers,
+        json={
+            "schema_version": 1,
+            "observations": [{"Timestamp": 1704067200000000, "Pack_Avg_C_Temp": 25}],
+        },
+    )
+    value = response.json()
+    assert response.status_code == 200
+    assert (
+        value["status"] == "insufficient_history"
+        and value["days_available"] == 1
+        and value["min_days_required"] == 8
+    )
+    assert value["alerts"] == [] and not value["is_drift_detected"]
+
+
+@pytest.mark.parametrize(
+    "scenario,expected",
+    [("flat", "normal"), ("warning", "warning"), ("critical", "critical")],
+)
+def test_real_trend_endpoint_thresholds(serving, scenario, expected):
+    """Controlled artificial patterns test thresholds, not real battery faults."""
+    _, client, headers = serving
+    readings = [
+        {"Timestamp": 1704067200000000 + i * 86400000000, "Pack_Avg_C_Temp": 25.0}
+        for i in range(20)
+    ]
+    if scenario == "warning":
+        readings[-2]["Pack_Avg_C_Temp"] = readings[-1]["Pack_Avg_C_Temp"] = 27.0
+    if scenario == "critical":
+        readings[-2]["Pack_Avg_C_Temp"], readings[-1]["Pack_Avg_C_Temp"] = 28.0, 40.0
+    response = client.post(
+        "/v1/score/nissan-leaf-trend-anomaly",
+        headers=headers,
+        json={"schema_version": 1, "observations": readings},
+    )
+    assert response.status_code == 200
+    result = response.json()
+    assert result["status"] == "ok" and result["days_evaluated"] == 20
+    assert (
+        result["warning_z_threshold"] == 2.5 and result["critical_z_threshold"] == 3.5
+    )
+    assert result["signal_details"]["pack_avg_temp"]["status"] == expected
+    assert result["drift_alerts_count"] == (0 if expected == "normal" else 1)
+    if expected != "normal":
+        assert result["alerts"][0]["severity"] == expected

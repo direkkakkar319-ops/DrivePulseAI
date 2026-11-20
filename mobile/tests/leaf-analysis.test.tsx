@@ -93,3 +93,11 @@ it.each(['order', 'nonfinite', 'mismatch', 'partial'])('rejects malformed RUL un
   if (issue === 'partial') delete data.rul.result!.rul_km_p50;
   expect(() => parseLeafAnalysis(data)).toThrow();
 });
+
+it('labels RUL intervals with the supplied level and preserves the original point estimate', async () => {
+  const data = resultWithInterval(); data.rul.result!.confidence_interval!.level_pct = 95;
+  expect(parseLeafAnalysis(data)).toBe(data); await render(<LeafResults data={data} />);
+  expect(screen.getByText(/95% bootstrap interval:/)).toBeTruthy();
+  expect(screen.queryByText(/80% bootstrap interval:/)).toBeNull();
+  expect(screen.getByText('Point estimate: 1000.0 km')).toBeTruthy();
+});

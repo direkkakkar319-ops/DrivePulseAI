@@ -14,6 +14,7 @@ from app.schemas.leaf_analysis import (
     AnomalyResponse,
     HealthResponse,
     RULResponse,
+    TrendResponse,
 )
 from app.services.ml_errors import MLServiceError
 
@@ -179,5 +180,71 @@ class LeafInferenceService:
             ):
                 raise ValueError
             return validated.model_dump(exclude_unset=True)
+        except (ValidationError, ValueError):
+            raise MLServiceError("Invalid analysis service response", 502) from None
+
+    async def trend(self, observations: list[dict]) -> TrendResponse:
+        allowed = {
+            "Timestamp",
+            "Odometer",
+            "SOH",
+            "Pack_1_C_Temp",
+            "Pack_2_C_Temp",
+            "Pack_4_C_Temp",
+            "Pack_Avg_C_Temp",
+            "Ambient_C_Temp",
+            "HV_Bat_Voltage",
+            "HV_Bat_Current_2",
+        }
+        if not 1 <= len(observations) <= 10000:
+            raise MLServiceError("Invalid trend input", 422)
+        for row in observations:
+            if (
+                set(row) - allowed
+                or type(row.get("Timestamp")) is not int
+                or row["Timestamp"] < 0
+            ):
+                raise MLServiceError("Invalid trend input", 422)
+            if any(
+                type(value) not in (int, float) or not math.isfinite(value)
+                for value in row.values()
+            ):
+                raise MLServiceError("Invalid trend input", 422)
+        result = await self.call(
+            "/v1/score/nissan-leaf-trend-anomaly", {"observations": observations}
+        )
+        try:
+            validated = TrendResponse.model_validate(result)
+            days = len({row["Timestamp"] // 86400000000 for row in observations})
+            if (validated.status == "ok" and validated.days_evaluated != days) or (
+                validated.status == "insufficient_history"
+                and validated.days_available != days
+            ):
+                raise ValueError
+            if validated.status == "empty_input":
+                raise ValueError
+            fields = set().union(*(set(row) for row in observations))
+            expected_signals = set()
+            if (
+                len(
+                    fields.intersection(
+                        {"Pack_1_C_Temp", "Pack_2_C_Temp", "Pack_4_C_Temp"}
+                    )
+                )
+                >= 2
+            ):
+                expected_signals.add("pack_temp_spread")
+            if "Pack_Avg_C_Temp" in fields:
+                expected_signals.add(
+                    "pack_temp_rise" if "Ambient_C_Temp" in fields else "pack_avg_temp"
+                )
+            if {"SOH", "Odometer"} <= fields:
+                expected_signals.add("soh_decline_rate_per_kkm")
+            if (
+                validated.status == "ok"
+                and set(validated.signal_details) != expected_signals
+            ):
+                raise ValueError
+            return validated
         except (ValidationError, ValueError):
             raise MLServiceError("Invalid analysis service response", 502) from None

@@ -7,11 +7,14 @@ import { AppSelect } from '@/components/ui/app-select';
 import type { AnalysisController } from '@/hooks/use-leaf-analysis';
 import type { Capability, LeafAnalysis, RulConfidenceInterval } from '@/types/leaf-analysis';
 import { LeafReadingChart } from './leaf-reading-chart';
+import { LeafTrendResults } from './leaf-trend-results';
 function CapabilityResult({ title, capability }: { title: string; capability: Capability }) {
   const ci = capability.result?.confidence_interval as RulConfidenceInterval | null | undefined;
+  const isRul = capability.result?.model_version === 'nissan-leaf-soh-theilsen-v1';
   return <AppCard><AppText variant="subtitle">{title}</AppText><AppText>{capability.status.replaceAll('_', ' ')}</AppText>
     {capability.reason && <AppText>{capability.reason}</AppText>}
-    {capability.result && Object.entries(capability.result).filter(([key]) => !['bands', 'context_summary', 'limitations', 'schema_version', 'assessment_type', 'confidence_interval'].includes(key)).map(([key, value]) =>
+    {isRul && <AppText>Point estimate: {typeof capability.result?.rul_km === 'number' ? `${capability.result.rul_km.toPrecision(5)} km` : 'Unavailable'}</AppText>}
+    {capability.result && Object.entries(capability.result).filter(([key]) => !['bands', 'context_summary', 'limitations', 'schema_version', 'assessment_type', 'confidence_interval'].includes(key) && !(isRul && (key === 'rul_km' || /^rul_km_p(?:10|50|90)$/.test(key) || /^estimated_days_to_threshold_p(?:10|50|90)$/.test(key)))).map(([key, value]) =>
       <AppText key={key} variant="caption">{key.replaceAll('_', ' ')}: {value === null ? 'Unavailable' : String(value)}</AppText>)}
     {ci && <><AppText>{ci.level_pct}% bootstrap interval: {ci.rul_km_p10.toPrecision(5)}–{ci.rul_km_p90.toPrecision(5)} km · median {ci.rul_km_p50.toPrecision(5)} km</AppText><AppText variant="caption">Valid bootstrap fits: {ci.bootstrap_iterations_valid}. Experimental sample-based uncertainty, not validated failure confidence; unobserved late-life changes are not covered.</AppText>{ci.estimated_days_p10 != null && ci.estimated_days_p90 != null && <AppText variant="caption">Estimated calendar interval: {ci.estimated_days_p10.toPrecision(5)}–{ci.estimated_days_p90.toPrecision(5)} days</AppText>}</>}
     {capability.result && Array.isArray(capability.result.bands) && capability.result.bands.map((band, i) => <AppText key={i} variant="caption">SOH {(band as Record<string, unknown>).minimum_soh_pct as number}–{(band as Record<string, unknown>).maximum_soh_pct as number}% · score {(band as Record<string, unknown>).score as number}</AppText>)}
@@ -53,6 +56,7 @@ export function LeafResults({ data, telemetryOnly = false }: { data: LeafAnalysi
       {pages > 1 && <><AppButton title="Previous unusual readings" disabled={page === 0} onPress={() => setPage(page-1)} /><AppText>Page {page+1}/{pages}</AppText><AppButton title="Next unusual readings" disabled={page >= pages-1} onPress={() => setPage(page+1)} /></>}
       <AppText variant="caption">Top three local score contributions only; omitted contributions prevent a complete additive reconstruction. SHAP is not a physical fault diagnosis.</AppText>
     </AppCard>
+    <LeafTrendResults trend={data.trend} />
     <CapabilityResult title="Battery health · SOH bands, not a trained prediction" capability={data.health} />
     <CapabilityResult title="Experimental RUL · distance to SOH threshold" capability={data.rul} />
     <AppCard><AppText variant="subtitle">Data quality and limitations</AppText>{[...data.warnings, ...data.limitations].map((text, i) => <AppText key={i} variant="caption">{text}</AppText>)}</AppCard>

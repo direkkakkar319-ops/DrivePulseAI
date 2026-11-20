@@ -55,3 +55,10 @@ def test_pull_requests_and_merge_groups_keep_validation():
     assert "  pull_request:" in text and "  merge_group:" in text
     for name in ("lint-ml", "lint-backend", "lint-mobile", "test-ml", "test-backend"):
         assert "    if:" not in job(name)
+
+
+def test_mobile_regressions_run_with_pr_checks():
+    block = job("lint-mobile")
+    assert "    if:" not in block
+    assert "run: npm test -- --runInBand" in block
+    assert "working-directory: mobile" in block

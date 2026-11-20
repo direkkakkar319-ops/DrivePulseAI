@@ -215,9 +215,9 @@ Physical Android, pinned serving-container execution and live Render remain pend
 The deployment branch was merged non-destructively with remote commit `9565dcb`.
 Isolation Forest and SHAP remain the active anomaly path. The added ML endpoint
 `POST /v1/score/nissan-leaf-trend-anomaly` and its rolling Z-score implementation
-are preserved and tested, but **not integrated into the main backend/mobile in
-Step 4**. They require a separate longitudinal-input and presentation contract,
-unit verification and evaluation. They do not silently replace point anomalies.
+are preserved and tested. The follow-up trend integration below now connects
+this independent detector through the shared backend pipeline and mobile results.
+It does not replace point anomalies; unverified or missing signals remain unavailable.
 
 The updated RUL service defaults to 100 bootstrap fits and an 80% interval. The
 backend preserves optional `rul_km_p10`, `rul_km_p50`, `rul_km_p90`, corresponding
@@ -278,3 +278,129 @@ model/sample checksums and the remote RUL/trend algorithm ASTs were preserved.
 The two project-authored CSV fixtures retain their original CRLF bytes. Scoped
 `.gitattributes` entries disable text conversion and recognize CR at end of line;
 this preserves checksums without suppressing other whitespace checks.
+
+## Battery Trend Analysis integration
+
+The current additive schema1 response includes `trend` independently of `anomaly`,
+`health` and `rul`. Older responses without `trend` remain accepted by mobile.
+The existing three main-backend routes and Firebase authorization are unchanged.
+
+`services/leaf_trend.py` prepares the history from the same validated readings for
+sample and CSV uploads. The existing server-only HTTP client sends one request to
+`POST /v1/score/nissan-leaf-trend-anomaly` with `schema_version:1` and `observations`.
+Do **not** split this history into point-anomaly batches: its rolling baseline
+needs the complete accepted history. The current ML endpoint permits1–10000 rows;
+the tighter backend256-row limit remains authoritative. No SOC, row ID, user ID,
+Garage ID or Firebase token is sent in this model payload.
+
+The input keeps original Unix-microsecond timestamps and supplied measured pack
+temperatures, reported SOH and odometer. The ML implementation performs its own
+UTC-day aggregation: means for temperatures, medians for SOH/odometer. The backend
+never derives an average temperature from missing channels. `Pack_Avg_C_Temp` is
+now explicitly accepted as an optional finite °C column (the earlier guide listed
+it, but the parser allowlist had omitted it; a regression test covers this).
+
+`Ambient_C_Temp` remains outside leaf-csv-v1 because its original units are
+ambiguous. Consequently temperature-rise-over-ambient is explicitly unavailable,
+not assumed zero and not silently converted from a guessed unit. A later explicit
+ambient-unit contract is required. The other three signals can be supported by
+supplied pack sensors, average temperature and SOH/odometer respectively.
+
+A pack spread requires at least two measured pack channels on every supplied
+trend day. If any such day lacks that coverage, all pack channels are excluded
+from this detector request with a warning; the original telemetry and point
+anomaly inputs remain untouched. This conservative policy prevents pandas'
+missing-value-skipping max/min from presenting a single sensor's spread as a
+measured zero. Available average-temperature and SOH-rate analyses still proceed.
+
+### Response shape
+
+`trend` contains:
+
+- `status`: completed, insufficient_history, unavailable or failed; safe `reason`.
+- `prepared_readings`, `analyzed_readings`, `skipped_readings`, `observed_days`.
+  Prepared readings have usable trend input fields. Analyzed readings are counted
+  only after a validated model response; failed/unrequested work is not counted.
+- Source start/end timestamps, actual `source_fields`, `signal_availability` with
+  per-signal input availability/reasons, backend warnings and limitations.
+- `result`: the validated ML response or null; never fabricated normal output.
+
+The actual model response includes version`nissan-leaf-rolling-zscore-v1`,
+assessment`rolling_zscore_drift_detection`, status`ok`, `insufficient_history` or
+`empty_input`, `is_drift_detected`, `drift_alerts_count`, `alerts` and
+`signal_details`. Successful results include `days_evaluated`, `window_size_days`,
+`warning_z_threshold`, `critical_z_threshold`. Short histories instead report
+`days_available` and `min_days_required`.
+
+The defaults require eight observed UTC days: seven prior points plus the latest.
+A baseline uses up to14 prior finite observed daily values. Warning Z threshold2.5
+and critical3.5 require at least two persistent abnormal observed points. The
+SOH-rate signal can require additional data because the first difference is
+missing; distance change must exceed0.01km. A sufficient overall day count does
+not guarantee that each signal has enough finite history.
+
+Signal statuses include normal, warning, critical, insufficient_baseline_points
+and non_finite_current_reading. Usable signals return measured daily value,
+baseline mean/std, Z-score, observed baseline count and persistence. Alerts retain
+the supplied severity, signal identity, measurements, Z-score and explanation.
+The backend/mobile validate counts, identities, finite numbers, coverage and
+alert/detail agreement. They **do not recalculate severity from rounded Z-scores**.
+
+This detector assesses the **latest daily point**, not every historical interval.
+Its fields and explanation strings saying 'days' mean observed daily points,
+which can span calendar gaps. There is no invented daily interpolation, trend
+chart, mechanical diagnosis, probability or merged Isolation Forest/trend score.
+Signal input availability does not imply successful analysis; inspect the actual
+signal status and whole capability status too.
+
+### Resources and verification
+
+One extra sequential HTTP request is added, using the existing private key,
+30-second upstream timeout,120-second overall deadline, admission semaphore and
+byte/row limits. None was increased. The sample uses two point batches32+8, then
+health, RUL and trend requests. Inference is still remote; no model is loaded by
+the main backend. Invalid, unavailable or unauthorized trend responses become an
+independent failed capability; other completed analyses remain available. If the
+whole deadline expires, the route returns504 without misleading partial success.
+
+The sample remains the unchanged40-row synthetic fixture over117 calendar days.
+It supplies pack spread and SOH-rate inputs, but no average or verified ambient
+measurement. Those missing signals are explicitly unavailable. Test coverage
+compares sample/upload through the actual ML app, including point scores, health,
+RUL point/bootstrap estimates and trend results. Artificial warning/critical test
+patterns are separate from the built-in sample; they are protocol/threshold tests,
+not battery-failure evaluation.
+
+Physical Android, live Firebase/Render/TLS and the pinned serving environment are
+not verified locally. The documented scikit-learn version warning and existing
+PostgreSQL/legacy test skips still apply. Old perfect synthetic trends and narrow
+bootstrap intervals establish no real battery-lifetime accuracy.
+
+The deployment gates secured in`bd29b13` remain main-push-only. Full mobile Jest
+regressions now also run in the existing mobile CI job on PR/merge-group checks.
+No deployment hooks, secrets, Render settings, build profiles or production URLs
+were changed.
+
+### Completed trend verification
+
+Local checks for this follow-up:118 backend tests passed,255 skipped (206 retired
+KIT cases and49 PostgreSQL-dependent checks),45 ML tests passed, and503 mobile
+tests passed across33 suites. TypeScript, Expo lint, ML lint, changed-file Python
+lint, formatting and Git whitespace passed. Six CI workflow regression checks
+passed; all workflow YAML parsed. Full backend Ruff retains five documented,
+pre-existing findings in untouched legacy KIT/migration files.
+
+A fresh genuine main-backend→ML-app test compared sample and upload results,
+including trends and bootstrap intervals:40 readings over40 observed UTC days,
+zero point flags, zero trend alerts; pack spread and SOH-rate signals normal.
+SOC70%, SOH93.22%, health band4; experimental RUL point~59490km with100 valid
+bootstrap fits and an80% interval. This very regular synthetic fixture is not a
+battery-life benchmark. Average and ambient signals remain unavailable for this
+fixture; range remains null. Both workflows together took~2.43s locally, with a
+20826-byte sample response. The separate32-row synthetic SHAP stress batch took
+~10.64s. These do not establish Render performance or justify higher limits.
+
+No ML algorithms, artifacts, original sample bytes, production credentials or
+Render settings were changed. Physical Android, live Firebase/Render and pinned
+serving-environment verification remain pending. No push, deployment or APK build
+was performed.
