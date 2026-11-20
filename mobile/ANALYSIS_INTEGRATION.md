@@ -1,3 +1,7 @@
+> Current active flow: Nissan Leaf sample/CSV analysis. The earlier KIT sections
+> below describe the superseded implementation. See the current Nissan section
+> at the end and `backend/docs/nissan-leaf-analysis.md`.
+
 # Phase 4.1: Android analysis integration
 
 ## Current status
@@ -189,3 +193,35 @@ entry in that audit report; no other package version changed. No audit-fix comma
 or unrelated dependency upgrade was performed.
 
 Official SDK reference: [Expo SDK 57 DocumentPicker](https://docs.expo.dev/versions/v57.0.0/sdk/document-picker/).
+
+## Current Nissan Leaf integration (supersedes KIT sections above)
+
+The active Insights route uses `use-leaf-analysis`, `api/leaf-analysis.ts`,
+`types/leaf-analysis.ts` and `lib/leaf-analysis.ts`. It retains native Firebase
+refresh/account isolation, cancellation and native DocumentPicker references.
+Multipart now contains only `file`; timestamps are supplied within leaf-csv-v1,
+not via a recording-date field. See `backend/docs/nissan-leaf-analysis.md` and the
+clearly synthetic CSV under `backend/docs/examples/`.
+
+Sample and upload render through the same Leaf result components: battery overview,
+negative-direction novelty score chart, paginated unusual readings/top-three SHAP,
+health bands, experimental RUL availability, quality warnings and recorded telemetry.
+SVG charts use 48 points/page and break across missing/discontinuous readings;
+SHAP cards use eight unusual readings/page. Demo mode remains separate and transient.
+No model key reaches mobile and no analysis is saved to History/Garage.
+
+No new native dependency was added. Existing Firebase/DocumentPicker development
+client requirements still apply. Verify with `npx tsc --noEmit`, `npm run lint`,
+`npm test -- --runInBand`; physical Android and live Render verification remain
+pending. Old KIT utility tests are historical; active route tests now use Leaf
+protocol fixtures, explicitly artificial rather than evaluation/model results.
+
+### Partner RUL confidence intervals
+
+The reconciled response accepts optional RUL percentile fields and nested
+`confidence_interval`, including absent/null intervals. Runtime checks reject
+nonfinite, negative, unordered, partial or inconsistent populated bounds. Results
+show the supplied level, lower/median/upper distance, available calendar bounds,
+and valid bootstrap-fit count with explicit experimental limitations.
+The new rolling Z-score trend detector remains ML-service-only and is deferred
+from mobile integration; Isolation Forest remains the active anomaly detector.

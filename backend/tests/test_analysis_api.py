@@ -23,6 +23,12 @@ from app.services import analysis_service
 from app.services.inference_service import KITInferenceService
 from app.services.kit_samples import MANIFEST_PATH, load_sample
 
+# This suite targets the retired KIT API/assets, removed before Nissan integration.
+# Retain its assertions for historical reference; active coverage is test_leaf_analysis.py.
+pytestmark = pytest.mark.skip(
+    reason="Retired KIT contract/assets; replaced by Nissan observation analysis"
+)
+
 BASE = "/api/v1/analysis/samples"
 ANALYZE = BASE + "/kit-20180320-normal/analyze"
 AUTH = {"Authorization": "Bearer verified-fixture"}

@@ -2,8 +2,8 @@
 import { useLocalSearchParams } from 'expo-router';
 import { AIInsightsScreen } from '@/components/insights/ai-insights-screen';
 import { useAuthStore } from '@/store/authStore';
-import { useAnalysis } from '@/hooks/use-analysis';
-import { pickKitCsv } from '@/lib/csv-picker';
+import { useLeafAnalysis } from '@/hooks/use-leaf-analysis';
+import { pickLeafCsv } from '@/lib/csv-picker';
 
 export default function InsightsRoute() {
   const { demo } = useLocalSearchParams<{ demo?: string }>();
@@ -13,6 +13,6 @@ export default function InsightsRoute() {
 }
 
 function SessionInsights({ uid, initialDemo }: { uid: string | null; initialDemo: boolean }) {
-  const analysis = useAnalysis(uid, initialDemo, pickKitCsv);
+  const analysis = useLeafAnalysis(uid, initialDemo, pickLeafCsv);
   return <AIInsightsScreen analysis={analysis} />;
 }

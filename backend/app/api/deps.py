@@ -1,15 +1,19 @@
 """Reusable dependencies enforcing verified Firebase identity and DB session scope."""
 
+from __future__ import annotations
+
 from collections.abc import Generator
 from dataclasses import dataclass
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.core.firebase import verify_token
-from app.services.inference_service import KITInferenceService
+
+if TYPE_CHECKING:
+    from app.services.inference_service import KITInferenceService
 
 bearer = HTTPBearer(auto_error=False)
 

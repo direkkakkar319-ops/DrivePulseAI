@@ -20,6 +20,12 @@ from app.services.kit_samples import (
     make_window_pairs,
 )
 
+# This suite targets the retired KIT API/assets, removed before Nissan integration.
+# Retain its assertions for historical reference; active coverage is test_leaf_analysis.py.
+pytestmark = pytest.mark.skip(
+    reason="Retired KIT contract/assets; replaced by Nissan observation analysis"
+)
+
 SAMPLE_ID = "kit-20180320-normal"
 EXPECTED = Path(__file__).parent / "fixtures/kit_known_request.json"
 

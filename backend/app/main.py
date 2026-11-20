@@ -16,7 +16,7 @@ from app.api.routes.onboarding import router as onboarding_router
 from app.api.routes.users import router
 from app.config import Settings, get_settings
 from app.database import build_engine
-from app.services.inference_service import KITInferenceService
+from app.services.leaf_inference import LeafInferenceService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -25,8 +25,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.engine = build_engine(settings)
-        app.state.kit_upload_slots = asyncio.Semaphore(
-            settings.kit_upload_max_concurrent
+        app.state.leaf_upload_slots = asyncio.Semaphore(
+            settings.leaf_analysis_max_concurrent
         )
         try:
             async with httpx.AsyncClient(
@@ -34,7 +34,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 trust_env=False,
                 limits=httpx.Limits(max_connections=2, max_keepalive_connections=2),
             ) as client:
-                app.state.kit_inference = KITInferenceService(settings, client)
+                app.state.leaf_inference = LeafInferenceService(settings, client)
                 yield
         finally:
             app.state.engine.dispose()

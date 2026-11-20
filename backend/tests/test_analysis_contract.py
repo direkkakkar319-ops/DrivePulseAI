@@ -16,6 +16,12 @@ from app.schemas.inference import KitInferenceResult
 from app.services.analysis_service import build_analysis
 from app.services.kit_samples import SIGNALS, load_sample, make_window_pairs
 
+# This suite targets the retired KIT API/assets, removed before Nissan integration.
+# Retain its assertions for historical reference; active coverage is test_leaf_analysis.py.
+pytestmark = pytest.mark.skip(
+    reason="Retired KIT contract/assets; replaced by Nissan observation analysis"
+)
+
 
 def controlled(genuine, scores, windows=None):
     """Use real windows with explicitly synthetic scores to test arithmetic edges."""

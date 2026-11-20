@@ -67,9 +67,7 @@ class BatteryTrendAnomalyDetector:
         if window_size < 3:
             raise ValueError("window_size must be at least 3")
         if min_history_points < 3 or min_history_points > window_size:
-            raise ValueError(
-                "min_history_points must be at least 3 and <= window_size"
-            )
+            raise ValueError("min_history_points must be at least 3 and <= window_size")
         if warning_z <= 0 or critical_z <= warning_z:
             raise ValueError("warning_z must be positive and critical_z > warning_z")
         if consecutive_points < 1:
@@ -88,8 +86,12 @@ class BatteryTrendAnomalyDetector:
                 frame[col] = pd.to_numeric(frame[col], errors="coerce")
 
         if "Timestamp" in frame.columns and frame["Timestamp"].notna().any():
-            frame = frame.loc[frame["Timestamp"].notna() & frame["Timestamp"].ge(0)].copy()
-            frame["date"] = pd.to_datetime(frame["Timestamp"], unit="us", utc=True).dt.floor("D")
+            frame = frame.loc[
+                frame["Timestamp"].notna() & frame["Timestamp"].ge(0)
+            ].copy()
+            frame["date"] = pd.to_datetime(
+                frame["Timestamp"], unit="us", utc=True
+            ).dt.floor("D")
             agg_rules: dict[str, str] = {}
             for col in frame.columns:
                 if col in {"Timestamp", "date"}:
@@ -98,7 +100,9 @@ class BatteryTrendAnomalyDetector:
                     agg_rules[col] = "median"
                 else:
                     agg_rules[col] = "mean"
-            daily = frame.groupby("date", as_index=False).agg(agg_rules).sort_values("date")
+            daily = (
+                frame.groupby("date", as_index=False).agg(agg_rules).sort_values("date")
+            )
         else:
             daily = frame.copy().reset_index(drop=True)
 
@@ -133,7 +137,11 @@ class BatteryTrendAnomalyDetector:
         signals_to_evaluate: dict[str, pd.Series] = {}
 
         # 1. Pack Temperature Spread
-        pack_cols = [c for c in ["Pack_1_C_Temp", "Pack_2_C_Temp", "Pack_4_C_Temp"] if c in daily.columns]
+        pack_cols = [
+            c
+            for c in ["Pack_1_C_Temp", "Pack_2_C_Temp", "Pack_4_C_Temp"]
+            if c in daily.columns
+        ]
         if len(pack_cols) >= 2:
             spread = daily[pack_cols].max(axis=1) - daily[pack_cols].min(axis=1)
             signals_to_evaluate["pack_temp_spread"] = spread
@@ -160,14 +168,17 @@ class BatteryTrendAnomalyDetector:
         signal_details: dict[str, dict] = {}
 
         for sig_name, series in signals_to_evaluate.items():
-            meta = self.MONITORED_SIGNALS.get(sig_name, {
-                "label": sig_name,
-                "unit": "",
-                "min_std": 0.01,
-                "min_baseline_mean": None,
-                "high_is_bad": True,
-                "description": "",
-            })
+            meta = self.MONITORED_SIGNALS.get(
+                sig_name,
+                {
+                    "label": sig_name,
+                    "unit": "",
+                    "min_std": 0.01,
+                    "min_baseline_mean": None,
+                    "high_is_bad": True,
+                    "description": "",
+                },
+            )
 
             vals = series.to_numpy(dtype=float)
             current_val = float(vals[-1])
@@ -202,22 +213,25 @@ class BatteryTrendAnomalyDetector:
                 val_i = vals[-i]
                 if not math.isfinite(val_i):
                     break
-                hist_i = vals[: -i]
+                hist_i = vals[:-i]
                 valid_hist_i = hist_i[np.isfinite(hist_i)]
                 slice_i = valid_hist_i[-self.window_size :]
                 if len(slice_i) >= self.min_history_points:
                     mu_i = float(np.mean(slice_i))
                     sigma_i = max(float(np.std(slice_i, ddof=1)), meta["min_std"])
                     z_i = (val_i - mu_i) / sigma_i
-                    if (z_i >= self.warning_z if meta["high_is_bad"] else abs(z_i) >= self.warning_z):
+                    if (
+                        z_i >= self.warning_z
+                        if meta["high_is_bad"]
+                        else abs(z_i) >= self.warning_z
+                    ):
                         consec += 1
                     else:
                         break
 
             is_alert = (
-                (z >= self.warning_z if meta["high_is_bad"] else abs(z) >= self.warning_z)
-                and consec >= self.consecutive_points
-            )
+                z >= self.warning_z if meta["high_is_bad"] else abs(z) >= self.warning_z
+            ) and consec >= self.consecutive_points
 
             severity = "normal"
             if is_alert:
@@ -244,18 +258,20 @@ class BatteryTrendAnomalyDetector:
                     f"baseline mean of {mu:.2f}{meta['unit']} (std: {sigma:.2f}{meta['unit']}). "
                     f"Abnormal pattern persisted for {consec} consecutive days."
                 )
-                alerts.append({
-                    "signal": sig_name,
-                    "label": meta["label"],
-                    "severity": severity,
-                    "z_score": round(z, 2),
-                    "current_value": round(current_val, 4),
-                    "baseline_mean": round(mu, 4),
-                    "baseline_std": round(sigma, 4),
-                    "unit": meta["unit"],
-                    "consecutive_days": consec,
-                    "explanation": explanation,
-                })
+                alerts.append(
+                    {
+                        "signal": sig_name,
+                        "label": meta["label"],
+                        "severity": severity,
+                        "z_score": round(z, 2),
+                        "current_value": round(current_val, 4),
+                        "baseline_mean": round(mu, 4),
+                        "baseline_std": round(sigma, 4),
+                        "unit": meta["unit"],
+                        "consecutive_days": consec,
+                        "explanation": explanation,
+                    }
+                )
 
         return {
             "status": "ok",

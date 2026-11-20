@@ -12,10 +12,9 @@ import { colors, layout, spacing } from '@/theme/tokens';
 import type { PickCsv } from '@/types/ai-insights';
 import { AnalysisResultCard } from './analysis-result-card';
 import { CsvSourceControl } from './csv-source-control';
-import type { AnalysisController } from '@/hooks/use-analysis';
-import { KitAnalysisControls } from './kit-analysis-controls';
-import { KitAnalysisVisualization } from './kit-analysis-visualization';
-import { KitAnalysisFeedback } from './kit-analysis-feedback';
+import type { AnalysisController } from '@/hooks/use-leaf-analysis';
+import { LeafAnalysisControls } from './leaf-analysis-controls';
+import { LeafResults, LeafAnalysisFeedback } from './leaf-analysis-results';
 
 export function AIInsightsScreen({ initialDemo = false, pickCsv, analysis }: { initialDemo?: boolean; pickCsv?: PickCsv; analysis?: AnalysisController }) {
   const data = useInsightsSource(initialDemo, pickCsv);
@@ -26,7 +25,7 @@ export function AIInsightsScreen({ initialDemo = false, pickCsv, analysis }: { i
     <AppHeader title="AI Insights" />
     <AppText variant="subtitle" accessibilityRole="header">Choose Data Source</AppText>
     <AppCard>
-      {analysis && <KitAnalysisControls analysis={analysis} />}
+      {analysis && <LeafAnalysisControls analysis={analysis} />}
       <CsvSourceControl available={analysis ? analysis.canPickCsv : Boolean(pickCsv)} selecting={selecting}
         file={source.kind === 'csv' ? source.file : undefined} error={analysis?.selectionError ?? data.error}
         selectionLabel={analysis ? analysis.result.status === 'ready' && analysis.result.data.source_type === 'uploaded_csv'
@@ -46,9 +45,9 @@ export function AIInsightsScreen({ initialDemo = false, pickCsv, analysis }: { i
 
     <AppText variant="subtitle" accessibilityRole="header">Analysis Results</AppText>
     {demo ? demoInsights.results.map(result => <AnalysisResultCard key={result.id} result={result} />)
-      : analysis && analysis.result.status !== 'idle' ? <KitAnalysisFeedback analysis={analysis} />
+      : analysis && analysis.result.status !== 'idle' ? <LeafAnalysisFeedback analysis={analysis} />
       : analysis ? <AppCard><AppDataState status="empty" title="No analysis results yet"
-        message="Select a prerecorded KIT sample or a compatible CSV, then start analysis." /></AppCard>
+        message="Select a built-in Nissan Leaf sample or a compatible CSV, then start analysis." /></AppCard>
       : <AppCard><AppDataState status="empty" title={data.source.kind === 'csv' ? 'Analysis not available yet' : 'No analysis results yet'}
         message={data.source.kind === 'csv' ? 'The selected CSV has not been uploaded or analysed. ML inference is not integrated.'
           : 'Enable Use Demo Data to preview illustrative results.'} /></AppCard>}
@@ -61,7 +60,7 @@ export function AIInsightsScreen({ initialDemo = false, pickCsv, analysis }: { i
         <AppText tone="secondary" style={styles.switchLabel}>{item.label}</AppText>
         <AppText variant="label">{item.value}{item.unit === '%' || item.unit === '°C' ? '' : ' '}{item.unit}</AppText>
       </View>)}
-    </AppCard> : analysis?.result.status === 'ready' ? <KitAnalysisVisualization data={analysis.result.data} section="telemetry" /> : <AppCard><AppDataState status="empty" title="No telemetry data selected"
+    </AppCard> : analysis?.result.status === 'ready' ? <LeafResults data={analysis.result.data} telemetryOnly /> : <AppCard><AppDataState status="empty" title="No telemetry data selected"
       message={data.source.kind === 'csv' ? 'CSV telemetry preview is not available yet. The selected file has not been read.'
         : 'Enable Use Demo Data to view sample telemetry.'} /></AppCard>}
   </AppScreen>;

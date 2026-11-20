@@ -21,6 +21,15 @@ class Settings(BaseSettings):
     cors_origins: list[str] = []
     ml_service_url: str | None = None
     ml_inference_api_key: SecretStr | None = None
+    leaf_analysis_max_concurrent: int = Field(default=2, ge=1, le=4)
+    leaf_ml_batch_size: int = Field(default=32, ge=1, le=256)
+    leaf_upload_max_bytes: int = Field(
+        default=2 * 1024 * 1024, ge=1024, le=8 * 1024 * 1024
+    )
+    leaf_upload_max_rows: int = Field(default=256, ge=1, le=10000)
+    leaf_analysis_timeout_seconds: float = Field(
+        default=120, gt=0, le=180, allow_inf_nan=False
+    )
     kit_ml_batch_size: int = Field(default=32, ge=1, le=256)
     ml_request_timeout_seconds: float = Field(
         default=30, gt=0, le=120, allow_inf_nan=False
@@ -39,6 +48,10 @@ class Settings(BaseSettings):
     )
 
     @field_validator(
+        "leaf_analysis_max_concurrent",
+        "leaf_ml_batch_size",
+        "leaf_upload_max_bytes",
+        "leaf_upload_max_rows",
         "kit_ml_batch_size",
         "kit_upload_max_bytes",
         "kit_upload_max_rows",

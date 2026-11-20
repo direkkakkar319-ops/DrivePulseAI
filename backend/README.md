@@ -1,3 +1,6 @@
+> Current analysis API: [Nissan Leaf CSV and inference contract](docs/nissan-leaf-analysis.md).
+> Earlier KIT analysis instructions below are historical; account/Garage setup remains applicable.
+
 # DrivePulseAI API
 
 ## Final analysis contract (Phase 3C)
@@ -382,3 +385,10 @@ once. Completed accounts enter Home directly on later logins. The mobile app nee
 a reachable backend to restore state on entering the signed-in area. Failure offers
 Retry/Logout instead of assuming completion. Account rows and vehicles survive
 restarts/logout; client state is discarded on logout or UID change.
+
+## Current Nissan Leaf analysis
+
+The active analysis routes now use the observation-based Nissan Leaf contract,
+not KIT window pairs. See [CSV format, API, limits and rollout guide](docs/nissan-leaf-analysis.md).
+The built-in sample is explicitly synthetic and runs through genuine inference.
+No analysis persistence, verified fault diagnosis, or driving-range estimate is claimed.

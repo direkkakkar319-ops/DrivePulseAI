@@ -27,17 +27,19 @@ def _generate_trend_data(
         t4 = 25.0 + base_spread / 2 + rng.normal(0, 0.2)
         avg_temp = (t1 + t2 + t4) / 3.0
         ambient = 20.0 + rng.normal(0, 0.5)
-        rows.append({
-            "Timestamp": t,
-            "Odometer": odo,
-            "SOH": soh,
-            "Pack_1_C_Temp": t1,
-            "Pack_2_C_Temp": t2,
-            "Pack_4_C_Temp": t4,
-            "Pack_Avg_C_Temp": avg_temp,
-            "Ambient_C_Temp": ambient,
-            "HV_Bat_Voltage": 380.0 - rng.normal(0, 1.0),
-        })
+        rows.append(
+            {
+                "Timestamp": t,
+                "Odometer": odo,
+                "SOH": soh,
+                "Pack_1_C_Temp": t1,
+                "Pack_2_C_Temp": t2,
+                "Pack_4_C_Temp": t4,
+                "Pack_Avg_C_Temp": avg_temp,
+                "Ambient_C_Temp": ambient,
+                "HV_Bat_Voltage": 380.0 - rng.normal(0, 1.0),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -57,13 +59,17 @@ def test_trend_detector_init_validation():
     # Invalid min history
     with pytest.raises(ValueError, match="min_history_points must be at least 3"):
         BatteryTrendAnomalyDetector(min_history_points=2)
-    with pytest.raises(ValueError, match="min_history_points must be at least 3 and <= window_size"):
+    with pytest.raises(
+        ValueError, match="min_history_points must be at least 3 and <= window_size"
+    ):
         BatteryTrendAnomalyDetector(window_size=10, min_history_points=12)
 
     # Invalid thresholds
     with pytest.raises(ValueError, match="warning_z must be positive"):
         BatteryTrendAnomalyDetector(warning_z=-1.0)
-    with pytest.raises(ValueError, match="warning_z must be positive and critical_z > warning_z"):
+    with pytest.raises(
+        ValueError, match="warning_z must be positive and critical_z > warning_z"
+    ):
         BatteryTrendAnomalyDetector(warning_z=3.0, critical_z=2.5)
 
     # Invalid consecutive points

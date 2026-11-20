@@ -30,6 +30,12 @@ from app.services.inference_service import KITInferenceService
 from app.services.kit_samples import FEATURE_NAMES, load_sample
 from app.services.kit_upload import UploadError, prepare_csv
 
+# This suite targets the retired KIT API/assets, removed before Nissan integration.
+# Retain its assertions for historical reference; active coverage is test_leaf_analysis.py.
+pytestmark = pytest.mark.skip(
+    reason="Retired KIT contract/assets; replaced by Nissan observation analysis"
+)
+
 UPLOAD = "/api/v1/analysis/upload"
 ROOT = Path(__file__).resolve().parents[2]
 

@@ -2,12 +2,13 @@ import { fireEvent, render, screen, within } from '@testing-library/react-native
 import { KitAnalysisVisualization } from '../src/components/insights/kit-analysis-visualization';
 import { KitLineChart } from '../src/components/insights/kit-line-chart';
 import { AIInsightsScreen } from '../src/components/insights/ai-insights-screen';
-import { useAnalysis } from '../src/hooks/use-analysis';
+import { useLeafAnalysis as useAnalysis } from '../src/hooks/use-leaf-analysis';
+import * as leaf from './leaf-fixtures';
 import { parseKitAnalysis } from '../src/lib/kit-analysis';
 import { analysisSegments, clock, lineRuns, plotNumber, scorePoints, segmentKey, telemetryPoints, type PlotPoint } from '../src/lib/kit-visualization';
 import { sampleResult, uploadResult } from './analysis-fixtures';
 import flagged from './fixtures/kit-flagged-excerpt.json';
-import type { AnalysisApi } from '../src/types/kit-analysis';
+import type { LeafApi as AnalysisApi } from '../src/types/leaf-analysis';
 
 jest.mock('../src/api/auth', () => ({ authService: { getToken: jest.fn(), subscribe: jest.fn() } }));
 const flaggedResult = () => parseKitAnalysis(JSON.parse(JSON.stringify(flagged)));
@@ -115,34 +116,34 @@ it('keeps geometry finite for extreme positive and negative finite readings', as
   expect(JSON.stringify(view.toJSON())).not.toMatch(/NaN|Infinity/);
 });
 function connectedApi() {
-  return { samples: jest.fn(async () => ({ schema_version: 1 as const, samples: [sampleResult().sample] })),
-    sample: jest.fn(async () => sampleResult()), upload: jest.fn(async () => uploadResult()) };
+  return { samples: jest.fn(async () => ({ schema_version: 1 as const, samples: [leaf.leafSample] })),
+    sample: jest.fn(async () => leaf.sampleResult()), upload: jest.fn(async () => leaf.uploadResult()) };
 }
 async function analyze() {
-  await fireEvent.press(screen.getByRole('button', { name: 'Prerecorded KIT sample' }));
-  await fireEvent.press(await screen.findByRole('button', { name: 'KIT first-pair test excerpt' }));
-  await fireEvent.press(screen.getByRole('button', { name: 'Analyze KIT sample' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Built-in Nissan Leaf sample' }));
+  await fireEvent.press(await screen.findByRole('button', { name: 'Synthetic Leaf test fixture' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Analyze Nissan Leaf sample' }));
 }
 it('removes charts on demo selection and keeps illustrative values separate', async () => {
   const api = connectedApi(); function Connected() { return <AIInsightsScreen analysis={useAnalysis('alice', false, undefined, api)} />; }
-  await render(<Connected />); await analyze(); expect(screen.getByTestId('kit-scores-visualization')).toBeTruthy();
+  await render(<Connected />); await analyze(); expect(screen.getByTestId('Anomaly score chart')).toBeTruthy();
   await fireEvent(screen.getByRole('switch'), 'valueChange', true);
-  expect(screen.queryByTestId('kit-scores-visualization')).toBeNull(); expect(screen.getByText('94.2%')).toBeTruthy();
+  expect(screen.queryByTestId('Anomaly score chart')).toBeNull(); expect(screen.getByText('94.2%')).toBeTruthy();
   expect(screen.queryByTestId('Telemetry chart')).toBeNull();
 });
 it('removes charts on account switching and logout', async () => {
   const api = connectedApi();
   function Connected({ uid }: { uid: string | null }) { return <AIInsightsScreen analysis={useAnalysis(uid, false, undefined, api)} />; }
-  const view = await render(<Connected uid="alice" />); await analyze(); expect(screen.getByTestId('kit-scores-visualization')).toBeTruthy();
-  await view.rerender(<Connected uid="bob" />); expect(screen.queryByTestId('kit-scores-visualization')).toBeNull();
-  await view.rerender(<Connected uid={null} />); expect(screen.queryByTestId('kit-telemetry-visualization')).toBeNull();
+  const view = await render(<Connected uid="alice" />); await analyze(); expect(screen.getByTestId('Anomaly score chart')).toBeTruthy();
+  await view.rerender(<Connected uid="bob" />); expect(screen.queryByTestId('Anomaly score chart')).toBeNull();
+  await view.rerender(<Connected uid={null} />); expect(screen.queryByTestId('SOC chart')).toBeNull();
 });
 it('preserves Retry and clears charts on explicit cancellation', async () => {
   const api = connectedApi(); api.sample.mockRejectedValueOnce(new Error('Service temporarily unavailable'));
   function Connected() { return <AIInsightsScreen analysis={useAnalysis('alice', false, undefined, api as AnalysisApi)} />; }
-  await render(<Connected />); await analyze(); expect(screen.queryByTestId('kit-scores-visualization')).toBeNull();
-  await fireEvent.press(screen.getByRole('button', { name: 'Retry analysis' })); expect(screen.getByTestId('kit-scores-visualization')).toBeTruthy();
-  await fireEvent.press(screen.getByRole('button', { name: 'Clear analysis' })); expect(screen.queryByTestId('kit-scores-visualization')).toBeNull();
+  await render(<Connected />); await analyze(); expect(screen.queryByTestId('Anomaly score chart')).toBeNull();
+  await fireEvent.press(screen.getByRole('button', { name: 'Retry analysis' })); expect(screen.getByTestId('Anomaly score chart')).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: 'Clear analysis' })); expect(screen.queryByTestId('Anomaly score chart')).toBeNull();
 });
 it('uses the same graphs for uploaded CSV without persistence', async () => {
   const data = parseKitAnalysis(uploadResult()); await render(<KitAnalysisVisualization data={data} section="telemetry" />);

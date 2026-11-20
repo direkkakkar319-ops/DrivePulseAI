@@ -1,3 +1,5 @@
+import { useLeafAnalysis } from '../src/hooks/use-leaf-analysis';
+import * as leaf from './leaf-fixtures';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react-native';
 import { useAnalysis } from '../src/hooks/use-analysis';
 import { AIInsightsScreen } from '../src/components/insights/ai-insights-screen';
@@ -110,29 +112,28 @@ it('does not publish late inference or picker results after unmount', async () =
   await act(async () => { pending.resolve(sampleResult()); await request; });
 });
 it('renders minimal real-source success and keeps the simulated demo separate', async () => {
-  const { api, pick } = setup();
-  function Connected() { const analysis = useAnalysis('alice', false, pick, api as AnalysisApi); return <AIInsightsScreen analysis={analysis} />; }
+  const { api, pick } = ({ api: { samples: jest.fn(async () => ({ schema_version: 1 as const, samples: [leaf.leafSample] })), sample: jest.fn(async () => leaf.sampleResult()), upload: jest.fn(async () => leaf.uploadResult()) }, pick: jest.fn(async () => csvFile) });
+  function Connected() { const analysis = useLeafAnalysis('alice', false, pick, api); return <AIInsightsScreen analysis={analysis} />; }
   await render(<Connected />);
-  await fireEvent.press(screen.getByRole('button', { name: 'Prerecorded KIT sample' }));
-  await fireEvent.press(await screen.findByRole('button', { name: 'KIT first-pair test excerpt' }));
-  await fireEvent.press(screen.getByRole('button', { name: 'Analyze KIT sample' }));
-  expect(await screen.findByText('Real KIT analysis received')).toBeTruthy();
-  expect(screen.getByText('Maximum anomaly score: 3.435')).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: 'Built-in Nissan Leaf sample' }));
+  await fireEvent.press(await screen.findByRole('button', { name: 'Synthetic Leaf test fixture' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Analyze Nissan Leaf sample' }));
+  expect(await screen.findByText('Synthetic integration input · genuine model inference')).toBeTruthy();
+  expect(screen.getByText('SOC: 70%')).toBeTruthy();
   expect(screen.queryByText('94.2%')).toBeNull();
   await fireEvent(screen.getByRole('switch'), 'valueChange', true);
-  expect(screen.queryByText('Real KIT analysis received')).toBeNull(); expect(screen.getByText('94.2%')).toBeTruthy();
+  expect(screen.queryByText('Synthetic integration input · genuine model inference')).toBeNull(); expect(screen.getByText('94.2%')).toBeTruthy();
 });
 it('submits the explicit recording date from the minimal CSV form and labels transient results honestly', async () => {
-  const { api, pick } = setup();
-  function Connected() { const analysis = useAnalysis('alice', false, pick, api); return <AIInsightsScreen analysis={analysis} />; }
+  const { api, pick } = ({ api: { samples: jest.fn(async () => ({ schema_version: 1 as const, samples: [leaf.leafSample] })), sample: jest.fn(async () => leaf.sampleResult()), upload: jest.fn(async () => leaf.uploadResult()) }, pick: jest.fn(async () => csvFile) });
+  function Connected() { const analysis = useLeafAnalysis('alice', false, pick, api); return <AIInsightsScreen analysis={analysis} />; }
   await render(<Connected />);
   await fireEvent.press(screen.getByRole('button', { name: 'Select CSV file' }));
   expect(screen.getByText(csvFile.name)).toBeTruthy();
   expect(screen.getByText('Selected CSV · Not saved')).toBeTruthy();
-  await fireEvent.changeText(screen.getByLabelText('Recording date'), '2018-03-20');
   await fireEvent.press(screen.getByRole('button', { name: 'Upload and analyze CSV' }));
-  expect(api.upload).toHaveBeenCalledWith(csvFile, '2018-03-20', expect.objectContaining({ uid: 'alice' }));
-  expect(await screen.findByText('Real KIT analysis received')).toBeTruthy();
+  expect(api.upload).toHaveBeenCalledWith(csvFile, expect.objectContaining({ uid: 'alice' }));
+  expect(await screen.findByText('Uploaded Nissan Leaf telemetry')).toBeTruthy();
   expect(screen.getByText('CSV analysis received · Not saved')).toBeTruthy();
   expect(screen.queryByText('94.2%')).toBeNull();
 });

@@ -1,0 +1,3 @@
+# Preserve checksum-verified CSV bytes and recognize their CRLF line endings.
+backend/app/data/samples/nissan/synthetic-integration-v1.csv -text whitespace=cr-at-eol
+backend/docs/examples/leaf-csv-v1-synthetic.csv -text whitespace=cr-at-eol

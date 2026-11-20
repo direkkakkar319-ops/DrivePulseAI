@@ -18,7 +18,13 @@ from app.services.inference_service import (
 )
 from app.services.kit_samples import SIGNALS, load_sample
 
-pytestmark = pytest.mark.asyncio
+# This suite targets the retired KIT API/assets, removed before Nissan integration.
+# Retain its assertions for historical reference; active coverage is test_leaf_analysis.py.
+pytestmark = pytest.mark.skip(
+    reason="Retired KIT contract/assets; replaced by Nissan observation analysis"
+)
+
+pytestmark = [pytestmark, pytest.mark.asyncio]
 
 
 @pytest.fixture

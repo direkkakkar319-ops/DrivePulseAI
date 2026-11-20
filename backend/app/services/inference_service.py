@@ -24,17 +24,10 @@ from app.services.kit_samples import (
     SampleDataError,
     validate_window,
 )
+from app.services.ml_errors import MLServiceError
 
 T = TypeVar("T")
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
-
-
-class MLServiceError(Exception):
-    """Safe service failure; future routes may explicitly map status_code to HTTP."""
-
-    def __init__(self, message: str, status_code: int):
-        super().__init__(message)
-        self.status_code = status_code
 
 
 def bounded_batches(items: Sequence[T], size: int) -> tuple[tuple[T, ...], ...]:

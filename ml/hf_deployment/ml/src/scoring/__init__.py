@@ -5,6 +5,6 @@ from .trend_anomaly import BatteryTrendAnomalyDetector
 
 __all__ = [
     "HEALTH_SCORE_BANDS",
-    "battery_health_score",
     "BatteryTrendAnomalyDetector",
+    "battery_health_score",
 ]

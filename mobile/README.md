@@ -1,3 +1,7 @@
+> Current analysis integration uses the Nissan Leaf observation contract. See
+> [the CSV/API guide](../backend/docs/nissan-leaf-analysis.md) and
+> [current integration notes](ANALYSIS_INTEGRATION.md). KIT sections below are historical.
+
 # DrivePulseAI Android app
 
 Phase 5.1 verification and pending device acceptance are documented in the
