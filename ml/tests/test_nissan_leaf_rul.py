@@ -1,4 +1,4 @@
-"""Tests for the Nissan Leaf RUL estimator and battery health integration."""
+"""Tests for the Nissan Leaf RUL estimator, battery health integration, and bootstrap confidence intervals."""
 
 import numpy as np
 import pandas as pd
@@ -42,7 +42,10 @@ def test_nissan_leaf_rul_init_validation():
     estimator = NissanLeafRUL()
     assert estimator.eol_threshold_soh_pct == 80.0
     assert estimator.lookback_days == 365
-    assert estimator.min_daily_observations == 8
+    assert estimator.min_daily_observations == 30
+    assert estimator.min_history_span_days == 90
+    assert estimator.n_bootstrap == 100
+    assert estimator.confidence_level_pct == 80.0
 
     # Invalid EOL thresholds
     with pytest.raises(
@@ -60,12 +63,25 @@ def test_nissan_leaf_rul_init_validation():
     ):
         NissanLeafRUL(eol_threshold_soh_pct=-10.0)
 
-    # Invalid lookback / minimum observations
-    with pytest.raises(ValueError, match="lookback_days must be positive"):
+    # Invalid lookback / minimum observations / span
+    with pytest.raises(ValueError, match="lookback_days and minimum span must be positive"):
         NissanLeafRUL(lookback_days=0)
 
-    with pytest.raises(ValueError, match="lookback_days must be positive"):
+    with pytest.raises(ValueError, match="lookback_days and minimum span must be positive"):
         NissanLeafRUL(min_daily_observations=2)
+
+    with pytest.raises(ValueError, match="lookback_days and minimum span must be positive"):
+        NissanLeafRUL(min_history_span_days=0)
+
+    # Invalid bootstrap parameters
+    with pytest.raises(ValueError, match="n_bootstrap must be nonnegative"):
+        NissanLeafRUL(n_bootstrap=-1)
+
+    with pytest.raises(ValueError, match="confidence_level_pct must be between 0 and 100"):
+        NissanLeafRUL(confidence_level_pct=0)
+
+    with pytest.raises(ValueError, match="confidence_level_pct must be between 0 and 100"):
+        NissanLeafRUL(confidence_level_pct=100)
 
 
 def test_nissan_leaf_rul_missing_required_columns():
@@ -109,13 +125,15 @@ def test_nissan_leaf_rul_threshold_already_reached():
     res = estimator.estimate(df)
     assert res["status"] == "threshold_reached"
     assert res["rul_km"] == 0.0
+    assert res["rul_km_p10"] == 0.0
+    assert res["rul_km_p90"] == 0.0
     assert res["health_score"] == 1
     assert res["health_label"] == "end_of_life_range"
 
 
 def test_nissan_leaf_rul_insufficient_history():
     """Fewer than min_daily_observations days should return insufficient_history."""
-    estimator = NissanLeafRUL(min_daily_observations=8)
+    estimator = NissanLeafRUL(min_daily_observations=8, min_history_span_days=5)
     # Only 5 days
     df = _make_leaf_data(days=5, start_soh=95.0)
     res = estimator.estimate(df)
@@ -126,7 +144,7 @@ def test_nissan_leaf_rul_insufficient_history():
 
 def test_nissan_leaf_rul_insufficient_odometer_variation():
     """When odometer readings are static (no distance accumulated), variation is insufficient."""
-    estimator = NissanLeafRUL(min_daily_observations=8)
+    estimator = NissanLeafRUL(min_daily_observations=8, min_history_span_days=5)
     df = _make_leaf_data(days=10, start_soh=95.0, km_per_day=0.0)
     res = estimator.estimate(df)
     assert res["status"] == "insufficient_odometer_variation"
@@ -135,7 +153,7 @@ def test_nissan_leaf_rul_insufficient_odometer_variation():
 
 def test_nissan_leaf_rul_non_declining_trend():
     """When SOH is increasing or flat over time, return non_declining_trend."""
-    estimator = NissanLeafRUL(min_daily_observations=8)
+    estimator = NissanLeafRUL(min_daily_observations=8, min_history_span_days=5)
     # Positive slope: SOH increasing by 0.1 each day
     df = _make_leaf_data(days=10, start_soh=90.0, soh_decline_per_day=-0.1)
     res = estimator.estimate(df)
@@ -145,8 +163,14 @@ def test_nissan_leaf_rul_non_declining_trend():
 
 
 def test_nissan_leaf_rul_valid_projection():
-    """Successful RUL estimation on degrading battery history."""
-    estimator = NissanLeafRUL(eol_threshold_soh_pct=80.0, min_daily_observations=8)
+    """Successful RUL estimation on degrading battery history with bootstrap intervals."""
+    estimator = NissanLeafRUL(
+        eol_threshold_soh_pct=80.0,
+        min_daily_observations=8,
+        min_history_span_days=10,
+        n_bootstrap=50,
+        confidence_level_pct=80.0,
+    )
     df = _make_leaf_data(
         days=15,
         start_soh=92.0,
@@ -163,16 +187,28 @@ def test_nissan_leaf_rul_valid_projection():
     assert res["health_score"] in {3, 4}
     assert res["soh_slope_pct_per_1000_km"] < 0
     assert res["estimated_days_to_threshold"] > 0
-    assert res["median_daily_distance_km"] == pytest.approx(100.0)
+    assert res["average_calendar_distance_km_per_day"] == pytest.approx(100.0)
     assert (
         res["validation_status"]
         == "unvalidated_extrapolation_single_vehicle_no_threshold_crossing"
     )
 
+    # Bootstrap confidence interval checks
+    assert res["confidence_interval"] is not None
+    assert res["rul_km_p10"] is not None
+    assert res["rul_km_p50"] is not None
+    assert res["rul_km_p90"] is not None
+    assert res["rul_km_p10"] <= res["rul_km_p50"] <= res["rul_km_p90"]
+    assert res["confidence_interval"]["level_pct"] == 80.0
+    assert res["confidence_interval"]["bootstrap_iterations_valid"] >= 10
+    assert res["estimated_days_to_threshold_p10"] is not None
+    assert res["estimated_days_to_threshold_p90"] is not None
+    assert res["estimated_days_to_threshold_p10"] <= res["estimated_days_to_threshold_p90"]
+
 
 def test_nissan_leaf_rul_context_summary():
     """Context columns (Pack_Avg_C_Temp, SOC, HV_Bat_Voltage) are summarized."""
-    estimator = NissanLeafRUL(min_daily_observations=5)
+    estimator = NissanLeafRUL(min_daily_observations=5, min_history_span_days=5)
     df = _make_leaf_data(days=10, include_context=True)
     res = estimator.estimate(df)
     assert "context_summary" in res
