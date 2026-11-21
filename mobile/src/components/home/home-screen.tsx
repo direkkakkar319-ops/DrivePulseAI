@@ -1,4 +1,4 @@
-// Minimal account dashboard backed by saved vehicles; research recordings never supply vehicle metrics or history.
+// Minimal account dashboard backed by saved vehicles; demo results never supply account history.
 import { useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useOnboarding } from '@/store/onboardingStore';
@@ -67,9 +67,6 @@ export function HomeScreen() {
       <AppButton title="Explore Demo Data" variant="secondary" onPress={() => router.navigate({
         pathname: '/(main)/(tabs)/insights', params: { demo: String(Date.now()) },
       })} />
-      <AppText variant="caption" tone="secondary">Recorded research tools remain separate from demo data and your saved vehicles.</AppText>
-      <AppButton title="View recorded telemetry" variant="secondary" onPress={() => router.navigate('/(main)/(tabs)/telemetry')} />
-      <AppButton title="Open recorded replay" variant="text" onPress={() => router.push('/(main)/replay')} />
     </AppCard>
   </AppScreen>;
 }

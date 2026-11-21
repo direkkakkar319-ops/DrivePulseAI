@@ -1,4 +1,22 @@
+> Current analysis integration uses the Nissan Leaf observation contract. See
+> [the CSV/API guide](../backend/docs/nissan-leaf-analysis.md) and
+> [current integration notes](ANALYSIS_INTEGRATION.md). KIT sections below are historical.
+
 # DrivePulseAI Android app
+
+Phase 5.1 verification and pending device acceptance are documented in the
+[application testing report and Android checklist](TESTING_PHASE_5_1.md).
+
+## Main-backend KIT analysis integration (Phase 4.1)
+
+The protected Insights route now loads the real sample catalog and runs authenticated
+sample analysis through the existing main backend, with transient results, safe
+errors, cancellation and minimal summary feedback. Demo mode remains separate.
+Native CSV selection uses the installed SDK-compatible `expo-document-picker`
+57.0.3 and submits one native file reference plus its explicit recording date.
+An older development client missing the native module needs a separately approved
+rebuild; no Android rebuild or backend changes were performed here. See the
+[integration and Android verification guide](ANALYSIS_INTEGRATION.md).
 
 Vehicle onboarding and Garage Add/Edit share a small local demo catalog, dependent
 manufacturer/model/year selectors, explicit engine/type and conditional fuel
@@ -6,6 +24,15 @@ selection, and manual fallback. No external catalog is called by the form.
 See [demo coverage, sources and one-time onboarding](VEHICLE_CATALOG.md).
 
 React Native + Expo frontend with Firebase email/password and Android Google authentication.
+
+## KIT graphs and detailed results (Phase 4.2)
+
+Real sample and compatible CSV results now include anomaly score/threshold plots,
+observed-telemetry line plots, signal and segment selectors, point inspection,
+flagged intervals, normalized deviations and model limitations. Plots page through
+original values without interpolation. Forecast medians are absent from the API,
+so actual-versus-predicted comparison is explicitly unavailable. No dependencies
+were added. See [visualization contract and device checks](ANALYSIS_VISUALIZATION.md).
 
 ## AI Insights demonstration (Phase 4.4)
 
@@ -16,26 +43,21 @@ explanations, and never enter account analysis history. Fixed typed fixtures in
 `src/config/demo-insights.ts` are UI samples, unrelated to saved vehicles,
 recordings, training datasets, or actual model output. No charts or inference run.
 
-This build has no compatible CSV picker: selection/upload is explicitly unavailable
-and the select-file button is disabled. No dependency was added. An optional
-metadata-only picker contract is provided for a future integration; its component
-tests inject a picker to verify filename/size/type, cancellation, replacement,
-errors, and source switching. This does not enable native selection in the app.
-Even with that adapter, selecting a file shows **Analysis not available yet**;
-the UI does not read its contents, upload it, parse telemetry, or run ML.
+The original demo presentation can still run independently with an injected
+metadata-only picker and unavailable inference. The production Insights route now
+supplies the Phase 4.1 controller and real native picker: compatible CSVs can be
+selected and explicitly submitted for backend analysis. File selection alone
+never runs inference; demo values are never relabeled as uploaded-file results.
+The backend, not the Android UI, parses and preprocesses the CSV.
 
-Home retains saved Garage vehicles and empty genuine-history state. Its separate
-recorded telemetry/replay links still work. Recorded experimental results now live
-at `/(main)/recorded-insights`, including links from recorded replay/overview;
-recorded detail routes and source labels remain intact. The five-tab layout,
-authentication, onboarding, and backend APIs are unchanged.
+Home retains saved Garage vehicles and an empty genuine-history state. Its Explore
+Demo Data action opens the generic Insights demonstration without creating saved
+analyses. The five-tab layout, authentication, onboarding, and backend APIs remain
+independent of the offline ML research workflows.
 
-On Android, reload the development app and check both the Insights switch and the
-Home demo entry (including returning to it after turning demo off), large font
-sizes, safe areas, scrolling, recorded replay/details, and Android Back. No new
-APK is required for these JS-only changes. The earlier intermittent Garage
-maximum-depth crash still needs physical-device tracing; these changes do not
-claim to fix it.
+On Android, reload the development app and check the Insights switch, the Home
+demo entry, large font sizes, safe areas, scrolling, Garage navigation, and Android
+Back. Physical-device navigation verification remains part of release testing.
 
 ## Implemented
 
@@ -59,10 +81,7 @@ for future genuine records; no history API or persistence exists yet. See
 - Native Firebase session persistence and logout on this device.
 - Protected routes: signed-out users see login; unverified users see verification;
   only verified users enter the account area.
-- Five signed-in tabs: Home, Garage, AI Insights, History and Profile. Home links
-  to recorded Telemetry and Replay, independently of saved account vehicles.
-- Recorded Nissan Leaf replay with 416 real observations and saved Isolation Forest scores.
-  See [recorded replay architecture and API contract](RECORDED_REPLAY.md).
+- Five signed-in tabs: Home, Garage, AI Insights, History and Profile.
 - Garage manages PostgreSQL-backed vehicles: add, edit, confirm removal, and set
   active. The shared account provider synchronizes selection with Home. Removing
   the active vehicle selects the oldest remaining saved vehicle; removing the last
@@ -86,7 +105,7 @@ permission checks.
 
 FastAPI validation and PostgreSQL profile storage are implemented in `backend/`.
 Live use requires server credentials and a reachable API. Cloud deployment remains
-a subsequent step. Primary battery screens use a local recorded-data provider; legacy vehicle/report routes use the isolated simulator provider. Backend
+a subsequent step. Legacy vehicle/report routes use the isolated simulator provider. Backend
 report routes remain placeholders; saved vehicle metadata uses authenticated PostgreSQL APIs.
 iOS and web authentication have not been configured; they display a setup message.
 The Firebase Auth config plugin only adds iOS setup in the installed version, so
@@ -256,19 +275,15 @@ are unchanged. The chosen app name is separate from Firebase's display name.
 Account → My Garage shows owned vehicles and the persisted active selection above
 the separate session-only Demo garage. Demo selection never changes the active
 owned vehicle. Add demo vehicle remains available. Owned records have no connected
-telemetry and are never assigned bundled Nissan Leaf recordings.
+telemetry; demo values are not attached to owned records.
 
 Profile photos are temporary local previews only. They are not uploaded, referenced
 in PostgreSQL, or restored across sessions; initials remain the fallback. Profile
 and vehicle steps advance only after server confirmation. There is no local
 completion flag or in-memory substitute for durable storage.
 
-The primary MVP uses a light, restrained battery telemetry interface with genuine saved
-Nissan Leaf measurements and experimental anomaly scores. See [RECORDED_REPLAY.md](RECORDED_REPLAY.md)
-for navigation, provenance, playback semantics, data contracts and Step 3 requirements.
-
-The replay data adapter is local, but the onboarding gate now requires backend
+The main app uses the shared light design system for Home, Garage, generic demo
+Insights, History, and Profile/Settings. The onboarding gate requires backend
 connectivity to restore account state. Existing profile synchronization and account
-retry remain separate. No FastAPI replay endpoints or live inference were added.
-Legacy simulated vehicle, sensor and report routes remain labelled and are not mixed
-into recorded screens. Physical Android verification is still required after this change.
+retry remain separate. No model inference API is connected. Legacy simulated
+vehicle, sensor and report routes remain explicitly labelled as simulated.

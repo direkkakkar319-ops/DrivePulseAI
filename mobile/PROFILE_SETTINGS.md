@@ -72,7 +72,8 @@ Settings includes real app/privacy information, account-sync status/retry, and
 Logout. There are no notification, theme, or other decorative toggles. About
 explains the separation between Firebase credentials, PostgreSQL profile/vehicle
 records, temporary avatars, illustrative demo values, and recorded research data.
-It does not claim new ML inference or OBD integration.
+It distinguishes the available KIT analysis in AI Insights from unimplemented
+live OBD connectivity; demo results remain explicitly illustrative.
 
 Installed version is read only if the existing binary exposes the optional
 ExpoApplication native capability. No expo-application dependency was added.

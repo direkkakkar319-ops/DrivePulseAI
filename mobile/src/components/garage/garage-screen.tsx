@@ -97,7 +97,7 @@ export function GarageScreen() {
           onPress={() => { setError(''); setNotice(''); setEditor({ id: uuid.v4() }); }} />
       </>}
     <AppButton title="Explore simulated Garage" variant="text" onPress={() => router.push('/(main)/demo-garage')} />
-    <AppText variant="caption" tone="secondary">Simulated vehicles and recorded Nissan Leaf telemetry are separate from your saved vehicles.</AppText>
+    <AppText variant="caption" tone="secondary">Simulated vehicles are separate from your saved vehicles.</AppText>
   </AppScreen>;
 }
 

@@ -8,7 +8,7 @@ export default function DemoGarage() {
   const { vehicles, selectVehicle, activeId, listState, retry } = useVehicles();
   const router = useRouter();
   return <Page title="Demo garage" back={() => router.back()}>
-    <Copy muted>Simulated vehicles · changes reset when this session ends. Separate from saved account vehicles and recorded Nissan Leaf data.</Copy>
+    <Copy muted>Simulated vehicles · changes reset when this session ends. Separate from saved account vehicles.</Copy>
     <Button title="Add demo vehicle" onPress={() => router.push('/(main)/vehicle/add')} />
     {listState === 'loading' ? <State title="Loading vehicles" loading />
       : listState === 'error' ? <State title="Could not load vehicles" retry={retry} />

@@ -19,14 +19,14 @@ const detail: AnalysisDetails = { ...record,
   telemetryMetadata: [{ id: 'file', label: 'Original filename', value: 'inspection.csv' }],
 };
 
-it('renders the normal empty History without an account, Garage, or replay provider', async () => {
+it('renders the normal empty History without an account, Garage, or ML provider', async () => {
   await render(<HistoryRoute />);
   expect(screen.getByRole('header', { name: 'History' })).toBeTruthy();
   expect(screen.getByText('Your vehicle analysis records')).toBeTruthy();
   expect(screen.getByText('No analysis history yet')).toBeTruthy();
   expect(screen.getByText('Your completed vehicle analyses will appear here once real analysis is available.')).toBeTruthy();
   expect(screen.queryAllByTestId(/^history-record-/)).toHaveLength(0);
-  expect(screen.queryByText(/Nissan|94\.2%|360 V|anomaly score|maintenance risk/i)).toBeNull();
+  expect(screen.queryByText(/94\.2%|360 V|anomaly score|maintenance risk/i)).toBeNull();
   expect(mockNavigate).not.toHaveBeenCalled();
   await fireEvent.press(screen.getByRole('button', { name: 'Explore AI Insights' }));
   expect(mockNavigate).toHaveBeenCalledTimes(1);
@@ -60,7 +60,7 @@ it.each([
 ] as const)('supports %s provenance without inferring a Garage vehicle', async (kind, label) => {
   await render(<AnalysisHistoryCard record={{ id: 'source-test', source: { kind } }} />);
   expect(screen.getByText(`Data source: ${label}`)).toBeTruthy();
-  expect(screen.queryByText(/active vehicle|Nissan|My Car/)).toBeNull();
+  expect(screen.queryByText(/active vehicle|My Car/)).toBeNull();
   expect(screen.queryAllByRole('button')).toHaveLength(0);
 });
 

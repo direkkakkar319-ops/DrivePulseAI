@@ -3,8 +3,7 @@ import { Stack } from 'expo-router';
 import { VehicleDataProvider } from '@/store/vehicleDataStore';
 import { ProfileSyncProvider } from '@/hooks/use-profile-sync';
 import { useAuthStore } from '@/store/authStore';
-import { RecordedReplayProvider } from '@/store/recordedReplayStore';
-import { palette } from '@/components/recorded/ui';
+import { colors } from '@/theme/tokens';
 import { StatusBar } from 'expo-status-bar';
 import { OnboardingProvider } from '@/store/onboardingStore';
 import { OnboardingGate } from '@/components/onboarding-gate';
@@ -15,20 +14,18 @@ export default function MainLayout() {
     <ProfileSyncProvider key={user?.uid}>
       <OnboardingProvider uid={user.uid}>
         <VehicleDataProvider>
-          <RecordedReplayProvider>
-            <StatusBar style="dark" />
-            <OnboardingGate>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: palette.background },
-                  animation: 'fade_from_bottom',
-                }}
-              >
-                <Stack.Screen name="(tabs)" />
-              </Stack>
-            </OnboardingGate>
-          </RecordedReplayProvider>
+          <StatusBar style="dark" />
+          <OnboardingGate>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.background },
+                animation: 'fade_from_bottom',
+              }}
+            >
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+          </OnboardingGate>
         </VehicleDataProvider>
       </OnboardingProvider>
     </ProfileSyncProvider>

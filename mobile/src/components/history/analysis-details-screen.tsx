@@ -1,4 +1,4 @@
-// Unrouted details presentation for a future genuine record; never reads demo/replay state.
+// Unrouted details presentation for a future genuine record; never reads demo state.
 import { AppCard } from '@/components/ui/app-card';
 import { AppDataState } from '@/components/ui/app-data-state';
 import { AppHeader } from '@/components/ui/app-header';

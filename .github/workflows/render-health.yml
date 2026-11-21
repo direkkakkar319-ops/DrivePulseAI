@@ -1,0 +1,100 @@
+name: render-health
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-health:
+    if: >-
+      (github.event.deployment_status.state == 'success' ||
+       github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error') &&
+      contains(github.event.deployment_status.environment_url, 'drivepulse-backend')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail when Render reports a backend deployment failure
+        if: >-
+          github.event.deployment_status.state == 'failure' ||
+          github.event.deployment_status.state == 'error'
+        env:
+          DEPLOYMENT_STATE: ${{ github.event.deployment_status.state }}
+        run: |
+          echo "❌ Render backend deployment ended with state: $DEPLOYMENT_STATE"
+          exit 1
+
+      - name: Check backend and database health
+        if: github.event.deployment_status.state == 'success'
+        env:
+          SERVICE_URL: ${{ github.event.deployment_status.environment_url }}
+        run: |
+          case "$SERVICE_URL" in
+            https://*.onrender.com) ;;
+            *)
+              echo "Unexpected backend deployment URL: $SERVICE_URL"
+              exit 1
+              ;;
+          esac
+
+          check_endpoint() {
+            local url="$1"
+            for attempt in $(seq 1 18); do
+              if curl --fail --silent --show-error --max-time 10 "$url"; then
+                echo "✅ Healthy: $url"
+                return 0
+              fi
+              echo "Waiting for $url ($attempt/18)..."
+              sleep 10
+            done
+            echo "❌ Health check timed out: $url"
+            return 1
+          }
+
+          check_endpoint "${SERVICE_URL%/}/health"
+          check_endpoint "${SERVICE_URL%/}/health/db"
+
+  ml-health:
+    if: >-
+      (github.event.deployment_status.state == 'success' ||
+       github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error') &&
+      contains(github.event.deployment_status.environment_url, 'drivepulseai')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail when Render reports an ML deployment failure
+        if: >-
+          github.event.deployment_status.state == 'failure' ||
+          github.event.deployment_status.state == 'error'
+        env:
+          DEPLOYMENT_STATE: ${{ github.event.deployment_status.state }}
+        run: |
+          echo "❌ Render ML deployment ended with state: $DEPLOYMENT_STATE"
+          exit 1
+
+      - name: Check ML service health
+        if: github.event.deployment_status.state == 'success'
+        env:
+          SERVICE_URL: ${{ github.event.deployment_status.environment_url }}
+        run: |
+          case "$SERVICE_URL" in
+            https://*.onrender.com) ;;
+            *)
+              echo "Unexpected ML deployment URL: $SERVICE_URL"
+              exit 1
+              ;;
+          esac
+
+          HEALTH_URL="${SERVICE_URL%/}/health"
+          for attempt in $(seq 1 18); do
+            if curl --fail --silent --show-error --max-time 10 "$HEALTH_URL"; then
+              echo "✅ ML service is healthy."
+              exit 0
+            fi
+            echo "Waiting for ML health endpoint ($attempt/18)..."
+            sleep 10
+          done
+
+          echo "❌ ML service did not become healthy within 3 minutes."
+          exit 1

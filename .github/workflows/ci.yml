@@ -1,0 +1,312 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  detect-deploy-changes:
+    name: Detect Render deploy changes
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.paths.outputs.backend }}
+      ml: ${{ steps.paths.outputs.ml }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect changed service files
+        id: paths
+        env:
+          BASE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+            changed_files="$(git ls-tree -r --name-only "$HEAD_SHA")"
+          else
+            changed_files="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+          fi
+
+          if grep -Eq '^(backend/|\.github/scripts/render_deploy.py$|\.github/workflows/ci\.yml$)' <<< "$changed_files"; then
+            echo 'backend=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'backend=false' >> "$GITHUB_OUTPUT"
+          fi
+
+          if grep -Eq '^(ml/|\.github/scripts/render_deploy.py$|\.github/workflows/ci\.yml$)' <<< "$changed_files"; then
+            echo 'ml=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ml=false' >> "$GITHUB_OUTPUT"
+          fi
+
+  lint-ml:
+    name: ML lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ml/requirements.txt
+      - name: Install ML dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt
+      - name: Ruff
+        run: ruff check ml/
+
+  lint-backend:
+    name: Backend lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r backend/requirements.txt
+          python -m ruff --version
+      - name: Ruff
+        run: python -m ruff check backend/
+
+  lint-frontend:
+    name: Frontend lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: ESLint
+        working-directory: frontend
+        run: npm run lint --if-present
+
+  lint-mobile:
+    name: Mobile lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - name: Install mobile dependencies
+        working-directory: mobile
+        run: npm ci
+      - name: ESLint
+        working-directory: mobile
+        run: npm run lint --if-present
+      - name: TypeScript
+        working-directory: mobile
+        run: npx tsc --noEmit
+      - name: Mobile regression tests
+        working-directory: mobile
+        run: npm test -- --runInBand
+
+  test-ml:
+    name: ML tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ml/requirements.txt
+      - name: Install ML and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt pytest
+      - name: Run Nissan Leaf model tests when present
+        run: |
+          if [ -d ml/tests ] && find ml/tests -type f \( -name 'test_*.py' -o -name '*_test.py' \) -print -quit | grep -q .; then
+            PYTHONPATH=ml pytest ml/tests
+          else
+            echo "::notice title=ML tests pending::No ML test files are present yet; this job will run them when added."
+          fi
+
+  test-backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: drivepulse
+          POSTGRES_PASSWORD: drivepulse_test
+          POSTGRES_DB: drivepulse_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U drivepulse -d drivepulse_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+psycopg2://drivepulse:drivepulse_test@127.0.0.1:5432/drivepulse_test
+      TEST_DATABASE_URL: postgresql+psycopg2://drivepulse:drivepulse_test@127.0.0.1:5432/drivepulse_test
+      FIREBASE_PROJECT_ID: drivepulse-d2034
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pytest-asyncio -r backend/requirements.txt
+      - name: Pytest
+        run: pytest backend/tests
+
+  test-frontend:
+    name: Frontend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Run frontend tests when configured
+        working-directory: frontend
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.test ? 0 : 1)"; then
+            npm test
+          else
+            echo "::notice title=Frontend tests pending::No frontend test script is configured yet."
+          fi
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+  trigger-backend-deployment:
+    name: Trigger backend deployment
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.detect-deploy-changes.outputs.backend == 'true'
+    needs:
+      - detect-deploy-changes
+      - lint-ml
+      - lint-backend
+      - lint-frontend
+      - lint-mobile
+      - test-ml
+      - test-backend
+      - test-frontend
+    runs-on: ubuntu-latest
+    outputs:
+      service_id: ${{ steps.trigger.outputs.service_id }}
+      deploy_id: ${{ steps.trigger.outputs.deploy_id }}
+      deploy_started_at: ${{ steps.trigger.outputs.deploy_started_at }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Request Render backend deployment
+        id: trigger
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          DEPLOY_REF: ${{ github.sha }}
+        run: python .github/scripts/render_deploy.py trigger
+
+  trigger-ml-deployment:
+    name: Trigger ML deployment
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.detect-deploy-changes.outputs.ml == 'true'
+    needs:
+      - detect-deploy-changes
+      - lint-ml
+      - lint-backend
+      - lint-frontend
+      - lint-mobile
+      - test-ml
+      - test-backend
+      - test-frontend
+    runs-on: ubuntu-latest
+    outputs:
+      service_id: ${{ steps.trigger.outputs.service_id }}
+      deploy_id: ${{ steps.trigger.outputs.deploy_id }}
+      deploy_started_at: ${{ steps.trigger.outputs.deploy_started_at }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Request Render ML deployment
+        id: trigger
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_ML_DEPLOY_HOOK }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          DEPLOY_REF: ${{ github.sha }}
+        run: python .github/scripts/render_deploy.py trigger
+
+  verify-backend-deployment:
+    name: Check backend deployment is live
+    if: >-
+      always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.trigger-backend-deployment.result == 'success'
+    needs: [trigger-backend-deployment]
+    runs-on: ubuntu-latest
+    timeout-minutes: 140
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Wait for backend deploy and verify health
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ needs.trigger-backend-deployment.outputs.service_id }}
+          RENDER_DEPLOY_ID: ${{ needs.trigger-backend-deployment.outputs.deploy_id }}
+          DEPLOY_STARTED_AT: ${{ needs.trigger-backend-deployment.outputs.deploy_started_at }}
+          EXPECTED_COMMIT: ${{ github.sha }}
+          HEALTH_URLS: https://drivepulse-backend-91fz.onrender.com/health,https://drivepulse-backend-91fz.onrender.com/health/db
+        run: python .github/scripts/render_deploy.py verify
+
+  verify-ml-deployment:
+    name: Check ML deployment is live
+    if: >-
+      always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.trigger-ml-deployment.result == 'success'
+    needs: [trigger-ml-deployment]
+    runs-on: ubuntu-latest
+    timeout-minutes: 140
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Wait for ML deploy and verify health
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ needs.trigger-ml-deployment.outputs.service_id }}
+          RENDER_DEPLOY_ID: ${{ needs.trigger-ml-deployment.outputs.deploy_id }}
+          DEPLOY_STARTED_AT: ${{ needs.trigger-ml-deployment.outputs.deploy_started_at }}
+          EXPECTED_COMMIT: ${{ github.sha }}
+          HEALTH_URLS: https://drivepulseai.onrender.com/health
+        run: python .github/scripts/render_deploy.py verify

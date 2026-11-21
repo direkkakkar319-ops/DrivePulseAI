@@ -1,0 +1,8 @@
+{
+  "id": "nissan-leaf-synthetic-integration-v1",
+  "synthetic": true,
+  "provenance": "Project-authored deterministic integration fixture. Not real telemetry, not fitted to force any novelty outcome; RUL output is not validation.",
+  "sha256": "8577f17609bd81a8f81f61e305085a30b630f096b4935c9e066494b5ff914f05",
+  "rows": 40,
+  "calendar_span_days": 117
+}

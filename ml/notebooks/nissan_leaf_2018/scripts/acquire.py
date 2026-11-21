@@ -9,11 +9,11 @@ import re
 import shutil
 import subprocess
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
-DATA = ROOT / "data/nissan_leaf_2018"
+DATA = ROOT / "data/automotive_prognostics/nissan_leaf_2018/v1"
 BASE = ROOT / "ml/reports/nissan_leaf_2018"
 
 
@@ -116,7 +116,7 @@ def main() -> None:
             if dest.suffix == ".xlsx"
             else "none",
             "download_status": "complete",
-            "verified_at_utc": datetime.now(timezone.utc).isoformat(),
+            "verified_at_utc": datetime.now(UTC).isoformat(),
         }
         if dest.suffix == ".xlsx":
             with zipfile.ZipFile(dest) as archive:

@@ -11,7 +11,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / "ml/src"))
-from nissan_leaf_preparation.core import (
+from data.nissan_leaf_preparation.core import (
     FLAGS,
     digest,
     fingerprints,
@@ -19,7 +19,7 @@ from nissan_leaf_preparation.core import (
     make_windows,
     save_json,
 )
-from nissan_leaf_preparation.report import markdown
+from data.nissan_leaf_preparation.report import markdown
 
 BASE = ROOT / "ml/reports/nissan_leaf_2018"
 OUT = BASE / "tables/negative_speed"
@@ -56,7 +56,8 @@ def main() -> None:
     ]
     frame = pd.read_parquet(artifact / "row_ledger.parquet", columns=columns)
     raw = pd.read_csv(
-        ROOT / "data/nissan_leaf_2018/raw/Dataset_NissanLeaf-2021_2022.csv",
+        ROOT
+        / "data/automotive_prognostics/nissan_leaf_2018/v1/raw/Dataset_NissanLeaf-2021_2022.csv",
         usecols=["Timestamp", "Gear"],
     )
     assert np.array_equal(frame.Timestamp, raw.Timestamp)
@@ -153,7 +154,8 @@ def main() -> None:
     trip_table = pd.DataFrame(trips)
     trip_table.to_csv(OUT / "negative_trips.csv", index=False)
     processed = pd.read_csv(
-        ROOT / "data/nissan_leaf_2018/processed/Dataset_Preprocessed.csv",
+        ROOT
+        / "data/automotive_prognostics/nissan_leaf_2018/v1/processed/Dataset_Preprocessed.csv",
         usecols=["Timestamp", "Trip", "Speed"],
     )
     matched = frame.loc[negative, ["Timestamp", "Trip", "Speed"]].merge(

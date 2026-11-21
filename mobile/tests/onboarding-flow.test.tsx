@@ -78,7 +78,7 @@ it('walks first-time users through profile, vehicle and Home using only confirme
   expect(screen.getByText(/^Home:/)).toHaveTextContent(/000000000001/);
 });
 
-describe.each(['home', 'vehicles', 'insights', 'history', 'account', 'edit-profile', 'security', 'settings', 'telemetry', 'replay', 'recorded-insight', 'recorded-insights', 'vehicle'])('%s protected destination', route => {
+describe.each(['home', 'vehicles', 'insights', 'history', 'account', 'edit-profile', 'security', 'settings', 'vehicle'])('%s protected destination', route => {
   it.each(['profile', 'vehicle'] as const)('resumes incomplete %s onboarding before exposing the destination', async step => {
     mockRoute = route;
     const { api } = makeApi(step);

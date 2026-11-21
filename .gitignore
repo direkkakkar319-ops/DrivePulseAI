@@ -29,6 +29,10 @@ data/automotive_prognostics/**
 !data/automotive_prognostics/**/README.md
 # KIT raw inputs are locally retained; generated feature windows are local-only.
 data/automotive_obd/kit_obd/processed/
+# Model files in the HF deployment repository are intentional, versioned inputs.
+!ml/hf_deployment/model_repository/
+!ml/hf_deployment/model_repository/*.joblib
+!ml/hf_deployment/model_repository/README.md
 # Existing 20-car source-release bundle is retained locally for audit only.
 data/automotive_prognostics/onroad_ev_capacity/source_release/**
 ml/artifacts/*
@@ -63,8 +67,3 @@ Thumbs.db
 **/*firebase-adminsdk*.json
 backend/service-account*.json
 backend/.secrets/
-
-# Nissan Leaf source telemetry: preserve locally, do not commit large downloads
-/data/nissan_leaf_2018/raw/*
-/data/nissan_leaf_2018/processed/*
-/data/nissan_leaf_2018/**/*.part

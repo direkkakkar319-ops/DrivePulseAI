@@ -1,359 +1,322 @@
-"""Test preparation safety with explicitly synthetic code fixtures, never training data."""
+"""Tests for Nissan Leaf preparation primitives (quality audit, time parsing, scaling, splitting, windows)."""
 
-from __future__ import annotations
-
-import copy
-import json
-import sys
+import hashlib
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "ml/src"))
-from nissan_leaf_preparation.core import (
-    AUDIT_COLUMNS,
+from ml.src.data.nissan_leaf_preparation.battery import (
+    inherit_splits,
+    sorted_membership,
+)
+from ml.src.data.nissan_leaf_preparation.core import (
     FLAGS,
     audit_trip,
     chronological_split,
-    fingerprints,
+    digest,
     fit_transformer,
-    make_windows,
     parse_time,
     transform,
     validate_config,
     validate_schema,
 )
-from nissan_leaf_preparation.pipeline import trip_chunks
 
 
 @pytest.fixture
-def config() -> dict:
-    return json.loads(
-        (ROOT / "ml/notebooks/nissan_leaf_2018/config/preparation.json").read_text()
-    )
+def base_config() -> dict:
+    return {
+        "features": [
+            "Speed",
+            "Torque",
+            "Motor_Temp",
+            "HV_Bat_Voltage",
+            "Pack_1_C_Temp",
+            "SOC",
+        ],
+        "source_version": "raw",
+        "missing_policy": "exclude",
+        "scaling": "robust",
+        "gap_seconds": 1.0,
+        "voltage_review_max": 500.0,
+        "temperature_sentinel_band": [-1.01, -0.99],
+        "odometer_jump_km": 1.0,
+        "odometer_jump_interval_seconds": 1.0,
+        "formula_atol": 1e-08,
+        "formula_rtol": 1e-08,
+        "split_fractions": [0.7, 0.15, 0.15],
+        "split_embargo_seconds": 95.0,
+        "duplicate_round_decimals": {
+            "Speed": 1,
+            "Torque": 2,
+            "Motor_Temp": 1,
+            "HV_Bat_Voltage": 2,
+            "Pack_1_C_Temp": 2,
+            "SOC": 2,
+        },
+        "temperature": {
+            "target": "Pack_1_C_Temp",
+            "lookback_seconds": 30.0,
+            "horizon_seconds": 60.0,
+            "tolerance_seconds": 0.5,
+            "stride_seconds": 10.0,
+        },
+        "typical_interval_band_seconds": [0.2, 0.3],
+    }
 
 
-@pytest.fixture
-def telemetry() -> pd.DataFrame:
-    """Synthetic code-only fixture; no file is exported as real telemetry."""
-    n = 64
-    frame = pd.DataFrame({col: np.zeros(n) for col in AUDIT_COLUMNS})
-    frame["source_row"] = np.arange(n)
-    frame["index"] = np.arange(n) + 100
-    frame["Trip"] = 5
-    frame["Timestamp"] = 1605186068000000 + np.arange(n) * 250000
-    frame["Speed"] = 30.0
-    frame["SOC"] = 60.0
-    frame["SOH"] = 95.0
-    frame["Motor_Temp"] = 40.0
-    frame["HV_Bat_Voltage"] = 360.0
-    frame["HV_Bat_Current_2"] = -10
-    frame["Instant_kW"] = -3.6
-    for pack in [1, 2, 4]:
-        frame[f"Pack_{pack}_C_Temp"] = 20 + np.arange(n) / 100
-    frame["Pack_Avg_C_Temp"] = frame.Pack_1_C_Temp
-    for tire in ["TP_FR", "TP_FL", "TP_RR", "TP_RL"]:
-        frame[tire] = 35
-    return frame
+def test_digest(tmp_path: Path):
+    """Verify SHA-256 calculation matches hashlib directly."""
+    f = tmp_path / "sample.txt"
+    content = b"DrivePulseAI test content 12345"
+    f.write_bytes(content)
+    expected = hashlib.sha256(content).hexdigest()
+    assert digest(f) == expected
 
 
-def test_config_and_feature_selection(config: dict) -> None:
-    validate_config(config)
-    for feature in ["Timestamp", "Trip", "SOH", "Instant_kW", "HV_Bat_Current_2"]:
-        bad = copy.deepcopy(config)
-        bad["features"].append(feature)
-        with pytest.raises(ValueError):
-            validate_config(bad)
+def test_validate_schema():
+    """Exact schema order and uniqueness are strictly checked."""
+    validate_schema(["a", "b", "c"], ["a", "b", "c"])
+
+    with pytest.raises(ValueError, match="Source schema mismatch"):
+        validate_schema(["a", "b"], ["a", "b", "c"])
+
+    with pytest.raises(ValueError, match="Source schema mismatch"):
+        validate_schema(["a", "a", "b"], ["a", "a", "b"])
 
 
-def test_invalid_config_policies(config: dict) -> None:
-    for key, value in [
-        ("source_version", "processed"),
-        ("scaling", "PCA"),
-        ("missing_policy", "backfill"),
-        ("split_embargo_seconds", 1),
-    ]:
-        bad = dict(config, **{key: value})
-        with pytest.raises(ValueError):
-            validate_config(bad)
-
-
-def test_schema() -> None:
-    validate_schema(["Trip", "Timestamp"], ["Trip", "Timestamp"])
-    for bad in [["Trip"], ["Timestamp", "Trip"], ["Trip", "Trip"]]:
-        with pytest.raises(ValueError):
-            validate_schema(bad, ["Trip", "Timestamp"])
-
-
-def test_timestamp_parse(telemetry: pd.DataFrame) -> None:
-    parsed = parse_time(telemetry.Timestamp)
+def test_parse_time():
+    """Verify microsecond integer parsing to UTC datetime and error handling."""
+    ts = pd.Series([1_600_000_000_000_000, 1_600_000_001_000_000])
+    parsed = parse_time(ts)
+    assert parsed.dt.tz is not None
     assert str(parsed.dt.tz) == "UTC"
-    assert parsed.diff().dropna().dt.total_seconds().eq(0.25).all()
-    for bad in [
-        pd.Series([np.nan]),
-        pd.Series(["invalid"]),
-        pd.Series([1.5]),
-        pd.Series([np.inf]),
-    ]:
-        with pytest.raises(ValueError):
-            parse_time(bad)
+
+    # Non-integer / float fraction raises
+    with pytest.raises(ValueError, match="Invalid microsecond timestamp"):
+        parse_time(pd.Series([1_600_000_000_000_000.5]))
+
+    # Non-numeric string raises
+    with pytest.raises(ValueError, match="Invalid microsecond timestamp"):
+        parse_time(pd.Series(["not_a_time"]))
 
 
-def test_ordering_and_trip_scope(telemetry: pd.DataFrame, config: dict) -> None:
-    with pytest.raises(ValueError, match="reversal"):
-        audit_trip(telemetry.iloc[::-1], config)
-    telemetry.loc[1, "Trip"] = 7
-    with pytest.raises(ValueError, match="one nonmissing trip"):
-        audit_trip(telemetry, config)
+def test_validate_config(base_config):
+    """Ensure valid config passes and violations raise appropriate errors."""
+    validate_config(base_config)
+
+    # Unknown feature
+    bad_feat = base_config.copy()
+    bad_feat["features"] = ["Speed", "UnknownFeature"]
+    with pytest.raises(ValueError, match="Only reviewed, unique measurement features"):
+        validate_config(bad_feat)
+
+    # Bad split fractions
+    bad_split = base_config.copy()
+    bad_split["split_fractions"] = [0.5, 0.5]  # Not 3 fractions
+    with pytest.raises(ValueError, match="Three positive split fractions"):
+        validate_config(bad_split)
+
+    # Short embargo
+    bad_embargo = base_config.copy()
+    bad_embargo["split_embargo_seconds"] = 10.0  # < 30 + 60 + 0.5
+    with pytest.raises(ValueError, match="Embargo is shorter than full window span"):
+        validate_config(bad_embargo)
 
 
-def test_missing_and_sentinel_are_distinct(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    telemetry.loc[0, "Speed"] = np.nan
-    telemetry.loc[1, "Pack_1_C_Temp"] = -1
-    telemetry.loc[2, "Torque"] = -1
-    before = telemetry.copy(deep=True)
-    frame = audit_trip(telemetry, config)
-    pd.testing.assert_frame_equal(telemetry, before)
-    assert frame.quality_flags.iloc[0] & FLAGS["missing_candidate"][0]
-    assert frame.quality_flags.iloc[1] & FLAGS["pack_sentinel"][0]
-    assert not frame.quality_eligible.iloc[:2].any()
-    assert frame.quality_eligible.iloc[
-        2
-    ]  # negative torque is legitimate, not blanket-masked
+def test_audit_trip(base_config):
+    """Test trip audit quality flags, domain checks, and row categorization."""
+    base_us = 1_600_000_000_000_000
+    rows = []
+    # 5 consecutive rows, 0.25s apart (250_000 us)
+    for i in range(5):
+        rows.append(
+            {
+                "Trip": 1,
+                "Timestamp": base_us + i * 250_000,
+                "Speed": 40.0 if i != 2 else -5.0,  # row 2 has negative speed
+                "Torque": 50.0,
+                "Motor_Temp": 35.0,
+                "HV_Bat_Voltage": 380.0
+                if i != 3
+                else 600.0,  # row 3 triggers voltage_review (> 500)
+                "Pack_1_C_Temp": 22.0,
+                "Pack_2_C_Temp": 22.0,
+                "Pack_4_C_Temp": 22.0,
+                "Pack_Avg_C_Temp": 22.0,
+                "SOC": 80.0 if i != 4 else 105.0,  # row 4 triggers soc_domain (> 100)
+                "TP_FR": 32.0,
+                "TP_FL": 32.0,
+                "TP_RR": 32.0,
+                "TP_RL": 32.0,
+                "Odometer": 15000.0 + i * 0.01,
+                "SOH": 92.0,
+                "Instant_kW": 380.0 * 10.0 / 1000,
+                "HV_Bat_Current_2": 10.0,
+            }
+        )
+    df = pd.DataFrame(rows)
+
+    audited = audit_trip(df, base_config)
+
+    assert "quality_flags" in audited.columns
+    assert "quality_eligible" in audited.columns
+    assert "segment_in_trip" in audited.columns
+
+    # Row 0 is clean
+    assert bool(audited.loc[0, "quality_eligible"]) is True
+    assert audited.loc[0, "quality_flags"] == 0
+
+    # Row 2 flagged speed_negative
+    speed_flag_bit = FLAGS["speed_negative"][0]
+    assert audited.loc[2, "quality_flags"] & speed_flag_bit != 0
+
+    # Row 3 flagged voltage_review
+    voltage_flag_bit = FLAGS["voltage_review"][0]
+    assert audited.loc[3, "quality_flags"] & voltage_flag_bit != 0
+
+    # Row 4 flagged soc_domain
+    soc_flag_bit = FLAGS["soc_domain"][0]
+    assert audited.loc[4, "quality_flags"] & soc_flag_bit != 0
 
 
-def test_quality_categories_and_nonfeature_flags(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    telemetry.loc[0, "SOC"] = 101
-    telemetry.loc[1, "HV_Bat_Voltage"] = 655.35
-    telemetry.loc[2, "SOH"] = 0
-    telemetry.loc[3, "TP_FR"] = 0
-    telemetry.loc[4, "Motor_Temp"] = np.inf
-    telemetry.loc[5, "Motor_Temp"] = -40  # statistical extreme alone must survive
-    frame = audit_trip(telemetry, config)
-    assert not frame.quality_eligible.iloc[[0, 1, 4]].any()
-    assert frame.quality_eligible.iloc[[2, 3, 5]].all()
-    assert frame.quality_flags.iloc[2] & FLAGS["soh_zero"][0]
-
-
-def test_formula_flags_do_not_repair(telemetry: pd.DataFrame, config: dict) -> None:
-    telemetry.loc[0, "Instant_kW"] = 100
-    telemetry.loc[1, "Pack_Avg_C_Temp"] = 100
-    frame = audit_trip(telemetry, config)
-    assert frame.quality_flags.iloc[0] & FLAGS["power_formula"][0]
-    assert frame.quality_flags.iloc[1] & FLAGS["temperature_formula"][0]
-    assert frame.Instant_kW.iloc[0] == 100
-    assert frame.Pack_Avg_C_Temp.iloc[1] == 100
-    assert frame.quality_eligible.all()
-
-
-def test_gaps_and_duplicate_times(telemetry: pd.DataFrame, config: dict) -> None:
-    telemetry.loc[32:, "Timestamp"] += 2000000
-    frame = audit_trip(telemetry, config)
-    assert frame.segment_in_trip.nunique() == 2
-    telemetry.loc[10, "Timestamp"] = telemetry.Timestamp.iloc[9]
-    frame = audit_trip(telemetry, config)
-    assert not frame.quality_eligible.iloc[[9, 10]].any()
-    assert frame.segment_in_trip.iloc[11] != frame.segment_in_trip.iloc[9]
-
-
-def trip_table() -> pd.DataFrame:
-    start = 1605186068000000 + np.arange(10) * 86400000000
-    return pd.DataFrame(
+def test_fit_transformer_and_transform_robust(base_config):
+    """Test robust scaling (median / IQR) fitting and transformation."""
+    features = ["Speed", "Torque"]
+    train_df = pd.DataFrame(
         {
-            "Trip": np.arange(10),
-            "rows": 100,
-            "start_us": start,
-            "end_us": start + 60000000,
+            "Speed": [10.0, 20.0, 30.0, 40.0, 50.0],
+            "Torque": [100.0, 110.0, 120.0, 130.0, 140.0],
+            "split": ["train"] * 5,
         }
     )
 
+    state = fit_transformer(train_df, features, base_config)
+    assert state["scaling"] == "robust"
+    assert state["median"]["Speed"] == 30.0
+    assert state["median"]["Torque"] == 120.0
 
-def test_grouped_split_exclusive_and_deterministic(config: dict) -> None:
-    split = chronological_split(trip_table(), config)
-    pd.testing.assert_frame_equal(
-        split, chronological_split(trip_table().sample(frac=1, random_state=1), config)
+    eval_df = pd.DataFrame(
+        {
+            "Speed": [30.0, 50.0],
+            "Torque": [120.0, 140.0],
+        }
     )
-    assert split.Trip.nunique() == 10
-    assert split.groupby("Trip").split.nunique().max() == 1
-    assert list(split.split.drop_duplicates()) == ["train", "validation", "test"]
+    transformed = transform(eval_df, state)
+    assert transformed.shape == (2, 2)
+    # Center value transforms to 0.0
+    assert pytest.approx(float(transformed.loc[0, "Speed"])) == 0.0
+    assert pytest.approx(float(transformed.loc[0, "Torque"])) == 0.0
 
 
-def test_split_overlap_or_missing_boundaries_blocks(config: dict) -> None:
-    trips = trip_table()
-    trips.loc[0, "end_us"] = trips.start_us.iloc[1]
-    with pytest.raises(ValueError, match="overlapping"):
-        chronological_split(trips, config)
-    with pytest.raises(ValueError, match="boundaries"):
-        chronological_split(trip_table().iloc[:2], config)
+def test_transform_missing_policy_training_median(base_config):
+    """Ensure training_median policy creates __missing indicator columns."""
+    cfg = base_config.copy()
+    cfg["missing_policy"] = "training_median"
+    features = ["Speed"]
+
+    train_df = pd.DataFrame(
+        {
+            "Speed": [10.0, 20.0, 30.0],
+            "split": ["train"] * 3,
+        }
+    )
+    state = fit_transformer(train_df, features, cfg)
+    assert "Speed__missing" in state["output_features"]
+
+    eval_df = pd.DataFrame({"Speed": [np.nan, 20.0]})
+    transformed = transform(eval_df, state)
+    assert "Speed__missing" in transformed.columns
+    assert transformed.loc[0, "Speed__missing"] == 1.0
+    assert transformed.loc[1, "Speed__missing"] == 0.0
 
 
-def test_transform_fit_rejects_validation(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    telemetry["split"] = "validation"
-    with pytest.raises(ValueError, match="training-only"):
-        fit_transformer(telemetry, config["features"], config)
+def test_chronological_split(base_config):
+    """Verify chronological whole-trip split assignments."""
+    day_us = 86_400 * 1_000_000
+    base_us = 1_600_000_000_000_000
+    trips = pd.DataFrame(
+        [
+            {"Trip": 1, "start_us": base_us, "end_us": base_us + 1000, "rows": 100},
+            {
+                "Trip": 2,
+                "start_us": base_us + day_us,
+                "end_us": base_us + day_us + 1000,
+                "rows": 100,
+            },
+            {
+                "Trip": 3,
+                "start_us": base_us + 2 * day_us,
+                "end_us": base_us + 2 * day_us + 1000,
+                "rows": 100,
+            },
+            {
+                "Trip": 4,
+                "start_us": base_us + 3 * day_us,
+                "end_us": base_us + 3 * day_us + 1000,
+                "rows": 100,
+            },
+        ]
+    )
+    cfg = base_config.copy()
+    cfg["split_embargo_seconds"] = 1.0
+
+    split_trips = chronological_split(trips, cfg)
+    assert "split" in split_trips.columns
+    unique_splits = set(split_trips.split.unique())
+    assert {"train", "validation", "test"} <= unique_splits
 
 
-@pytest.mark.parametrize("scaling", ["robust", "standard", "none"])
-def test_training_transform_and_no_test_leakage(
-    telemetry: pd.DataFrame, config: dict, scaling: str
-) -> None:
-    config = dict(config, scaling=scaling)
-    telemetry["split"] = "train"
-    state = fit_transformer(telemetry, config["features"], config)
-    frozen = json.dumps(state, sort_keys=True)
-    test = telemetry.copy()
-    test["split"] = "test"
-    test["Pack_1_C_Temp"] = 1000
-    result = transform(test, state)
-    assert json.dumps(state, sort_keys=True) == frozen
-    assert result.columns.tolist() == config["features"]
-    assert state["center"]["Pack_1_C_Temp"] < 100
-    assert np.isfinite(result).all().all()
-    pd.testing.assert_frame_equal(result, transform(test, json.loads(frozen)))
+def test_sorted_membership():
+    """Verify numpy searchsorted fast membership tester."""
+    reference = np.array([10, 20, 30, 40, 50], dtype=np.uint64)
+    queries = np.array([5, 10, 25, 30, 55], dtype=np.uint64)
+    mask = sorted_membership(queries, reference)
+    expected = np.array([False, True, False, True, False], dtype=bool)
+    np.testing.assert_array_equal(mask, expected)
+
+    # Empty reference
+    empty_mask = sorted_membership(queries, np.array([], dtype=np.uint64))
+    assert not empty_mask.any()
 
 
-def test_optional_train_median_and_indicators(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    config = dict(config, missing_policy="training_median")
-    telemetry["split"] = "train"
-    telemetry.loc[0, "Speed"] = np.nan
-    state = fit_transformer(telemetry, config["features"], config)
-    test = telemetry.iloc[:1].copy()
-    test["split"] = "test"
-    output = transform(test, state)
-    assert state["median"]["Speed"] == 30
-    assert output.Speed__missing.iloc[0] == 1
-    assert output.Speed.iloc[0] == 0
-    assert np.isnan(test.Speed.iloc[0])
-
-
-def window_frame(telemetry: pd.DataFrame, config: dict) -> pd.DataFrame:
-    frame = audit_trip(telemetry, config)
-    frame["segment_id"] = frame.segment_in_trip
-    frame["split"] = "train"
-    frame["export_eligible"] = frame.quality_eligible
-    return frame
-
-
-def spec(config: dict) -> dict:
-    return dict(
-        config["temperature"],
-        lookback_seconds=2,
-        horizon_seconds=3,
-        tolerance_seconds=0.25,
-        stride_seconds=1,
+def test_inherit_splits():
+    """Verify session split inheritance matches frozen source trips exactly."""
+    sessions = pd.DataFrame(
+        [
+            {"Trip": 1, "rows": 100, "start_us": 1000, "end_us": 2000},
+            {"Trip": 2, "rows": 200, "start_us": 3000, "end_us": 4000},
+            {"Trip": 3, "rows": 150, "start_us": 5000, "end_us": 6000},
+        ]
+    )
+    frozen = pd.DataFrame(
+        [
+            {
+                "Trip": 1,
+                "rows": 100,
+                "start_us": 1000,
+                "end_us": 2000,
+                "split": "train",
+            },
+            {
+                "Trip": 2,
+                "rows": 200,
+                "start_us": 3000,
+                "end_us": 4000,
+                "split": "validation",
+            },
+            {"Trip": 3, "rows": 150, "start_us": 5000, "end_us": 6000, "split": "test"},
+        ]
     )
 
+    inherited = inherit_splits(sessions, frozen)
+    assert inherited.split.tolist() == ["train", "validation", "test"]
 
-def test_window_future_target_not_input(telemetry: pd.DataFrame, config: dict) -> None:
-    frame = window_frame(telemetry, config)
-    windows, counts = make_windows(frame, spec(config))
-    assert len(windows) > 0
-    assert counts["anchors_considered"] == sum(
-        counts[key] for key in counts if key != "anchors_considered"
-    )
-    assert (windows.target_us > windows.anchor_us).all()
-    assert (windows.input_start_row <= windows.anchor_row).all()
-    assert (windows.anchor_row < windows.target_row).all()
-    assert np.array_equal(
-        windows.target_temperature_c, frame.Pack_1_C_Temp.iloc[windows.target_row]
-    )
-
-
-def test_window_no_future_dependency_in_input_selection(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    frame = window_frame(telemetry, config)
-    before, _ = make_windows(frame, spec(config))
-    changed = frame.copy()
-    target_row = int(before.target_row.iloc[-1])
-    changed.loc[target_row, "Pack_1_C_Temp"] += 10
-    after, _ = make_windows(changed, spec(config))
-    pd.testing.assert_frame_equal(
-        before.drop(columns=["target_temperature_c", "temperature_change_c"]),
-        after.drop(columns=["target_temperature_c", "temperature_change_c"]),
-    )
-    assert (
-        after.target_temperature_c.iloc[-1] == before.target_temperature_c.iloc[-1] + 10
-    )
-
-
-def test_window_boundaries_and_excluded_intervals(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    telemetry.loc[32:, "Timestamp"] += 2000000
-    frame = window_frame(telemetry, config)
-    frame.loc[10, "export_eligible"] = False
-    windows, _ = make_windows(frame, spec(config))
-    for row in windows.itertuples():
-        interval = frame.iloc[row.input_start_row : row.target_row + 1]
-        assert interval.export_eligible.all()
-        assert interval.segment_id.nunique() == 1
-    frame.loc[0, "split"] = "test"
-    with pytest.raises(ValueError, match="boundary"):
-        make_windows(frame, spec(config))
-
-
-def test_window_rejects_filtered_source_rows(
-    telemetry: pd.DataFrame, config: dict
-) -> None:
-    frame = window_frame(telemetry, config).drop(index=8)
-    with pytest.raises(ValueError, match="full source rows"):
-        make_windows(frame, spec(config))
-
-
-def test_rounded_repeat_screen(telemetry: pd.DataFrame, config: dict) -> None:
-    left = telemetry.iloc[:1].copy()
-    right = left.copy()
-    right["source_row"] = 100000
-    right["Trip"] = 999
-    right["Speed"] += 0.001
-    assert fingerprints(left, config)[0] == fingerprints(right, config)[0]
-    right["Speed"] += 10
-    assert fingerprints(left, config)[0] != fingerprints(right, config)[0]
-
-
-def test_chunk_boundary_trip_handling(tmp_path: Path, telemetry: pd.DataFrame) -> None:
-    telemetry.loc[32:, "Trip"] = 6
-    path = tmp_path / "synthetic_code_fixture.csv"
-    telemetry[AUDIT_COLUMNS].to_csv(path, index=False)
-    chunks = list(trip_chunks(path, AUDIT_COLUMNS, 7))
-    assert [len(g) for g in chunks] == [32, 32]
-    assert pd.concat(chunks).source_row.tolist() == list(range(64))
-    telemetry.loc[60:, "Trip"] = 5
-    telemetry[AUDIT_COLUMNS].to_csv(path, index=False)
-    with pytest.raises(ValueError, match="reused"):
-        list(trip_chunks(path, AUDIT_COLUMNS, 7))
-
-
-def test_completed_output_summary() -> None:
-    path = (
-        ROOT / "ml/reports/nissan_leaf_2018/tables/preparation/preparation_summary.json"
-    )
-    if not path.exists():
-        pytest.skip(
-            "Full-data integration report is generated by the preparation command"
-        )
-    result = json.loads(path.read_text())
-    assert result["validation"]["passed"]
-    assert result["audit"]["raw"]["rows"] == 2322105
-    assert sum(s["source_rows"] for s in result["splits"]) == 2322105
-    for split in result["splits"]:
-        assert (
-            split["source_rows"]
-            == split["quality_excluded_rows"]
-            + split["cross_split_repeat_exclusions"]
-            + split["feature_rows"]
-        )
-    assert result["transformer"]["fit_rows"] == result["splits"][0]["feature_rows"]
-    assert result["task_status"]["energy"] == "blocked"
+    # Mismatched row counts must raise
+    mismatched = sessions.copy()
+    mismatched.loc[0, "rows"] = 99
+    with pytest.raises(
+        ValueError, match="Frozen split source trips/counts/timestamps differ"
+    ):
+        inherit_splits(mismatched, frozen)

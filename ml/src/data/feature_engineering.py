@@ -1,44 +1,72 @@
-"""Derived features for DrivePulse AI datasets."""
+"""Model-specific Nissan Leaf input selection and validation."""
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
+import numpy as np
 import pandas as pd
 
+NISSAN_LEAF_ANOMALY_FEATURES = (
+    "HV_Bat_Voltage",
+    "Pack_1_C_Temp",
+    "SOC",
+    "HV_Bat_Current_2",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp",
+)
+NISSAN_LEAF_RUL_FEATURES = ("Timestamp", "Odometer", "SOH")
+NISSAN_LEAF_RUL_CONTEXT = (
+    "Pack_Avg_C_Temp",
+    "Pack_1_C_Temp",
+    "Pack_2_C_Temp",
+    "Pack_4_C_Temp",
+    "HV_Bat_Current_2",
+    "SOC",
+    "HV_Bat_Voltage",
+)
 
-class FeatureEngineering:
-    """Derived features. Inputs are never mutated."""
 
-    @staticmethod
-    def add_aps_features(df: pd.DataFrame) -> pd.DataFrame:
-        """Adds per-row missing count plus sum/mean/max per prefix group.
+def _numeric_columns(
+    frame: pd.DataFrame, columns: Sequence[str], *, task: str
+) -> pd.DataFrame:
+    missing = sorted(set(columns) - set(frame.columns))
+    if missing:
+        raise ValueError(f"{task} input is missing columns: {missing}")
+    result = frame.loc[:, list(columns)].copy()
+    for column in columns:
+        result[column] = pd.to_numeric(result[column], errors="coerce")
+    values = result.to_numpy(dtype=float)
+    if not np.isfinite(values).all():
+        raise ValueError(f"{task} input contains missing or non-finite values")
+    return result
 
-        Takes the loaded frame WITH NaNs: n_missing needs the pre-imputation
-        state (APS positives miss ~29 cells/row vs ~14 for negatives).
-        Group aggregates skip NaN; min_count=1 keeps fully-missing groups
-        NaN for PreProcessing.clean to impute.
-        """
-        out = df.copy()
-        meta = ("class", "failure", "vehicle_id", "source")
-        feats = [c for c in out.columns if c not in meta]
-        out["n_missing"] = out[feats].isna().sum(axis=1)
-        groups: dict[str, list[str]] = {}
-        for c in feats:
-            groups.setdefault(c.split("_")[0], []).append(c)
-        for prefix, cols in sorted(groups.items()):
-            if len(cols) < 2:
-                continue
-            g = out[cols]
-            out[f"{prefix}_sum"] = g.sum(axis=1, min_count=1)
-            out[f"{prefix}_mean"] = g.mean(axis=1, skipna=True)
-            out[f"{prefix}_max"] = g.max(axis=1, skipna=True)
-        return out
 
-    @staticmethod
-    def aps_model_columns(df: pd.DataFrame) -> list[str]:
-        """Numeric classifier inputs. Call after add_aps_features."""
-        exclude = {"class", "failure", "rul", "vehicle_id", "source"}
-        return [
-            c
-            for c in df.columns
-            if c not in exclude and pd.api.types.is_numeric_dtype(df[c])
-        ]
+def nissan_leaf_anomaly_features(frame: pd.DataFrame) -> pd.DataFrame:
+    """Select the three measured features expected by the fitted Isolation Forest.
+
+    No derived or synthetic columns are added. Invalid rows raise an error;
+    this helper never silently shrinks the caller's dataset.
+    """
+    result = _numeric_columns(frame, NISSAN_LEAF_ANOMALY_FEATURES, task="anomaly")
+    if not result.SOC.between(0, 100).all():
+        raise ValueError("anomaly SOC values must be within [0, 100]")
+    if not result.HV_Bat_Voltage.between(0, 500, inclusive="right").all():
+        raise ValueError("anomaly battery voltage must be within (0, 500]")
+    return result
+
+
+def nissan_leaf_rul_history(frame: pd.DataFrame) -> pd.DataFrame:
+    """Select RUL history and available context without changing the measurements."""
+    result = _numeric_columns(frame, NISSAN_LEAF_RUL_FEATURES, task="RUL")
+    for column in NISSAN_LEAF_RUL_CONTEXT:
+        if column in frame.columns:
+            values = pd.to_numeric(frame[column], errors="coerce")
+            if np.isinf(values.to_numpy(dtype=float, na_value=np.nan)).any():
+                raise ValueError(f"RUL context {column} contains infinite values")
+            result[column] = values
+    if (result.Timestamp < 0).any() or (result.Odometer < 0).any():
+        raise ValueError("RUL timestamps and odometer values must be nonnegative")
+    if not result.SOH.between(0, 100).all():
+        raise ValueError("RUL SOH values must be within [0, 100]")
+    return result

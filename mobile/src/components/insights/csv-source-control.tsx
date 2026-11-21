@@ -14,15 +14,16 @@ interface CsvSourceControlProps {
   error?: string;
   onSelect: () => void;
   onClear: () => void;
+  selectionLabel?: string;
 }
-export function CsvSourceControl({ available, selecting, file, error, onSelect, onClear }: CsvSourceControlProps) {
+export function CsvSourceControl({ available, selecting, file, error, onSelect, onClear, selectionLabel = 'Selected CSV · Not uploaded' }: CsvSourceControlProps) {
   return <View style={styles.control}>
     <AppIcon name="plus" color={colors.accent} />
     <AppText variant="subtitle">Upload CSV Dataset</AppText>
     <AppText tone="secondary">{available ? 'Select a CSV file. Selection does not upload or analyse it.'
       : 'CSV selection and upload are not yet available in this build.'}</AppText>
     {file && <View style={styles.file} accessibilityLiveRegion="polite">
-      <AppStatus label="Selected CSV · Not uploaded" tone="info" />
+      <AppStatus label={selectionLabel} tone="info" />
       <AppText variant="label">{file.name}</AppText>
       {file.sizeBytes !== undefined && <AppText variant="caption" tone="secondary">{file.sizeBytes.toLocaleString()} bytes</AppText>}
       {!!file.mimeType && <AppText variant="caption" tone="secondary">{file.mimeType}</AppText>}
