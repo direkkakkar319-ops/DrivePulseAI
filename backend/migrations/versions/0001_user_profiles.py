@@ -1,7 +1,6 @@
 """Create the minimal Firebase-linked PostgreSQL user profile table."""
 
 import sqlalchemy as sa
-
 from alembic import op
 
 revision = "0001_user_profiles"

@@ -1,8 +1,7 @@
 """Preserve completed onboarding when a user removes saved vehicles."""
 
-from sqlalchemy import text
-
 from alembic import op
+from sqlalchemy import text
 
 revision = "0003_garage_lifecycle"
 down_revision = "0002_onboarding_vehicles"

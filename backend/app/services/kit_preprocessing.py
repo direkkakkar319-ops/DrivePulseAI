@@ -6,14 +6,14 @@ callers. This kernel does no filling, smoothing, unit conversion or resampling.
 
 import math
 import statistics
-from datetime import datetime
+from datetime import UTC, datetime
 
 from .kit_samples import SIGNALS, WINDOW_SECONDS
 
 
 def parse_time(value: str) -> float | None:
     try:
-        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f")
+        parsed = datetime.strptime(value.strip(), "%H:%M:%S.%f").replace(tzinfo=UTC)
     except ValueError:
         return None
     return (
